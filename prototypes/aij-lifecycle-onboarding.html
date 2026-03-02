@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lifecycle Onboarding Prototype</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" data-type="module">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+/* ─── Google Fonts ─── */
+const fontLink = document.createElement("link");
+fontLink.href =
+  "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&display=swap";
+fontLink.rel = "stylesheet";
+document.head.appendChild(fontLink);
+
+/* ─── Inject base styles ─── */
+const styleEl = document.createElement("style");
+styleEl.textContent = `
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #FAFAF8; color: #1a1a1a; -webkit-font-smoothing: antialiased; overflow: hidden; }
+  .fraunces { font-family: 'Fraunces', serif; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-40px); } }
+  @keyframes pulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+  @keyframes slideInRight { from { transform: translateX(100%); opacity:0; } to { transform: translateX(0); opacity:1; } }
+  @keyframes stageCardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes copilotSlideIn { from { width: 0; min-width: 0; opacity: 0; } to { width: 320px; min-width: 320px; opacity: 1; } }
+  @keyframes copilotSlideOut { from { width: 320px; min-width: 320px; opacity: 1; } to { width: 0; min-width: 0; opacity: 0; } }
+  @keyframes bubblePop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes dotBounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-4px); } }
+  .animate-fadeInUp { animation: fadeInUp .7s cubic-bezier(.16,1,.3,1) forwards; }
+  .animate-fadeIn { animation: fadeIn .5s ease forwards; }
+  .animate-slideUp { animation: slideUp .5s cubic-bezier(.16,1,.3,1) forwards; }
+  .animate-slideInRight { animation: slideInRight .45s cubic-bezier(.16,1,.3,1) forwards; }
+  .animate-stageCardIn { animation: stageCardIn .4s cubic-bezier(.16,1,.3,1) forwards; }
+  .chip-dropdown { position: relative; display: inline-flex; }
+  .chip-dropdown-menu {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 50;
+    background: white; border: 1px solid #e5e5e0; border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.08); min-width: 180px; overflow: hidden;
+  }
+  .chip-dropdown-menu button {
+    display: block; width: 100%; text-align: left; padding: 9px 14px;
+    font-size: 13.5px; color: #3a3a3a; border: none; background: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: background .15s;
+  }
+  .chip-dropdown-menu button:hover { background: #f5f2fb; }
+  .chip-dropdown-menu button.active { color: #683FCF; font-weight: 500; }
+  input::placeholder { color: #b0afa8; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: transparent; border-radius: 10px; transition: background .3s; }
+  *:hover::-webkit-scrollbar-thumb { background: #d5d5d0; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  .nav-item { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 10px; cursor: pointer; transition: all .15s; position: relative; }
+  .nav-item:hover { background: #f0f0ec; }
+  .nav-item.active-purple { background: #ede8f8; }
+  .nav-item.active-pink { background: #fce8e6; }
+`;
+document.head.appendChild(styleEl);
+
+/* ─── Constants ─── */
+const ACCENT = "#683FCF";
+const ACCENT_DARK = "#5530b0";
+const ACCENT_LIGHT = "#ede8f8";
+const ACCENT_BG = "#f5f2fb";
+const BG = "#FAFAF8";
+const CARD_BG = "#FFFFFF";
+const BORDER = "#e8e8e3";
+const TEXT = "#1a1a1a";
+const TEXT_MUTED = "#7a7a72";
+const SURFACE = "#f3f3ee";
+const NAV_WIDTH = 56;
+const LANDING_ICON = "data:image/png;base64,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";
+
+/* ─── Left Nav Component ─── */
+function LeftNav({ showLifecycleNav = false }) {
+  const [activeNav, setActiveNav] = useState("lifecycle");
+  const iconColor = "#6b6b6b";
+  const activeColor = ACCENT;
+
+  /* ── Icon definitions ── */
+  const icons = {
+    tickets: (color) => (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="2" width="14" height="16" rx="2" stroke={color} strokeWidth="1.5" />
+        <path d="M7 6h6M7 9.5h6M7 13h3" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      </svg>
+    ),
+    search: (color) => (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="9" cy="9" r="5.5" stroke={color} strokeWidth="1.5" />
+        <path d="M13.5 13.5L17 17" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+    lifecycle: (color) => (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 17V6" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.5 10L10 3l4.5 7" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M6 15.5c0-1.5 1.8-2.5 4-2.5s4 1 4 2.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+    settings: (color) => (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="2.5" stroke={color} strokeWidth="1.5" />
+        <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M15.78 4.22l-1.42 1.42M5.64 14.36l-1.42 1.42" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+      </svg>
+    ),
+    help: (color) => (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="7.5" stroke={color} strokeWidth="1.5" />
+        <path d="M7.5 8a2.5 2.5 0 014.87.83c0 1.67-2.5 2.08-2.5 3.34" stroke={color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="10" cy="14.5" r=".8" fill={color} />
+      </svg>
+    ),
+    bell: (color) => (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2.5a4.5 4.5 0 00-4.5 4.5c0 5-2 6.5-2 6.5h13s-2-1.5-2-6.5a4.5 4.5 0 00-4.5-4.5z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M8.5 15.5a1.5 1.5 0 003 0" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+    phone: (color) => (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M4 3h3.5l1.5 4-2 1.5a9 9 0 004.5 4.5L13 11l4 1.5V16a1.5 1.5 0 01-1.5 1.5A13.5 13.5 0 012.5 4.5 1.5 1.5 0 014 3z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+      </svg>
+    ),
+  };
+
+  const topItems = [
+    { id: "tickets", label: "Tickets" },
+    { id: "search", label: "Search" },
+    ...(showLifecycleNav ? [{ id: "lifecycle", label: "Lifecycle", highlight: "purple" }] : []),
+  ];
+
+  const bottomItems = [
+    { id: "settings", label: "Settings" },
+    { id: "help", label: "Help" },
+    { id: "bell", label: "Notifications", badge: 30 },
+    { id: "phone", label: "Phone" },
+  ];
+
+  return (
+    <div
+      style={{
+        width: NAV_WIDTH,
+        minWidth: NAV_WIDTH,
+        height: "100vh",
+        background: "#FFFFFF",
+        borderRight: `1px solid ${BORDER}`,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "12px 0 14px",
+        flexShrink: 0,
+      }}
+    >
+      {/* Top nav items */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center", flex: 1 }}>
+        {topItems.map((item) => {
+          const isActive = activeNav === item.id;
+          const bgClass = isActive && item.highlight === "purple"
+            ? "active-purple"
+            : isActive && item.highlight === "pink"
+            ? "active-pink"
+            : "";
+          const color = isActive
+            ? item.highlight === "purple" ? ACCENT : "#d45050"
+            : iconColor;
+
+          return (
+            <div
+              key={item.id}
+              className={`nav-item ${bgClass} ${item.id === "lifecycle" ? "animate-fadeInUp" : ""}`}
+              onClick={() => setActiveNav(item.id)}
+              title={item.label}
+            >
+              {icons[item.id](color)}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Bottom nav items */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center" }}>
+        {bottomItems.map((item) => (
+          <div
+            key={item.id}
+            className="nav-item"
+            title={item.label}
+            style={{ position: "relative" }}
+          >
+            {icons[item.id](iconColor)}
+            {item.badge && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: 2,
+                  right: 0,
+                  minWidth: 18,
+                  height: 16,
+                  borderRadius: 8,
+                  background: "#e04040",
+                  color: "white",
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 4px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  lineHeight: 1,
+                }}
+              >
+                {item.badge}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Avatar */}
+        <div
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: "50%",
+            background: "#e8dff5",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 12,
+            fontWeight: 600,
+            color: ACCENT,
+            cursor: "pointer",
+            marginTop: 4,
+            position: "relative",
+          }}
+        >
+          LT
+          {/* Green online dot */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: "#34c759",
+              border: "2px solid white",
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Chip Component ─── */
+function Chip({ value, options, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <span className="chip-dropdown" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          padding: "3px 10px",
+          background: ACCENT_LIGHT,
+          color: ACCENT,
+          border: `1px solid ${ACCENT}22`,
+          borderRadius: 7,
+          fontSize: 14,
+          fontWeight: 500,
+          cursor: "pointer",
+          fontFamily: "'DM Sans', sans-serif",
+          transition: "all .2s",
+          lineHeight: 1.5,
+          whiteSpace: "nowrap",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "#ddd5f3";
+          e.currentTarget.style.borderColor = ACCENT + "44";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = ACCENT_LIGHT;
+          e.currentTarget.style.borderColor = ACCENT + "22";
+        }}
+      >
+        {value}
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginLeft: 2 }}>
+          <path d="M3 4.5L6 7.5L9 4.5" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      {open && (
+        <div className="chip-dropdown-menu">
+          {options.map((opt) => (
+            <button
+              key={opt}
+              className={opt === value ? "active" : ""}
+              onClick={() => { onChange(opt); setOpen(false); }}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </span>
+  );
+}
+
+/* ─── Stage Card Component (chat inline) ─── */
+function StageCard({ stage, onApprove, onSkip, showActions, animDelay = 0, config, onConfigChange }) {
+  const defChip = config?.defChip ?? stage.defChipDefault;
+  const defChip2 = config?.defChip2 ?? (stage.defChip2Default || null);
+  const goalChip = config?.goalChip ?? stage.goalChipDefault;
+  const disengageDays = config?.disengageDays ?? stage.disengageDaysDefault;
+  const disengageCondition = config?.disengageCondition ?? stage.disengageConditionDefault;
+  const update = (key, val) => onConfigChange?.({ ...config, [key]: val });
+
+  return (
+    <div
+      className="animate-fadeInUp"
+      style={{
+        background: CARD_BG,
+        border: `1px solid ${BORDER}`,
+        borderRadius: 14,
+        padding: "24px 28px",
+        maxWidth: 520,
+        marginTop: 12,
+        animationDelay: `${animDelay}ms`,
+        opacity: 0,
+        boxShadow: "0 1px 3px rgba(0,0,0,.03)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: stage.color, flexShrink: 0 }} />
+        <h3 className="fraunces" style={{ fontSize: 20, fontWeight: 600, color: TEXT, letterSpacing: "-0.01em" }}>
+          {stage.name}
+        </h3>
+      </div>
+
+      <div style={{ fontSize: 15, lineHeight: 1.7, color: "#3a3a3a" }}>
+        {/* Definition */}
+        <p style={{ marginBottom: 12 }}>
+          {stage.defPre}
+          <Chip value={defChip} options={stage.defChipOptions} onChange={(v) => update("defChip", v)} />
+          {stage.defMid || ""}
+          {stage.defChip2Options && defChip2 && (
+            <Chip value={defChip2} options={stage.defChip2Options} onChange={(v) => update("defChip2", v)} />
+          )}
+          {stage.defPost}
+        </p>
+        {/* Goal */}
+        <p style={{ marginBottom: 12 }}>
+          {stage.goalPre}
+          <Chip value={goalChip} options={stage.goalChipOptions} onChange={(v) => update("goalChip", v)} />
+          {stage.goalPost}
+        </p>
+        {/* Disengagement */}
+        {stage.disengageDaysOptions && (
+          <p style={{ color: TEXT_MUTED, fontSize: 14 }}>
+            {stage.disengagePre}
+            <Chip value={disengageDays} options={stage.disengageDaysOptions} onChange={(v) => update("disengageDays", v)} />
+            {stage.disengageMid}
+            <Chip value={disengageCondition} options={stage.disengageConditionOptions} onChange={(v) => update("disengageCondition", v)} />
+            {stage.disengagePost}
+          </p>
+        )}
+      </div>
+
+      {showActions && (
+        <div
+          className="animate-fadeIn"
+          style={{
+            display: "flex", gap: 8, marginTop: 20, paddingTop: 16,
+            borderTop: `1px solid ${BORDER}`, animationDelay: "300ms", opacity: 0,
+          }}
+        >
+          <button
+            onClick={() => onApprove("Looks good")}
+            style={{
+              padding: "8px 16px", borderRadius: 9,
+              border: `1px solid ${ACCENT}`,
+              background: ACCENT_BG,
+              color: ACCENT,
+              fontSize: 13.5, fontWeight: 500, cursor: "pointer",
+              fontFamily: "'DM Sans', sans-serif", transition: "all .2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.background = "#ddd5f3";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.background = ACCENT_BG;
+            }}
+          >
+            Looks good
+          </button>
+          <button
+            onClick={() => onSkip()}
+            style={{
+              padding: "8px 16px", borderRadius: 9,
+              border: `1px solid ${BORDER}`,
+              background: "transparent",
+              color: TEXT_MUTED,
+              fontSize: 13.5, fontWeight: 500, cursor: "pointer",
+              fontFamily: "'DM Sans', sans-serif", transition: "all .2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.borderColor = "#ccc";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.borderColor = BORDER;
+            }}
+          >
+            Skip this stage
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Loyalty Models ─── */
+const LOYALTY_MODELS = {
+  "purchase-frequency": {
+    id: "purchase-frequency",
+    label: "Purchase frequency",
+    description: "Best for consumables, beauty, food & beverage",
+    defPre: "Shoppers who have placed at least ",
+    defChipDefault: "3 orders",
+    defChipOptions: ["3 orders", "4 orders", "5+ orders", "2 orders"],
+    defMid: " with an average reorder cycle of ",
+    defChip2Default: "under 60 days",
+    defChip2Options: ["under 30 days", "under 45 days", "under 60 days", "under 90 days"],
+    defPost: " between purchases.",
+    goalPre: "Your goal is to ",
+    goalChipDefault: "retain, reward, and activate as an advocate",
+    goalChipOptions: ["retain, reward, and activate as an advocate", "drive referrals and reviews", "unlock VIP perks and early access", "increase order frequency"],
+    goalPost: ".",
+    goalSummary: "Retain, reward, activate as advocate",
+  },
+  "advocacy-engagement": {
+    id: "advocacy-engagement",
+    label: "Advocacy & engagement",
+    description: "Best for big-ticket items, furniture, electronics",
+    defPre: "Shoppers who have made a purchase and demonstrated ",
+    defChipDefault: "strong advocacy signals",
+    defChipOptions: ["strong advocacy signals", "referral activity", "review + social engagement", "community participation"],
+    defMid: " such as ",
+    defChip2Default: "reviews, referrals, or social shares",
+    defChip2Options: ["reviews, referrals, or social shares", "2+ referrals", "product reviews + social mentions", "UGC contributions"],
+    defPost: ".",
+    goalPre: "Your goal is to ",
+    goalChipDefault: "deepen emotional loyalty and amplify word-of-mouth",
+    goalChipOptions: ["deepen emotional loyalty and amplify word-of-mouth", "turn them into brand ambassadors", "drive referral program engagement", "build community and belonging"],
+    goalPost: ".",
+    goalSummary: "Deepen loyalty, amplify word-of-mouth",
+  },
+  "category-breadth": {
+    id: "category-breadth",
+    label: "Category breadth",
+    description: "Best for fashion, collections, multi-category brands",
+    defPre: "Shoppers who have purchased across ",
+    defChipDefault: "3+ product categories",
+    defChipOptions: ["2+ product categories", "3+ product categories", "4+ product categories", "multiple collections"],
+    defMid: " showing ",
+    defChip2Default: "broad brand affinity",
+    defChip2Options: ["broad brand affinity", "seasonal collection interest", "full-range exploration", "style versatility"],
+    defPost: " beyond a single product line.",
+    goalPre: "Your goal is to ",
+    goalChipDefault: "retain, reward, and activate as an advocate",
+    goalChipOptions: ["retain, reward, and activate as an advocate", "drive full-catalog exploration", "unlock VIP early access to new drops", "build wardrobe-level loyalty"],
+    goalPost: ".",
+    goalSummary: "Retain, reward, expand category engagement",
+  },
+};
+
+/* ─── Loyal Stage Card Component (with model switching) ─── */
+function LoyalStageCard({ stage, onApprove, onSkip, showActions, animDelay = 0, config, onConfigChange }) {
+  const activeModelId = config?.modelId ?? (stage.defaultModelId || "purchase-frequency");
+  const [altExpanded, setAltExpanded] = useState(false);
+  const model = LOYALTY_MODELS[activeModelId];
+
+  const defChip = config?.defChip ?? model.defChipDefault;
+  const defChip2 = config?.defChip2 ?? (model.defChip2Default || null);
+  const goalChip = config?.goalChip ?? model.goalChipDefault;
+  const disengageDays = config?.disengageDays ?? stage.disengageDaysDefault;
+  const disengageCondition = config?.disengageCondition ?? stage.disengageConditionDefault;
+  const update = (key, val) => onConfigChange?.({ ...config, modelId: activeModelId, [key]: val });
+
+  const switchModel = (newModelId) => {
+    const newModel = LOYALTY_MODELS[newModelId];
+    onConfigChange?.({ ...config, modelId: newModelId, defChip: newModel.defChipDefault, defChip2: newModel.defChip2Default || null, goalChip: newModel.goalChipDefault });
+    setAltExpanded(false);
+  };
+
+  const alternativeModels = Object.values(LOYALTY_MODELS).filter((m) => m.id !== activeModelId);
+
+  return (
+    <div
+      className="animate-fadeInUp"
+      style={{
+        background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 14,
+        padding: "24px 28px", maxWidth: 520, marginTop: 12,
+        animationDelay: `${animDelay}ms`, opacity: 0,
+        boxShadow: "0 1px 3px rgba(0,0,0,.03)",
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: stage.color, flexShrink: 0 }} />
+        <h3 className="fraunces" style={{ fontSize: 20, fontWeight: 600, color: TEXT, letterSpacing: "-0.01em", flex: 1 }}>
+          {stage.name}
+        </h3>
+        <span style={{
+          fontSize: 11, fontWeight: 500, color: ACCENT, background: ACCENT_LIGHT,
+          padding: "3px 10px", borderRadius: 6, letterSpacing: "0.02em",
+        }}>
+          {model.label}
+        </span>
+      </div>
+
+      {/* Definition with chips from active model */}
+      <div style={{ fontSize: 15, lineHeight: 1.7, color: "#3a3a3a" }}>
+        <p style={{ marginBottom: 12 }}>
+          {model.defPre}
+          <Chip value={defChip} options={model.defChipOptions} onChange={(v) => update("defChip", v)} />
+          {model.defMid || ""}
+          {model.defChip2Options && defChip2 && (
+            <Chip value={defChip2} options={model.defChip2Options} onChange={(v) => update("defChip2", v)} />
+          )}
+          {model.defPost}
+        </p>
+        <p style={{ marginBottom: 12 }}>
+          {model.goalPre}
+          <Chip value={goalChip} options={model.goalChipOptions} onChange={(v) => update("goalChip", v)} />
+          {model.goalPost}
+        </p>
+        {stage.disengageDaysOptions && (
+          <p style={{ color: TEXT_MUTED, fontSize: 14 }}>
+            {stage.disengagePre}
+            <Chip value={disengageDays} options={stage.disengageDaysOptions} onChange={(v) => update("disengageDays", v)} />
+            {stage.disengageMid}
+            <Chip value={disengageCondition} options={stage.disengageConditionOptions} onChange={(v) => update("disengageCondition", v)} />
+            {stage.disengagePost}
+          </p>
+        )}
+      </div>
+
+      {/* Other loyalty models expandable */}
+      <div style={{ marginTop: 18, borderTop: `1px solid ${BORDER}`, paddingTop: 14 }}>
+        <button
+          onClick={() => setAltExpanded(!altExpanded)}
+          style={{
+            display: "flex", alignItems: "center", gap: 6,
+            background: "none", border: "none", cursor: "pointer",
+            fontSize: 13, color: TEXT_MUTED, fontFamily: "'DM Sans', sans-serif",
+            padding: 0, transition: "color .15s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = ACCENT; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = TEXT_MUTED; }}
+        >
+          <svg
+            width="14" height="14" viewBox="0 0 14 14" fill="none"
+            style={{ transition: "transform .2s", transform: altExpanded ? "rotate(90deg)" : "rotate(0deg)" }}
+          >
+            <path d="M5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Other loyalty models
+        </button>
+
+        {altExpanded && (
+          <div className="animate-fadeIn" style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8, opacity: 0 }}>
+            {alternativeModels.map((alt) => (
+              <button
+                key={alt.id}
+                onClick={() => switchModel(alt.id)}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 10,
+                  padding: "12px 16px", cursor: "pointer", textAlign: "left",
+                  fontFamily: "'DM Sans', sans-serif", transition: "all .2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = ACCENT + "55";
+                  e.currentTarget.style.background = ACCENT_BG;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = BORDER;
+                  e.currentTarget.style.background = SURFACE;
+                }}
+              >
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 600, color: TEXT, marginBottom: 2 }}>{alt.label}</div>
+                  <div style={{ fontSize: 12, color: TEXT_MUTED, lineHeight: 1.4 }}>{alt.description}</div>
+                </div>
+                <div style={{
+                  fontSize: 11.5, color: ACCENT, fontWeight: 500, flexShrink: 0, marginLeft: 12,
+                  padding: "4px 10px", borderRadius: 6, background: ACCENT_LIGHT,
+                }}>
+                  Use this
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Actions */}
+      {showActions && (
+        <div
+          className="animate-fadeIn"
+          style={{
+            display: "flex", gap: 8, marginTop: 16, paddingTop: 16,
+            borderTop: `1px solid ${BORDER}`, animationDelay: "300ms", opacity: 0,
+          }}
+        >
+          <button
+            onClick={() => onApprove("Looks good")}
+            style={{
+              padding: "8px 16px", borderRadius: 9,
+              border: `1px solid ${ACCENT}`,
+              background: ACCENT_BG,
+              color: ACCENT,
+              fontSize: 13.5, fontWeight: 500, cursor: "pointer",
+              fontFamily: "'DM Sans', sans-serif", transition: "all .2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.background = "#ddd5f3";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.background = ACCENT_BG;
+            }}
+          >
+            Looks good
+          </button>
+          <button
+            onClick={() => onSkip()}
+            style={{
+              padding: "8px 16px", borderRadius: 9,
+              border: `1px solid ${BORDER}`,
+              background: "transparent",
+              color: TEXT_MUTED,
+              fontSize: 13.5, fontWeight: 500, cursor: "pointer",
+              fontFamily: "'DM Sans', sans-serif", transition: "all .2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.borderColor = "#ccc";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.borderColor = BORDER;
+            }}
+          >
+            Skip this stage
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Lifecycle Visualization (inline in chat) ─── */
+function LifecycleViz() {
+  const stageColors = ["#7c5fd6", "#5b8fd0", "#9b7eb5", "#c07a8a"];
+  const displayed = [
+    { name: "Prospect", desc: "New subscribers" },
+    { name: "Active Customer", desc: "Recent buyers" },
+    { name: "Loyal Customer", desc: "High-value advocates" },
+    { name: "Disengaged", desc: "Needs re-engagement" },
+  ];
+
+  return (
+    <div
+      className="animate-fadeInUp"
+      style={{
+        background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 14,
+        padding: "28px 32px", marginTop: 12, boxShadow: "0 1px 3px rgba(0,0,0,.03)", overflowX: "auto",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 0, minWidth: "fit-content" }}>
+        {displayed.map((s, i) => (
+          <div key={s.name} style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 120 }}>
+              <div
+                style={{
+                  width: 48, height: 48, borderRadius: 14,
+                  background: stageColors[i] + "18", border: `1.5px solid ${stageColors[i]}44`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 17, color: stageColors[i], fontWeight: 600,
+                }}
+              >
+                {i + 1}
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: TEXT, letterSpacing: "-0.01em" }}>{s.name}</div>
+                <div style={{ fontSize: 11.5, color: TEXT_MUTED, marginTop: 2 }}>{s.desc}</div>
+              </div>
+            </div>
+            {i < displayed.length - 1 && (
+              <svg width="32" height="12" viewBox="0 0 32 12" style={{ flexShrink: 0, margin: "0 -4px" }}>
+                <line x1="2" y1="6" x2="24" y2="6" stroke="#d0d0ca" strokeWidth="1.5" />
+                <polyline points="22,2 28,6 22,10" fill="none" stroke="#d0d0ca" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Side Panel ─── */
+function SidePanel({ approvedStages, stages, onEditStage, stageConfigs }) {
+  const [hoveredCard, setHoveredCard] = useState(null);
+  if (approvedStages.length === 0) return null;
+
+  const getConfigSummary = (stage, i) => {
+    const cfg = stageConfigs?.[i];
+    if (!cfg) return { def: stage.defSummary, goal: stage.goalSummary, disengage: stage.disengageSummary };
+    const def = cfg.defChip ? `${cfg.defChip}${cfg.defChip2 ? ", " + cfg.defChip2 : ""}` : stage.defSummary;
+    const goal = cfg.goalChip || stage.goalSummary;
+    const dis = cfg.disengageDays ? `${cfg.disengageDays}, ${cfg.disengageCondition || "no engagement"}` : stage.disengageSummary;
+    return { def, goal, disengage: dis };
+  };
+
+  return (
+    <div
+      className="animate-slideInRight"
+      style={{
+        width: 480, minWidth: 480, height: "100vh",
+        background: CARD_BG, borderLeft: `1px solid ${BORDER}`,
+        display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden",
+      }}
+    >
+      {/* Panel Header */}
+      <div style={{ padding: "20px 28px 16px", borderBottom: `1px solid ${BORDER}` }}>
+        <h2 className="fraunces" style={{ fontSize: 17, fontWeight: 600, color: TEXT, letterSpacing: "-0.01em" }}>
+          Shopper Lifecycle
+        </h2>
+        <p style={{ fontSize: 12.5, color: TEXT_MUTED, marginTop: 4, lineHeight: 1.5 }}>
+          {approvedStages.length} of 4 stages configured
+        </p>
+      </div>
+
+      {/* Progress Bar */}
+      <div style={{ padding: "0 28px", marginTop: 16 }}>
+        <div style={{ height: 3, background: SURFACE, borderRadius: 3, overflow: "hidden" }}>
+          <div
+            style={{
+              height: "100%", background: ACCENT, borderRadius: 3,
+              width: `${(approvedStages.length / 4) * 100}%`,
+              transition: "width .5s cubic-bezier(.16,1,.3,1)",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Stage Cards */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px 28px 28px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          {stages.map((stage, i) => {
+            const isApproved = approvedStages.includes(i);
+            const isPending = !isApproved;
+            const isHovered = hoveredCard === i && isApproved;
+            const summary = getConfigSummary(stage, i);
+
+            return (
+              <div key={stage.name}>
+                {/* Connector line */}
+                {i > 0 && (
+                  <div style={{ display: "flex", justifyContent: "center", height: 20 }}>
+                    <div style={{ width: 1.5, height: "100%", background: isApproved ? ACCENT + "30" : BORDER }} />
+                  </div>
+                )}
+                <div
+                  className={isApproved ? "animate-stageCardIn" : ""}
+                  onMouseEnter={() => isApproved && setHoveredCard(i)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  style={{
+                    background: isApproved ? "white" : SURFACE + "80",
+                    border: `1px solid ${isHovered ? ACCENT + "44" : isApproved ? BORDER : "#ececec"}`,
+                    borderRadius: 12, padding: "16px 18px",
+                    opacity: isPending ? 0.45 : 1,
+                    transition: "all .2s",
+                    cursor: isApproved ? "default" : "default",
+                    position: "relative",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: isApproved ? 10 : 0 }}>
+                    <div
+                      style={{
+                        width: 28, height: 28, borderRadius: 8,
+                        background: stage.color + (isApproved ? "18" : "0c"),
+                        border: `1.5px solid ${stage.color}${isApproved ? "44" : "22"}`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 12, fontWeight: 600, color: stage.color, flexShrink: 0,
+                      }}
+                    >
+                      {isApproved ? (
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M3 7l3 3 5-6" stroke={stage.color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      ) : (
+                        i + 1
+                      )}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 600, color: TEXT }}>{stage.name}</div>
+                      {!isApproved && (
+                        <div style={{ fontSize: 11.5, color: TEXT_MUTED }}>Pending review</div>
+                      )}
+                    </div>
+                    {/* Edit button on hover */}
+                    {isHovered && (
+                      <button
+                        onClick={() => onEditStage(i)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 5,
+                          padding: "5px 10px", borderRadius: 7,
+                          border: `1px solid ${ACCENT}33`,
+                          background: ACCENT_BG, color: ACCENT,
+                          fontSize: 12, fontWeight: 500, cursor: "pointer",
+                          fontFamily: "'DM Sans', sans-serif", transition: "all .15s",
+                          flexShrink: 0,
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "#ddd5f3"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = ACCENT_BG; }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                          <path d="M7.5 2.5l2 2M2 8l-.5 2.5L4 10l6-6-2-2-6 6z" stroke={ACCENT} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        Edit
+                      </button>
+                    )}
+                  </div>
+
+                  {isApproved && (
+                    <div style={{ paddingLeft: 38, display: "flex", flexDirection: "column", gap: 10 }}>
+                      {/* Definition */}
+                      {summary.def && (
+                        <div>
+                          <div style={{ fontSize: 10.5, fontWeight: 600, color: "#a0a098", letterSpacing: "0.08em", textTransform: "uppercase", fontVariant: "small-caps", marginBottom: 3 }}>
+                            Definition
+                          </div>
+                          <div style={{ fontSize: 12.5, color: "#2a2a2a", lineHeight: 1.5 }}>
+                            {summary.def}
+                          </div>
+                        </div>
+                      )}
+                      {/* Goal */}
+                      <div>
+                        <div style={{ fontSize: 10.5, fontWeight: 600, color: "#a0a098", letterSpacing: "0.08em", textTransform: "uppercase", fontVariant: "small-caps", marginBottom: 3 }}>
+                          Goal
+                        </div>
+                        <div style={{ fontSize: 12.5, color: "#2a2a2a", lineHeight: 1.5 }}>
+                          {summary.goal}
+                        </div>
+                      </div>
+                      {/* Disengaged */}
+                      {summary.disengage && (
+                        <div>
+                          <div style={{ fontSize: 10.5, fontWeight: 600, color: "#a0a098", letterSpacing: "0.08em", textTransform: "uppercase", fontVariant: "small-caps", marginBottom: 3 }}>
+                            Disengaged
+                          </div>
+                          <div style={{ fontSize: 12.5, color: "#2a2a2a", lineHeight: 1.5 }}>
+                            {summary.disengage}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Summary View ─── */
+/* ─── Typing Indicator ─── */
+function TypingIndicator() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 0" }}>
+      <div
+        style={{
+          width: 32, height: 32, borderRadius: 10, background: ACCENT + "14",
+          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 1v4M8 11v4M1 8h4M11 8h4" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </div>
+      <div style={{ display: "flex", gap: 5, padding: "10px 16px", background: SURFACE, borderRadius: 12 }}>
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            style={{
+              width: 6, height: 6, borderRadius: "50%", background: "#aaa",
+              animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Stage Data ─── */
+const STAGES = [
+  {
+    name: "Prospect",
+    color: "#7c5fd6",
+    defPre: "Shoppers who have ",
+    defChipDefault: "opted in to marketing",
+    defChipOptions: ["opted in to marketing", "subscribed via SMS", "signed up for email", "joined any channel"],
+    defPost: " but haven't placed any orders yet.",
+    defSummary: "Opted in to marketing, no orders yet",
+    goalPre: "Your goal is to move them toward their ",
+    goalChipDefault: "first purchase",
+    goalChipOptions: ["first purchase", "first site engagement", "product discovery", "wishlist creation"],
+    goalPost: ".",
+    goalSummary: "Drive first purchase",
+    disengageSummary: "30 days, no site visit or interaction",
+    disengagePre: "We'll consider them disengaged after ",
+    disengageDaysDefault: "30 days",
+    disengageDaysOptions: ["14 days", "21 days", "30 days", "45 days", "60 days"],
+    disengageMid: " with no ",
+    disengageConditionDefault: "site visit or message interaction",
+    disengageConditionOptions: ["site visit or message interaction", "email open or click", "any channel interaction", "site visit"],
+    disengagePost: ".",
+  },
+  {
+    name: "Active Customer",
+    color: "#5b8fd0",
+    defPre: "Shoppers who have placed at least ",
+    defChipDefault: "1 order",
+    defChipOptions: ["1 order", "2 orders", "any order"],
+    defMid: " and their last order was within ",
+    defChip2Default: "90 days",
+    defChip2Options: ["30 days", "60 days", "90 days", "120 days", "180 days"],
+    defPost: ".",
+    defSummary: "At least 1 order within last 90 days",
+    goalPre: "Your goal is to deepen the relationship through ",
+    goalChipDefault: "repeat purchase",
+    goalChipOptions: ["repeat purchase", "reorder of consumables", "cross-sell or accessories", "product review or referral", "subscription signup"],
+    goalPost: " while the relationship is warm.",
+    goalSummary: "Deepen relationship (reorder / cross-sell)",
+    disengageSummary: "60 days, no repeat purchase",
+    disengagePre: "We'll consider them disengaged after ",
+    disengageDaysDefault: "60 days",
+    disengageDaysOptions: ["30 days", "45 days", "60 days", "90 days", "120 days"],
+    disengageMid: " with no ",
+    disengageConditionDefault: "repeat purchase",
+    disengageConditionOptions: ["repeat purchase", "site visit or purchase", "any engagement", "order or review"],
+    disengagePost: ".",
+  },
+  {
+    name: "Loyal Customer",
+    color: "#9b7eb5",
+    isLoyaltyModelStage: true,
+    defaultModelId: "purchase-frequency",
+    defSummary: "3+ orders, reorder cycle under 60 days",
+    defPre: "Shoppers who have demonstrated ",
+    defChipDefault: "sustained engagement",
+    defChipOptions: ["sustained engagement", "3+ orders over time", "high lifetime value", "consistent interaction"],
+    defPost: " \u2014 whether through multiple purchases, high LTV, or consistent interaction over time.",
+    goalPre: "Your goal is to ",
+    goalChipDefault: "retain, reward, and activate as an advocate",
+    goalChipOptions: [
+      "retain, reward, and activate as an advocate",
+      "drive referrals and reviews",
+      "unlock VIP perks and early access",
+      "deepen emotional loyalty",
+    ],
+    goalPost: ".",
+    goalSummary: "Retain, reward, activate as advocate",
+    disengageSummary: "120 days, no purchase or engagement",
+    disengagePre: "We'll consider them disengaged after ",
+    disengageDaysDefault: "120 days",
+    disengageDaysOptions: ["60 days", "90 days", "120 days", "180 days"],
+    disengageMid: " with no ",
+    disengageConditionDefault: "purchase or engagement",
+    disengageConditionOptions: ["purchase or engagement", "any order", "site visit or purchase", "message interaction"],
+    disengagePost: ".",
+  },
+  {
+    name: "Disengaged",
+    color: "#c07a8a",
+    defSummary: "Lapsed from any active stage",
+    defPre: "Shoppers who have ",
+    defChipDefault: "lapsed from any active stage",
+    defChipOptions: ["lapsed from any active stage", "exceeded their disengagement window", "gone inactive for 90+ days"],
+    defPost: " beyond the engagement window you've set.",
+    goalPre: "Your goal is to ",
+    goalChipDefault: "re-engage them back to their prior stage",
+    goalChipOptions: [
+      "re-engage them back to their prior stage",
+      "win them back with a compelling offer",
+      "re-activate with new product launches",
+      "sunset gracefully if unresponsive",
+    ],
+    goalPost: ".",
+    goalSummary: "Re-engage back to prior stage",
+    disengageSummary: null,
+    disengageDaysOptions: null,
+  },
+];
+
+/* ─── AI Messages ─── */
+const AI_MESSAGES = [
+  {
+    id: "greeting",
+    type: "greeting",
+    autoAdvance: true,
+    text: "Great context \u2014 a beauty brand with a strong reorder cycle gives us a lot to work with. Based on what you've shared, I've mapped out a four-stage shopper lifecycle tailored to your business:",
+    stages: ["Prospect", "Active Customer", "Loyal Customer", "Disengaged"],
+    text2: "This is a starting point, and we'll fine-tune each stage together. Let's walk through them one by one \u2014 I'll explain who belongs there, what we're trying to achieve, and when someone is considered disengaged. You can adjust anything along the way.",
+  },
+  { id: "stage-0", type: "stage", stageIndex: 0, preText: "Let's start with your prospects \u2014 the shoppers who are newest to your brand." },
+  { id: "stage-1", type: "stage", stageIndex: 1, preText: "Next up: your active customers. Since your brand has a natural reorder cycle, this is where you can deepen that relationship \u2014 whether through repeat purchases, cross-sells, or building loyalty." },
+  { id: "stage-2", type: "stage", stageIndex: 2, preText: "Now for your most valuable shoppers. Since you're a beauty brand with a strong reorder cycle, I've set this up around purchase frequency — that's usually the clearest loyalty signal for brands like yours. But there are other ways to define loyalty too, and you can switch models below if another fits better." },
+  { id: "stage-3", type: "stage", stageIndex: 3, preText: "Finally, let's handle disengagement. Every lifecycle has natural falloff, and having a plan for it matters." },
+  {
+    id: "summary",
+    type: "completion",
+    text: "Your shopper journey is all set. Here\u2019s what we\u2019ve mapped out together:",
+    text2: "You can revisit and adjust any of these stages anytime from the Lifecycle page in your sidebar.",
+    text3: "Now that we know your shopper journey, the next step is to draft your messaging strategy \u2014 the campaigns and flows that will nurture shoppers through each stage. We\u2019ll put together a tailored proposal based on everything you\u2019ve told us.",
+  },
+];
+
+/* ─── Lifecycle Page ─── */
+function LifecyclePage({ stages, draftingState, setDraftingState, draftProgress, setDraftProgress, draftingMode, stageConfigs, onConfigChange }) {
+  const [progressText, setProgressText] = useState("");
+  const [loadingPhase, setLoadingPhase] = useState(0);
+  const [activeTab, setActiveTab] = useState(0);
+  const [configModal, setConfigModal] = useState(null);
+  const [modalConfig, setModalConfig] = useState({});
+  const [copilotOpen, setCopilotOpen] = useState(false);
+  const [copilotClosing, setCopilotClosing] = useState(false);
+  const [copilotInput, setCopilotInput] = useState("");
+  const [copilotMessages, setCopilotMessages] = useState([]);
+  const [copilotReady, setCopilotReady] = useState(false);
+  const copilotEndRef = useRef(null);
+
+  const progressMessages = [
+    "Mapping prospect outreach for new visitors...",
+    "Designing active customer engagement flows...",
+    "Planning loyalty rewards and advocacy programs...",
+    "Setting up win-back sequences for disengaged shoppers...",
+  ];
+
+  // Auto-open copilot when drafting finishes; show bubble for explore path
+  useEffect(() => {
+    if (draftingState === "done" && !copilotReady) {
+      if (draftingMode === "drafting") {
+        const timer = setTimeout(() => {
+          setCopilotReady(true);
+          setCopilotOpen(true);
+          // Seed the initial messages with a typing effect
+          setTimeout(() => {
+            setCopilotMessages([
+              {
+                role: "ai",
+                text: `I've drafted SMS flows and campaigns for all four stages of your shopper lifecycle — from prospect outreach to win-back sequences.`,
+              },
+            ]);
+            setTimeout(() => {
+              setCopilotMessages((prev) => [
+                ...prev,
+                {
+                  role: "ai",
+                  text: `Take a look through each tab. You can ask me to adjust any flow, change messaging tone, add more campaigns, or tweak targeting — I'm here to help.`,
+                },
+              ]);
+            }, 1200);
+          }, 400);
+        }, 600);
+        return () => clearTimeout(timer);
+      } else {
+        // Explore path: just show the bubble after a brief delay
+        const timer = setTimeout(() => setCopilotReady(true), 1200);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [draftingState, draftingMode, copilotReady]);
+
+  // Scroll copilot to bottom on new messages
+  useEffect(() => {
+    if (copilotEndRef.current) {
+      setTimeout(() => copilotEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 100);
+    }
+  }, [copilotMessages]);
+
+  const handleCloseCopilot = () => {
+    setCopilotClosing(true);
+    setTimeout(() => {
+      setCopilotOpen(false);
+      setCopilotClosing(false);
+    }, 300);
+  };
+
+  const handleOpenCopilot = () => {
+    setCopilotOpen(true);
+    if (copilotMessages.length === 0) {
+      setTimeout(() => {
+        setCopilotMessages([
+          {
+            role: "ai",
+            text: `Your shopper lifecycle is set up with 4 stages. You can ask me anything about your strategy — adjust flows, add campaigns, or change targeting.`,
+          },
+        ]);
+      }, 400);
+    }
+  };
+
+  const handleCopilotSend = () => {
+    if (!copilotInput.trim()) return;
+    const userText = copilotInput.trim();
+    setCopilotInput("");
+    setCopilotMessages((prev) => [...prev, { role: "user", text: userText }]);
+    // Simulate AI thinking then responding
+    setTimeout(() => {
+      setCopilotMessages((prev) => [...prev, { role: "typing" }]);
+      setTimeout(() => {
+        setCopilotMessages((prev) => {
+          const filtered = prev.filter((m) => m.role !== "typing");
+          return [
+            ...filtered,
+            {
+              role: "ai",
+              text: `Great question! I can help with that. Let me look at your current configuration and suggest some adjustments. You can also click "Edit" on any stage overview card to modify its settings directly.`,
+            },
+          ];
+        });
+      }, 1500);
+    }, 300);
+  };
+
+  useEffect(() => {
+    if (draftingState !== "loading") return;
+    let phase = 0;
+    setProgressText(progressMessages[0]);
+    setLoadingPhase(0);
+    setDraftProgress(25);
+
+    const interval = setInterval(() => {
+      phase++;
+      if (phase < progressMessages.length) {
+        setProgressText(progressMessages[phase]);
+        setLoadingPhase(phase);
+        setDraftProgress(((phase + 1) / progressMessages.length) * 100);
+      } else {
+        clearInterval(interval);
+        setTimeout(() => setDraftingState("done"), 800);
+      }
+    }, 1800);
+
+    return () => clearInterval(interval);
+  }, [draftingState]);
+
+  /* Loading / drafting state */
+  if (draftingState === "loading") {
+    return (
+      <div style={{
+        flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        padding: 40, background: BG,
+      }}>
+        <div style={{ maxWidth: 480, textAlign: "center" }}>
+          {/* Animated orbital illustration */}
+          <div style={{ marginBottom: 40, position: "relative", width: 140, height: 140, margin: "0 auto 44px" }}>
+            <svg width="140" height="140" viewBox="0 0 140 140" fill="none" style={{ animation: "spin 12s linear infinite" }}>
+              <circle cx="70" cy="70" r="58" stroke={ACCENT + "10"} strokeWidth="1.5" strokeDasharray="6 4" />
+              <circle cx="70" cy="70" r="40" stroke={ACCENT + "18"} strokeWidth="1" strokeDasharray="4 6" />
+              <circle cx="70" cy="70" r="22" stroke={ACCENT + "25"} strokeWidth="1" />
+              {[0, 1, 2, 3].map((idx) => {
+                const angle = (idx * 90 + loadingPhase * 25) * (Math.PI / 180);
+                const r = 58;
+                const x = 70 + r * Math.cos(angle);
+                const y = 70 + r * Math.sin(angle);
+                const active = idx <= loadingPhase;
+                return (
+                  <g key={idx}>
+                    <circle cx={x} cy={y} r={active ? 8 : 5.5}
+                      fill={active ? stages[idx]?.color || ACCENT : stages[idx]?.color + "40" || ACCENT + "40"}
+                      style={{ transition: "all .6s cubic-bezier(.16,1,.3,1)" }}
+                    />
+                    {active && <circle cx={x} cy={y} r="12" fill="none" stroke={stages[idx]?.color + "30"} strokeWidth="1"
+                      style={{ animation: "pulse 2s ease-in-out infinite" }} />}
+                    {idx > 0 && (
+                      <line
+                        x1={70 + r * Math.cos(((idx - 1) * 90 + loadingPhase * 25) * (Math.PI / 180))}
+                        y1={70 + r * Math.sin(((idx - 1) * 90 + loadingPhase * 25) * (Math.PI / 180))}
+                        x2={x} y2={y}
+                        stroke={idx <= loadingPhase ? ACCENT + "25" : ACCENT + "08"}
+                        strokeWidth="1" style={{ transition: "stroke .6s" }}
+                      />
+                    )}
+                  </g>
+                );
+              })}
+              {/* Center icon */}
+              <circle cx="70" cy="70" r="14" fill={ACCENT + "0c"} />
+              <path d="M70 62v6M70 72v6M62 70h6M72 70h6" stroke={ACCENT} strokeWidth="1.3" strokeLinecap="round" />
+            </svg>
+          </div>
+
+          <h2 className="fraunces" style={{
+            fontSize: 24, fontWeight: 500, color: TEXT, marginBottom: 12,
+            letterSpacing: "-0.02em",
+          }}>
+            Crafting your nurture strategy...
+          </h2>
+
+          <div style={{ fontSize: 15, color: TEXT_MUTED, marginBottom: 36, lineHeight: 1.6, minHeight: 24 }}>
+            <span key={progressText} className="animate-fadeIn" style={{ opacity: 0 }}>
+              {progressText}
+            </span>
+          </div>
+
+          {/* Progress bar */}
+          <div style={{
+            width: "100%", maxWidth: 300, margin: "0 auto",
+            height: 3, background: SURFACE, borderRadius: 3, overflow: "hidden",
+          }}>
+            <div style={{
+              height: "100%", background: ACCENT, borderRadius: 3,
+              width: `${draftProgress}%`,
+              transition: "width .8s cubic-bezier(.16,1,.3,1)",
+            }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* Done state - Lifecycle page with tabbed layout */
+  const showCampaigns = draftingMode === "drafting";
+  const showBanner = draftingMode === "exploring";
+
+  const SHOPPER_COUNTS = [3420, 8145, 2870, 1560];
+
+  const STAGE_DRAFTS = [
+    { stage: 0, flows: [
+      { name: "Welcome Drip", kind: "Flow", desc: "3-message SMS welcome sequence triggered on opt-in", recipients: 1840 },
+      { name: "Browse Abandonment", kind: "Flow", desc: "Automated nudge when a prospect views products but doesn't purchase", recipients: 920 },
+    ], campaigns: [
+      { name: "First Purchase Offer", kind: "Campaign", desc: "One-time 15% off SMS blast targeting engaged prospects", recipients: 2100 },
+    ]},
+    { stage: 1, flows: [
+      { name: "Reorder Reminder", kind: "Flow", desc: "Automated SMS reminder based on individual purchase cycle timing", recipients: 5200 },
+      { name: "Post-Purchase Follow-Up", kind: "Flow", desc: "Thank-you message + product tips sent 3 days after delivery", recipients: 3400 },
+    ], campaigns: [
+      { name: "Cross-Sell Discovery", kind: "Campaign", desc: "Curated product recommendations based on purchase history", recipients: 6800 },
+      { name: "Review Request", kind: "Campaign", desc: "Timed SMS asking for a product review with a small incentive", recipients: 4100 },
+    ]},
+    { stage: 2, flows: [
+      { name: "VIP Early Access", kind: "Flow", desc: "Exclusive first-look at new launches before public release", recipients: 1450 },
+      { name: "Loyalty Milestone", kind: "Flow", desc: "Celebration message at key order milestones with surprise rewards", recipients: 870 },
+    ], campaigns: [
+      { name: "Referral Program Invite", kind: "Campaign", desc: "Shareable referral link with dual-sided rewards", recipients: 2200 },
+    ]},
+    { stage: 3, flows: [
+      { name: "Win-Back Series", kind: "Flow", desc: "3-step re-engagement sequence with escalating offers", recipients: 980 },
+      { name: "Sunset Flow", kind: "Flow", desc: "Graceful opt-down for unresponsive contacts to maintain list health", recipients: 420 },
+    ], campaigns: [
+      { name: "We Miss You", kind: "Campaign", desc: "One-time personalized SMS with curated picks based on past purchases", recipients: 1200 },
+    ]},
+  ];
+
+  const activeStage = stages[activeTab];
+  const activeDrafts = STAGE_DRAFTS.find((d) => d.stage === activeTab);
+
+  const openConfigModal = (stageIdx) => {
+    const s = stages[stageIdx];
+    setModalConfig({
+      defChip: stageConfigs[stageIdx]?.defChip || s.defChipDefault,
+      goalChip: stageConfigs[stageIdx]?.goalChip || s.goalChipDefault,
+      disengageDays: stageConfigs[stageIdx]?.disengageDays || s.disengageDaysDefault,
+      disengageCondition: stageConfigs[stageIdx]?.disengageCondition || s.disengageConditionDefault,
+    });
+    setConfigModal(stageIdx);
+  };
+
+  const formatCount = (n) => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, "") + "k" : n.toString();
+
+  return (
+    <div style={{ flex: 1, display: "flex", background: BG, overflow: "hidden" }}>
+      {/* Main content area — shrinks when copilot opens */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", transition: "all .35s cubic-bezier(.16,1,.3,1)" }}>
+      {/* Header */}
+      <div style={{
+        background: "rgba(250,250,248,.95)", backdropFilter: "blur(12px)",
+        padding: "20px 32px 0", flexShrink: 0,
+      }}>
+        <div style={{ marginBottom: 20 }}>
+          <h1 className="fraunces" style={{ fontSize: 20, fontWeight: 600, color: TEXT, letterSpacing: "-0.01em" }}>
+            Shopper Lifecycle
+          </h1>
+          <p style={{ fontSize: 13, color: TEXT_MUTED, marginTop: 3 }}>
+            {SHOPPER_COUNTS.reduce((a, b) => a + b, 0).toLocaleString()} total shoppers across 4 stages
+            {showCampaigns ? " \u00b7 SMS drafts generated" : ""}
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${BORDER}` }}>
+          {stages.map((stage, i) => {
+            const isActive = activeTab === i;
+            return (
+              <button
+                key={stage.name}
+                onClick={() => setActiveTab(i)}
+                style={{
+                  flex: 1, padding: "12px 16px", border: "none", background: "none",
+                  cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                  borderBottom: isActive ? `2.5px solid ${stage.color}` : "2.5px solid transparent",
+                  transition: "all .2s", display: "flex", alignItems: "center",
+                  justifyContent: "center", gap: 8, marginBottom: -1,
+                }}
+                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "#f5f5f0"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
+              >
+                <div style={{
+                  width: 8, height: 8, borderRadius: "50%",
+                  background: isActive ? stage.color : stage.color + "50",
+                  transition: "all .2s", flexShrink: 0,
+                }} />
+                <span style={{
+                  fontSize: 13.5, fontWeight: isActive ? 600 : 400,
+                  color: isActive ? TEXT : TEXT_MUTED, transition: "all .2s",
+                  whiteSpace: "nowrap",
+                }}>
+                  {stage.name}
+                </span>
+                <span style={{
+                  fontSize: 12, color: isActive ? stage.color : TEXT_MUTED + "aa",
+                  fontWeight: 500, fontVariantNumeric: "tabular-nums",
+                  transition: "all .2s",
+                }}>
+                  {formatCount(SHOPPER_COUNTS[i])}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Banner for explore path */}
+      {showBanner && (
+        <div className="animate-fadeInUp" style={{
+          margin: "20px 32px 0", padding: "14px 20px",
+          background: ACCENT_BG, border: `1px solid ${ACCENT}18`,
+          borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between",
+          opacity: 0, flexShrink: 0,
+        }}>
+          <span style={{ fontSize: 14, color: "#3a3a3a" }}>
+            Ready to draft SMS campaigns for your journey?
+          </span>
+          <button style={{
+            padding: "7px 16px", borderRadius: 8, border: "none",
+            background: ACCENT, color: "white", fontSize: 13, fontWeight: 500,
+            cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all .15s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = ACCENT_DARK; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = ACCENT; }}
+          >
+            Start drafting
+          </button>
+        </div>
+      )}
+
+      {/* Tab content — two-column layout */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "24px 32px 40px" }}>
+        <div key={activeTab} className="animate-fadeIn" style={{ opacity: 0, display: "flex", gap: 24, alignItems: "flex-start" }}>
+
+          {/* LEFT COLUMN — Stage Overview (1/3) */}
+          <div style={{ width: "33.333%", flexShrink: 0, position: "sticky", top: 0 }}>
+            <div style={{
+              background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 14,
+              padding: "22px 24px", boxShadow: "0 1px 3px rgba(0,0,0,.02)",
+            }}>
+              {/* Header */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 9, height: 9, borderRadius: "50%", background: activeStage.color }} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                    Overview
+                  </span>
+                </div>
+                <button
+                  onClick={() => openConfigModal(activeTab)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 4,
+                    padding: "4px 10px", borderRadius: 6,
+                    border: `1px solid ${BORDER}`, background: CARD_BG, color: TEXT_MUTED,
+                    fontSize: 11.5, fontWeight: 500, cursor: "pointer",
+                    fontFamily: "'DM Sans', sans-serif", transition: "all .15s",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = ACCENT + "44"; e.currentTarget.style.color = ACCENT; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_MUTED; }}
+                >
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                    <path d="M7.5 2.5l2 2M2 8l-.5 2.5L4 10l6-6-2-2-6 6z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Edit
+                </button>
+              </div>
+
+              {/* Stacked fields */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <div>
+                  <div style={{ fontSize: 10.5, fontWeight: 600, color: "#a0a098", letterSpacing: "0.08em", textTransform: "uppercase", fontVariant: "small-caps", marginBottom: 5 }}>
+                    Definition
+                  </div>
+                  <div style={{ fontSize: 13, color: TEXT, lineHeight: 1.55 }}>
+                    {stageConfigs[activeTab]?.defChip || activeStage.defSummary}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10.5, fontWeight: 600, color: "#a0a098", letterSpacing: "0.08em", textTransform: "uppercase", fontVariant: "small-caps", marginBottom: 5 }}>
+                    Goal
+                  </div>
+                  <div style={{ fontSize: 13, color: TEXT, lineHeight: 1.55 }}>
+                    {stageConfigs[activeTab]?.goalChip || activeStage.goalSummary}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10.5, fontWeight: 600, color: "#a0a098", letterSpacing: "0.08em", textTransform: "uppercase", fontVariant: "small-caps", marginBottom: 5 }}>
+                    Disengagement
+                  </div>
+                  <div style={{ fontSize: 13, color: TEXT, lineHeight: 1.55 }}>
+                    {stageConfigs[activeTab]?.disengageDays
+                      ? `${stageConfigs[activeTab].disengageDays}, ${stageConfigs[activeTab].disengageCondition || "no engagement"}`
+                      : activeStage.disengageSummary}
+                  </div>
+                </div>
+              </div>
+
+              {/* Shopper count */}
+              <div style={{
+                marginTop: 20, paddingTop: 16, borderTop: `1px solid ${BORDER}`,
+                display: "flex", alignItems: "center", gap: 8,
+              }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle cx="5" cy="5" r="3" stroke={TEXT_MUTED} strokeWidth="1.2" />
+                  <circle cx="9" cy="5" r="3" stroke={TEXT_MUTED} strokeWidth="1.2" />
+                  <path d="M1 13c0-2.2 1.8-4 4-4h4c2.2 0 4 1.8 4 4" stroke={TEXT_MUTED} strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+                <span style={{ fontSize: 12.5, color: TEXT_MUTED }}>
+                  <strong style={{ color: TEXT, fontWeight: 600 }}>{SHOPPER_COUNTS[activeTab].toLocaleString()}</strong> shoppers
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN — Flows & Campaigns (2/3) */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {showCampaigns && activeDrafts && (
+              <>
+                {/* Flows */}
+                {activeDrafts.flows.length > 0 && (
+                  <div style={{ marginBottom: 28 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M2 3h10M2 7h7M2 11h4" stroke={ACCENT} strokeWidth="1.4" strokeLinecap="round" />
+                        <circle cx="12" cy="7" r="1.5" fill={ACCENT} />
+                        <circle cx="9" cy="11" r="1.5" fill={ACCENT} />
+                      </svg>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: TEXT, letterSpacing: "0.01em" }}>
+                        SMS Flows
+                      </span>
+                      <span style={{ fontSize: 12, color: TEXT_MUTED }}>
+                        Automated sequences
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {activeDrafts.flows.map((f, fi) => (
+                        <div key={fi} style={{
+                          padding: "16px 20px", borderRadius: 12,
+                          border: `1px solid ${BORDER}`, background: CARD_BG,
+                          transition: "border-color .15s, box-shadow .15s", cursor: "default",
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#d5d5d0"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,.04)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = "none"; }}
+                        >
+                          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                                <span style={{ fontSize: 14, fontWeight: 600, color: TEXT }}>{f.name}</span>
+                                <span style={{
+                                  padding: "2px 7px", borderRadius: 5,
+                                  background: ACCENT + "0c", color: ACCENT,
+                                  fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase",
+                                }}>
+                                  Draft
+                                </span>
+                              </div>
+                              <div style={{ fontSize: 13, color: TEXT_MUTED, lineHeight: 1.5 }}>{f.desc}</div>
+                            </div>
+                            <div style={{ textAlign: "right", flexShrink: 0 }}>
+                              <div style={{ fontSize: 15, fontWeight: 600, color: TEXT, fontVariantNumeric: "tabular-nums" }}>
+                                {f.recipients.toLocaleString()}
+                              </div>
+                              <div style={{ fontSize: 11, color: TEXT_MUTED }}>recipients</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Campaigns */}
+                {activeDrafts.campaigns.length > 0 && (
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <rect x="1.5" y="3" width="11" height="8" rx="2" stroke={ACCENT} strokeWidth="1.3" />
+                        <path d="M1.5 5.5L7 9l5.5-3.5" stroke={ACCENT} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: TEXT, letterSpacing: "0.01em" }}>
+                        SMS Campaigns
+                      </span>
+                      <span style={{ fontSize: 12, color: TEXT_MUTED }}>
+                        One-time sends
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {activeDrafts.campaigns.map((c, ci) => (
+                        <div key={ci} style={{
+                          padding: "16px 20px", borderRadius: 12,
+                          border: `1px solid ${BORDER}`, background: CARD_BG,
+                          transition: "border-color .15s, box-shadow .15s", cursor: "default",
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#d5d5d0"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,.04)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = "none"; }}
+                        >
+                          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                                <span style={{ fontSize: 14, fontWeight: 600, color: TEXT }}>{c.name}</span>
+                                <span style={{
+                                  padding: "2px 7px", borderRadius: 5,
+                                  background: ACCENT + "0c", color: ACCENT,
+                                  fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase",
+                                }}>
+                                  Draft
+                                </span>
+                              </div>
+                              <div style={{ fontSize: 13, color: TEXT_MUTED, lineHeight: 1.5 }}>{c.desc}</div>
+                            </div>
+                            <div style={{ textAlign: "right", flexShrink: 0 }}>
+                              <div style={{ fontSize: 15, fontWeight: 600, color: TEXT, fontVariantNumeric: "tabular-nums" }}>
+                                {c.recipients.toLocaleString()}
+                              </div>
+                              <div style={{ fontSize: 11, color: TEXT_MUTED }}>recipients</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Empty state for explore path */}
+            {!showCampaigns && (
+              <div style={{
+                background: CARD_BG, border: `1px dashed ${BORDER}`, borderRadius: 14,
+                padding: "40px 28px", textAlign: "center",
+              }}>
+                <div style={{ fontSize: 14, color: TEXT_MUTED, marginBottom: 4 }}>
+                  No SMS flows or campaigns drafted yet for this stage.
+                </div>
+                <div style={{ fontSize: 13, color: TEXT_MUTED + "99" }}>
+                  Use the banner above to start drafting.
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Configuration Modal */}
+      {/* Configuration Modal */}
+      {configModal !== null && (
+        <div style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,.35)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 1000, animation: "fadeIn .2s ease",
+        }}
+        onClick={() => setConfigModal(null)}
+        >
+          <div style={{
+            background: CARD_BG, borderRadius: 18, padding: "32px 36px",
+            width: 520, maxHeight: "80vh", overflowY: "auto",
+            boxShadow: "0 20px 60px rgba(0,0,0,.15)", animation: "fadeInUp .3s cubic-bezier(.16,1,.3,1)",
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+              <div>
+                <h3 className="fraunces" style={{ fontSize: 18, fontWeight: 600, color: TEXT }}>
+                  Configure {stages[configModal].name}
+                </h3>
+                <p style={{ fontSize: 13, color: TEXT_MUTED, marginTop: 3 }}>
+                  Adjust the definition, goal, and disengagement settings.
+                </p>
+              </div>
+              <button
+                onClick={() => setConfigModal(null)}
+                style={{
+                  width: 32, height: 32, borderRadius: 8, border: `1px solid ${BORDER}`,
+                  background: CARD_BG, cursor: "pointer", display: "flex",
+                  alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M3 3l8 8M11 3l-8 8" stroke={TEXT_MUTED} strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Definition */}
+            <div style={{ marginBottom: 22 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "#a0a098", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+                Definition
+              </label>
+              <select
+                value={modalConfig.defChip}
+                onChange={(e) => setModalConfig({ ...modalConfig, defChip: e.target.value })}
+                style={{
+                  width: "100%", padding: "10px 14px", borderRadius: 10,
+                  border: `1px solid ${BORDER}`, background: CARD_BG,
+                  fontSize: 14, color: TEXT, fontFamily: "'DM Sans', sans-serif",
+                  cursor: "pointer", outline: "none",
+                }}
+              >
+                {stages[configModal].defChipOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Goal */}
+            <div style={{ marginBottom: 22 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "#a0a098", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+                Goal
+              </label>
+              <select
+                value={modalConfig.goalChip}
+                onChange={(e) => setModalConfig({ ...modalConfig, goalChip: e.target.value })}
+                style={{
+                  width: "100%", padding: "10px 14px", borderRadius: 10,
+                  border: `1px solid ${BORDER}`, background: CARD_BG,
+                  fontSize: 14, color: TEXT, fontFamily: "'DM Sans', sans-serif",
+                  cursor: "pointer", outline: "none",
+                }}
+              >
+                {stages[configModal].goalChipOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Disengagement */}
+            <div style={{ marginBottom: 22 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "#a0a098", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+                Disengage After
+              </label>
+              <div style={{ display: "flex", gap: 10 }}>
+                <select
+                  value={modalConfig.disengageDays}
+                  onChange={(e) => setModalConfig({ ...modalConfig, disengageDays: e.target.value })}
+                  style={{
+                    flex: 1, padding: "10px 14px", borderRadius: 10,
+                    border: `1px solid ${BORDER}`, background: CARD_BG,
+                    fontSize: 14, color: TEXT, fontFamily: "'DM Sans', sans-serif",
+                    cursor: "pointer", outline: "none",
+                  }}
+                >
+                  {stages[configModal].disengageDaysOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+                <select
+                  value={modalConfig.disengageCondition}
+                  onChange={(e) => setModalConfig({ ...modalConfig, disengageCondition: e.target.value })}
+                  style={{
+                    flex: 1.5, padding: "10px 14px", borderRadius: 10,
+                    border: `1px solid ${BORDER}`, background: CARD_BG,
+                    fontSize: 14, color: TEXT, fontFamily: "'DM Sans', sans-serif",
+                    cursor: "pointer", outline: "none",
+                  }}
+                >
+                  {stages[configModal].disengageConditionOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Save */}
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 28 }}>
+              <button
+                onClick={() => setConfigModal(null)}
+                style={{
+                  padding: "10px 20px", borderRadius: 10, border: `1px solid ${BORDER}`,
+                  background: CARD_BG, color: TEXT_MUTED, fontSize: 14, fontWeight: 500,
+                  cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  onConfigChange(configModal, modalConfig);
+                  setConfigModal(null);
+                }}
+                style={{
+                  padding: "10px 24px", borderRadius: 10, border: "none",
+                  background: ACCENT, color: "white", fontSize: 14, fontWeight: 500,
+                  cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all .15s",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = ACCENT_DARK; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = ACCENT; }}
+              >
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>{/* end main content area */}
+
+      {/* ─── Co-Pilot Side Panel ─── */}
+      {copilotOpen && (
+        <div style={{
+          width: 320, minWidth: 320, flexShrink: 0,
+          display: "flex", flexDirection: "column",
+          borderLeft: `1px solid ${BORDER}`, background: CARD_BG,
+          animation: copilotClosing ? "copilotSlideOut .3s cubic-bezier(.16,1,.3,1) forwards" : "copilotSlideIn .35s cubic-bezier(.16,1,.3,1) forwards",
+          overflow: "hidden",
+        }}>
+          {/* Copilot Header */}
+          <div style={{
+            padding: "16px 18px", borderBottom: `1px solid ${BORDER}`,
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            flexShrink: 0, background: "rgba(250,250,248,.95)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: ACCENT + "14",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 1v4M7 9v4M1 7h4M9 7h4" stroke={ACCENT} strokeWidth="1.3" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>Co-pilot</div>
+                <div style={{ fontSize: 11, color: TEXT_MUTED }}>Lifecycle strategy assistant</div>
+              </div>
+            </div>
+            <button
+              onClick={handleCloseCopilot}
+              style={{
+                width: 28, height: 28, borderRadius: 7, border: `1px solid ${BORDER}`,
+                background: CARD_BG, cursor: "pointer", display: "flex",
+                alignItems: "center", justifyContent: "center", transition: "all .15s",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#ccc"; e.currentTarget.style.background = SURFACE; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = CARD_BG; }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 2l8 8M10 2l-8 8" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Copilot Messages */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "16px 14px 16px" }}>
+            {copilotMessages.map((msg, idx) => {
+              if (msg.role === "typing") {
+                return (
+                  <div key={idx} style={{ display: "flex", gap: 8, marginBottom: 14, alignItems: "flex-start" }}>
+                    <div style={{
+                      width: 24, height: 24, borderRadius: 7, background: ACCENT + "14",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0, marginTop: 1,
+                    }}>
+                      <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+                        <path d="M7 1v4M7 9v4M1 7h4M9 7h4" stroke={ACCENT} strokeWidth="1.3" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <div style={{
+                      padding: "10px 14px", borderRadius: "12px 12px 12px 4px",
+                      background: SURFACE, display: "flex", gap: 4, alignItems: "center",
+                    }}>
+                      {[0, 1, 2].map((d) => (
+                        <div key={d} style={{
+                          width: 5, height: 5, borderRadius: "50%", background: TEXT_MUTED,
+                          animation: `dotBounce .8s ease-in-out ${d * 0.15}s infinite`,
+                        }} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (msg.role === "ai") {
+                return (
+                  <div key={idx} className="animate-fadeIn" style={{ display: "flex", gap: 8, marginBottom: 14, opacity: 0, alignItems: "flex-start" }}>
+                    <div style={{
+                      width: 24, height: 24, borderRadius: 7, background: ACCENT + "14",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0, marginTop: 1,
+                    }}>
+                      <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+                        <path d="M7 1v4M7 9v4M1 7h4M9 7h4" stroke={ACCENT} strokeWidth="1.3" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <div style={{
+                      padding: "10px 14px", borderRadius: "12px 12px 12px 4px",
+                      background: SURFACE, fontSize: 13, lineHeight: 1.6,
+                      color: "#3a3a3a", maxWidth: "calc(100% - 36px)",
+                    }}>
+                      {msg.text}
+                    </div>
+                  </div>
+                );
+              }
+
+              // User message
+              return (
+                <div key={idx} className="animate-fadeIn" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14, opacity: 0 }}>
+                  <div style={{
+                    padding: "10px 14px", borderRadius: "12px 12px 4px 12px",
+                    background: TEXT, color: "#f5f5f0", fontSize: 13, lineHeight: 1.6,
+                    maxWidth: "85%",
+                  }}>
+                    {msg.text}
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={copilotEndRef} />
+          </div>
+
+          {/* Copilot Input */}
+          <div style={{
+            padding: "12px 14px", borderTop: `1px solid ${BORDER}`,
+            background: "rgba(250,250,248,.95)", flexShrink: 0,
+          }}>
+            <div style={{
+              display: "flex", alignItems: "flex-end", gap: 8,
+              background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 4,
+            }}>
+              <textarea
+                value={copilotInput}
+                onChange={(e) => setCopilotInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleCopilotSend(); } }}
+                placeholder="Ask anything..."
+                rows={1}
+                style={{
+                  flex: 1, border: "none", outline: "none", resize: "none",
+                  padding: "8px 10px", fontSize: 13, lineHeight: 1.5,
+                  color: TEXT, fontFamily: "'DM Sans', sans-serif", background: "transparent",
+                }}
+              />
+              <button
+                onClick={handleCopilotSend}
+                style={{
+                  width: 30, height: 30, borderRadius: 8, border: "none",
+                  background: copilotInput.trim() ? ACCENT : "#e0e0db", color: "white",
+                  cursor: copilotInput.trim() ? "pointer" : "default",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0, margin: 2, transition: "all .2s",
+                }}
+                onMouseEnter={(e) => { if (copilotInput.trim()) e.currentTarget.style.background = ACCENT_DARK; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = copilotInput.trim() ? ACCENT : "#e0e0db"; }}
+              >
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 8h12M10 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Co-pilot bubble (when closed) */}
+      {!copilotOpen && copilotReady && (
+        <button
+          onClick={handleOpenCopilot}
+          style={{
+            position: "fixed", bottom: 24, right: 24, zIndex: 100,
+            width: 48, height: 48, borderRadius: 14, border: "none",
+            background: ACCENT, color: "white", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 4px 20px rgba(104,63,207,.3), 0 1px 4px rgba(0,0,0,.08)",
+            transition: "all .2s", animation: "bubblePop .35s cubic-bezier(.16,1,.3,1) forwards",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.08)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(104,63,207,.4), 0 2px 6px rgba(0,0,0,.1)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(104,63,207,.3), 0 1px 4px rgba(0,0,0,.08)"; }}
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2v5M10 13v5M2 10h5M13 10h5" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+            <circle cx="10" cy="10" r="2" fill="white" opacity=".3" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ─── Main App ─── */
+function App() {
+  const [phase, setPhase] = useState(1);
+  const [transitioning, setTransitioning] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [currentAiStep, setCurrentAiStep] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const [inputValue, setInputValue] = useState(
+    "My brand sells beauty products and most customers reorder every 6\u20138 weeks. Show me what my shopper journey looks like."
+  );
+  const [activeStageActions, setActiveStageActions] = useState(null);
+  const [approvedStages, setApprovedStages] = useState([]);
+  const [stageConfigs, setStageConfigs] = useState({});
+  const [editingStage, setEditingStage] = useState(null);
+  const [lifecycleComplete, setLifecycleComplete] = useState(false);
+  const [appPage, setAppPage] = useState("chat");
+  const [draftingMode, setDraftingMode] = useState(null);
+  const [draftingState, setDraftingState] = useState(null);
+  const [draftProgress, setDraftProgress] = useState(0);
+  const chatEndRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 100);
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping, scrollToBottom]);
+
+  const addAiMessage = useCallback(
+    (stepIndex) => {
+      if (stepIndex >= AI_MESSAGES.length) return;
+      const msg = AI_MESSAGES[stepIndex];
+      setIsTyping(true);
+
+      const delay = stepIndex === 0 ? 1800 : 1200;
+      setTimeout(() => {
+        setIsTyping(false);
+        setMessages((prev) => [...prev, { role: "ai", ...msg }]);
+        setCurrentAiStep(stepIndex + 1);
+
+        if (msg.type === "completion") {
+          setLifecycleComplete(true);
+        }
+
+        if (msg.type === "stage") {
+          setTimeout(() => setActiveStageActions(msg.stageIndex), 400);
+        }
+
+        if (msg.autoAdvance) {
+          setTimeout(() => {
+            setIsTyping(true);
+            setTimeout(() => {
+              setIsTyping(false);
+              const nextMsg = AI_MESSAGES[stepIndex + 1];
+              if (nextMsg) {
+                setMessages((prev) => [...prev, { role: "ai", ...nextMsg }]);
+                setCurrentAiStep(stepIndex + 2);
+                if (nextMsg.type === "stage") {
+                  setTimeout(() => setActiveStageActions(nextMsg.stageIndex), 400);
+                }
+              }
+            }, 1200);
+          }, 2000);
+        }
+
+        scrollToBottom();
+      }, delay);
+    },
+    [scrollToBottom]
+  );
+
+  const handleSendMessage = () => {
+    if (!inputValue.trim()) return;
+    const userMsg = inputValue.trim();
+    setInputValue("");
+
+    if (phase === 1) {
+      setTransitioning(true);
+      setTimeout(() => {
+        setPhase(2);
+        setMessages([{ role: "user", text: userMsg }]);
+        setTimeout(() => addAiMessage(0), 600);
+      }, 500);
+    } else {
+      setMessages((prev) => [...prev, { role: "user", text: userMsg }]);
+    }
+  };
+
+  const handleStageAction = (action, stageIndex) => {
+    setActiveStageActions(null);
+    const label = action === "Looks good" ? "Looks good" : action;
+    setMessages((prev) => [...prev, { role: "user", text: label }]);
+
+    // If this is an edit-mode action, just confirm and don't advance
+    if (editingStage !== null) {
+      if (action === "Looks good") {
+        // Config is already persisted via handleConfigChange; add confirmation
+        setIsTyping(true);
+        setTimeout(() => {
+          setIsTyping(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "ai",
+              type: "text",
+              text: `Got it \u2014 ${STAGES[editingStage].name} has been updated. You can see the changes in the preview panel.`,
+            },
+          ]);
+          setEditingStage(null);
+          scrollToBottom();
+        }, 600);
+      } else {
+        setEditingStage(null);
+      }
+      return;
+    }
+
+    // Mark stage as approved (for side panel)
+    if (action === "Looks good" || action === "Adjust") {
+      setApprovedStages((prev) => {
+        if (!prev.includes(stageIndex)) {
+          return [...prev, stageIndex];
+        }
+        return prev;
+      });
+    }
+
+    setTimeout(() => addAiMessage(currentAiStep), 400);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleConfigChange = (stageIndex, newConfig) => {
+    setStageConfigs((prev) => ({ ...prev, [stageIndex]: newConfig }));
+  };
+
+  const handleEditStage = (stageIndex) => {
+    setEditingStage(stageIndex);
+    const stageName = STAGES[stageIndex].name;
+
+    // Add a typing indicator, then inject AI message with editable card
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "ai",
+          type: "stage",
+          preText: `Looks like you want to edit the ${stageName} configuration. Go ahead and adjust the settings below \u2014 click "Looks good" when you\u2019re happy with the changes.`,
+          stageIndex,
+          isEdit: true,
+        },
+      ]);
+      setTimeout(() => setActiveStageActions(stageIndex), 400);
+      scrollToBottom();
+    }, 800);
+  };
+
+  const handleDraftCampaigns = () => {
+    setDraftingMode("drafting");
+    setDraftingState("loading");
+    setDraftProgress(0);
+    setAppPage("lifecycle");
+  };
+
+  const handleExploreSelf = () => {
+    setDraftingMode("exploring");
+    setDraftingState("done");
+    setAppPage("lifecycle");
+  };
+
+  /* ─── Phase 1: Landing ─── */
+  if (phase === 1) {
+    return (
+      <div style={{ display: "flex", height: "100vh" }}>
+        <LeftNav showLifecycleNav={lifecycleComplete} />
+        <div
+          className={transitioning ? "animate-slideUp" : ""}
+          style={{
+            flex: 1, display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center",
+            padding: "40px 24px", background: BG, overflow: "auto",
+          }}
+        >
+          <div style={{ maxWidth: 720, width: "100%", textAlign: "center" }}>
+            <div className="animate-fadeInUp" style={{ marginBottom: 48, opacity: 0 }}>
+              <div style={{ marginBottom: 28, display: "flex", justifyContent: "center" }}>
+                <img src={LANDING_ICON} alt="Journey" style={{ width: 64, height: 64, objectFit: "contain" }} />
+              </div>
+              <h1
+                className="fraunces"
+                style={{
+                  fontSize: "clamp(28px, 3.2vw, 40px)", fontWeight: 500,
+                  lineHeight: 1.25, color: TEXT, letterSpacing: "-0.02em", marginBottom: 20,
+                }}
+              >
+                Every shopper is on a journey.<br />
+                Let's meet them where they are.
+              </h1>
+              <p style={{ fontSize: 17, lineHeight: 1.65, color: TEXT_MUTED, maxWidth: 520, margin: "0 auto" }}>
+                Your customers are browsing, buying, coming back, telling friends. They don't see your campaigns &mdash; they feel your brand. Let's map out their journey and build the right experience for every stage.
+              </p>
+            </div>
+
+            <div className="animate-fadeInUp" style={{ opacity: 0, animationDelay: "200ms", maxWidth: 560, margin: "0 auto" }}>
+              <div
+                style={{
+                  background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 16,
+                  padding: 6, boxShadow: "0 2px 12px rgba(0,0,0,.04)",
+                  transition: "box-shadow .3s, border-color .3s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,.07)";
+                  e.currentTarget.style.borderColor = "#d0d0ca";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,.04)";
+                  e.currentTarget.style.borderColor = BORDER;
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 8 }}>
+                  <textarea
+                    ref={inputRef}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    rows={2}
+                    style={{
+                      flex: 1, border: "none", outline: "none", resize: "none",
+                      padding: "14px 16px", fontSize: 15, lineHeight: 1.55,
+                      color: TEXT, fontFamily: "'DM Sans', sans-serif", background: "transparent",
+                    }}
+                  />
+                  <button
+                    onClick={handleSendMessage}
+                    style={{
+                      width: 42, height: 42, borderRadius: 11, border: "none",
+                      background: ACCENT, color: "white", cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0, margin: 4, transition: "all .2s",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = ACCENT_DARK; e.currentTarget.style.transform = "scale(1.04)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = "scale(1)"; }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path d="M3 9h12M11 5l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p style={{ fontSize: 13, color: "#b0afa8", marginTop: 14, letterSpacing: "0.01em" }}>
+                Or just tell us about your brand in your own words
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ─── Phase 2: Conversation ─── */
+  const showSidePanel = approvedStages.length > 0;
+
+  /* ─── Phase 3: Lifecycle Page ─── */
+  if (appPage === "lifecycle") {
+    return (
+      <div className="animate-fadeIn" style={{ display: "flex", height: "100vh", background: BG }}>
+        <LeftNav showLifecycleNav={lifecycleComplete} />
+        <LifecyclePage
+          stages={STAGES}
+          draftingState={draftingState}
+          setDraftingState={setDraftingState}
+          draftProgress={draftProgress}
+          setDraftProgress={setDraftProgress}
+          draftingMode={draftingMode}
+          stageConfigs={stageConfigs}
+          onConfigChange={handleConfigChange}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-fadeIn" style={{ display: "flex", height: "100vh", background: BG }}>
+      <LeftNav showLifecycleNav={lifecycleComplete} />
+
+      {/* Main Chat Area */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, position: "relative" }}>
+        {/* Header */}
+        <div
+          style={{
+            borderBottom: `1px solid ${BORDER}`, background: "rgba(250,250,248,.9)",
+            backdropFilter: "blur(12px)", padding: "14px 24px",
+            display: "flex", alignItems: "center", gap: 12,
+            zIndex: 40, flexShrink: 0,
+          }}
+        >
+          <div
+            style={{
+              width: 34, height: 34, borderRadius: 10, background: ACCENT + "14",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1v4M8 11v4M1 8h4M11 8h4" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: TEXT }}>Lifecycle Setup</div>
+            <div style={{ fontSize: 12, color: TEXT_MUTED }}>Mapping your shopper journey</div>
+          </div>
+        </div>
+
+        {/* Chat Messages */}
+        <div
+          style={{
+            flex: 1, overflowY: "auto", padding: "28px 24px 140px",
+            maxWidth: 700, width: "100%", margin: "0 auto",
+          }}
+        >
+          {messages.map((msg, i) => {
+            if (msg.role === "user") {
+              return (
+                <div key={i} className="animate-fadeInUp" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 24, opacity: 0 }}>
+                  <div
+                    style={{
+                      background: TEXT, color: "#f5f5f0", padding: "12px 18px",
+                      borderRadius: "16px 16px 4px 16px", maxWidth: "80%",
+                      fontSize: 14.5, lineHeight: 1.6,
+                    }}
+                  >
+                    {msg.text}
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <div key={i} className="animate-fadeInUp" style={{ display: "flex", gap: 12, marginBottom: 28, opacity: 0, alignItems: "flex-start" }}>
+                <div
+                  style={{
+                    width: 32, height: 32, borderRadius: 10, background: ACCENT + "14",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0, marginTop: 2,
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 1v4M7 9v4M1 7h4M9 7h4" stroke={ACCENT} strokeWidth="1.3" strokeLinecap="round" />
+                  </svg>
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {msg.type === "greeting" && (
+                    <>
+                      <div style={{ fontSize: 15, lineHeight: 1.7, color: "#3a3a3a", marginBottom: 4 }}>{msg.text}</div>
+                      <ol style={{ margin: "12px 0", paddingLeft: 22, display: "flex", flexDirection: "column", gap: 4 }}>
+                        {msg.stages.map((name, idx) => (
+                          <li key={idx} style={{ fontSize: 14.5, lineHeight: 1.6, color: "#3a3a3a" }}>
+                            {name}
+                          </li>
+                        ))}
+                      </ol>
+                      <div className="animate-fadeInUp" style={{ fontSize: 15, lineHeight: 1.7, color: "#3a3a3a", marginTop: 4, opacity: 0, animationDelay: "300ms" }}>
+                        {msg.text2}
+                      </div>
+                    </>
+                  )}
+
+                  {msg.type === "stage" && (
+                    <>
+                      <div style={{ fontSize: 15, lineHeight: 1.7, color: "#3a3a3a", marginBottom: 4 }}>{msg.preText}</div>
+                      {STAGES[msg.stageIndex].isLoyaltyModelStage ? (
+                        <LoyalStageCard
+                          stage={STAGES[msg.stageIndex]}
+                          showActions={activeStageActions === msg.stageIndex}
+                          onApprove={(action) => handleStageAction(action, msg.stageIndex)}
+                          onSkip={() => handleStageAction("Skip", msg.stageIndex)}
+                          animDelay={200}
+                          config={stageConfigs[msg.stageIndex]}
+                          onConfigChange={(cfg) => handleConfigChange(msg.stageIndex, cfg)}
+                        />
+                      ) : (
+                        <StageCard
+                          stage={STAGES[msg.stageIndex]}
+                          showActions={activeStageActions === msg.stageIndex}
+                          onApprove={(action) => handleStageAction(action, msg.stageIndex)}
+                          onSkip={() => handleStageAction("Skip", msg.stageIndex)}
+                          animDelay={200}
+                          config={stageConfigs[msg.stageIndex]}
+                          onConfigChange={(cfg) => handleConfigChange(msg.stageIndex, cfg)}
+                        />
+                      )}
+                    </>
+                  )}
+
+                  {msg.type === "text" && (
+                    <div style={{ fontSize: 15, lineHeight: 1.7, color: "#3a3a3a" }}>{msg.text}</div>
+                  )}
+
+                  {msg.type === "completion" && (
+                    <>
+                      <div style={{ fontSize: 15, lineHeight: 1.7, color: "#3a3a3a", marginBottom: 16 }}>{msg.text}</div>
+
+                      {/* Text summary of stages */}
+                      <div className="animate-fadeInUp" style={{ opacity: 0, animationDelay: "100ms", marginBottom: 20 }}>
+                        <div style={{
+                          background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 14,
+                          padding: "24px 28px", boxShadow: "0 1px 3px rgba(0,0,0,.03)",
+                        }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                            {STAGES.map((s) => (
+                              <div key={s.name} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                                <div style={{
+                                  width: 24, height: 24, borderRadius: 7, marginTop: 1,
+                                  background: s.color + "14", border: `1.5px solid ${s.color}33`,
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  flexShrink: 0,
+                                }}>
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M2.5 6l2.5 2.5L9.5 4" stroke={s.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <div style={{ fontSize: 14, fontWeight: 600, color: TEXT, lineHeight: 1.4 }}>{s.name}</div>
+                                  <div style={{ fontSize: 13, color: TEXT_MUTED, lineHeight: 1.5, marginTop: 2 }}>{s.goalSummary}</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Reassurance */}
+                      <div className="animate-fadeInUp" style={{ fontSize: 14.5, lineHeight: 1.7, color: "#6a6a62", marginBottom: 28, opacity: 0, animationDelay: "400ms" }}>
+                        {msg.text2}
+                      </div>
+
+                      {/* Next step */}
+                      <div className="animate-fadeInUp" style={{ fontSize: 15, lineHeight: 1.7, color: "#3a3a3a", marginBottom: 20, opacity: 0, animationDelay: "700ms" }}>
+                        {msg.text3}
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="animate-fadeInUp" style={{ display: "flex", alignItems: "center", gap: 12, opacity: 0, animationDelay: "900ms" }}>
+                        <button
+                          onClick={() => handleDraftCampaigns()}
+                          style={{
+                            padding: "12px 28px", borderRadius: 11, border: "none",
+                            background: ACCENT, color: "white", fontSize: 14.5, fontWeight: 500,
+                            cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                            transition: "all .25s", boxShadow: "0 2px 12px rgba(104,63,207,.18)",
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = ACCENT_DARK; e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(104,63,207,.28)"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(104,63,207,.18)"; }}
+                        >
+                          Draft messaging strategy
+                        </button>
+                        <button
+                          onClick={() => handleExploreSelf()}
+                          style={{
+                            padding: "12px 20px", borderRadius: 11, border: "none",
+                            background: "transparent", color: TEXT_MUTED, fontSize: 13.5, fontWeight: 400,
+                            cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                            transition: "all .15s",
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = TEXT; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = TEXT_MUTED; }}
+                        >
+                          I'll explore on my own
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          {isTyping && <TypingIndicator />}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Chat Input */}
+        <div
+          style={{
+            position: "absolute", bottom: 0, left: 0, right: 0,
+            background: "rgba(250,250,248,.92)", backdropFilter: "blur(12px)",
+            borderTop: `1px solid ${BORDER}`, padding: "16px 24px", zIndex: 40,
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 700, margin: "0 auto", display: "flex", alignItems: "flex-end", gap: 10,
+              background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 5,
+            }}
+          >
+            <textarea
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type a message or adjust something..."
+              rows={1}
+              style={{
+                flex: 1, border: "none", outline: "none", resize: "none",
+                padding: "10px 14px", fontSize: 14.5, lineHeight: 1.5,
+                color: TEXT, fontFamily: "'DM Sans', sans-serif", background: "transparent",
+              }}
+            />
+            <button
+              onClick={handleSendMessage}
+              style={{
+                width: 38, height: 38, borderRadius: 10, border: "none",
+                background: inputValue.trim() ? ACCENT : "#e0e0db", color: "white",
+                cursor: inputValue.trim() ? "pointer" : "default",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0, margin: 2, transition: "all .2s",
+              }}
+              onMouseEnter={(e) => { if (inputValue.trim()) e.currentTarget.style.background = ACCENT_DARK; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = inputValue.trim() ? ACCENT : "#e0e0db"; }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 8h12M10 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Side Panel */}
+      {showSidePanel && <SidePanel approvedStages={approvedStages} stages={STAGES} onEditStage={handleEditStage} stageConfigs={stageConfigs} />}
+    </div>
+  );
+}
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
