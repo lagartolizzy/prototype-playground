@@ -33,7 +33,7 @@ NC='\033[0m'
 # ============================================================
 # CONFIGURATION — Update these for your setup
 # ============================================================
-GITHUB_USERNAME="YOUR_GITHUB_USERNAME"       # ← Change this
+GITHUB_USERNAME="lagartolizzy"                # ← Change this
 REPO_NAME="prototype-playground"              # ← Change if different
 # ============================================================
 
