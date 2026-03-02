@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "name": "AIJ Agentic Vision (3 agents)",
+    "author": "Lisa",
+    "date": "2026-03-02",
+    "status": "Draft",
+    "tags": [],
+    "description": "Provocation prototype exploring the agentic approach with 3 agents",
+    "file": "aij-agentic-vision-3-agents.html"
+  }
+]
