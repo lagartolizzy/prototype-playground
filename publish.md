@@ -10,6 +10,18 @@ You are helping a designer publish an HTML prototype to the Prototype Playground
 
 If they don't provide a description, generate a brief one based on the prototype name.
 
+## Finding a screenshot automatically
+
+If the user doesn't explicitly provide a screenshot, **ask if they want to include one**. If they say yes, find the most recent screenshot on their Desktop:
+
+```bash
+ls -t ~/Desktop/Screenshot*.png 2>/dev/null | head -1
+```
+
+Show them the filename and ask if that's the right one before using it.
+
+If the user says something like "use the latest screenshot" or "grab my screenshot", find it automatically using the command above.
+
 ## Playground location
 
 - Repo: `~/Documents/prototype-playground`
@@ -27,12 +39,12 @@ If they don't provide a description, generate a brief one based on the prototype
    cp "<SOURCE_FILE>" ~/Documents/prototype-playground/prototypes/<slug>.html
    ```
 
-3. **If a screenshot is provided**, copy it to the images folder:
+3. **If a screenshot is provided or found**, copy it to the images folder:
    ```bash
    mkdir -p ~/Documents/prototype-playground/images
    cp "<SCREENSHOT_PATH>" ~/Documents/prototype-playground/images/<slug>.png
    ```
-   Supported formats: .png, .jpg, .jpeg, .webp. Keep the same extension.
+   If the source image is .jpg or .jpeg or .webp, keep that extension instead.
 
 4. **Update prototypes.json** — Read the current JSON array, then append a new entry:
    ```json
@@ -63,9 +75,10 @@ If they don't provide a description, generate a brief one based on the prototype
 
 ## Example prompts the user might say
 
-- "Publish ~/Downloads/onboarding.html as 'AI Agent Onboarding V2' with screenshot ~/Desktop/Screenshot.png"
-- "Publish this prototype as 'SMS Flow Builder'" (you'll need to ask which file)
-- "Add a screenshot to the existing AI Agent Onboarding V2 prototype" (update the image field and copy the image)
+- "Publish ~/Downloads/onboarding.html as 'AI Agent Onboarding V2'"  → ask if they want to include a screenshot
+- "Publish this with my latest screenshot" → find most recent screenshot on Desktop
+- "Publish ~/Downloads/sms.html as 'SMS Builder' with screenshot ~/Desktop/Screenshot 2026-03-02.png"
+- "Add a screenshot to the existing AI Agent Onboarding V2 prototype" → update the image field and copy the image
 
 ## Updating an existing prototype
 
