@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prototype Playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0C0C0E;
+      --surface: rgba(255,255,255,0.02);
+      --surface-hover: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.05);
+      --border-hover: rgba(255,255,255,0.1);
+      --text-primary: rgba(255,255,255,0.92);
+      --text-secondary: rgba(255,255,255,0.45);
+      --text-tertiary: rgba(255,255,255,0.25);
+      --text-muted: rgba(255,255,255,0.18);
+      --accent: #E8723A;
+      --accent-bg: rgba(232,114,58,0.1);
+      --accent-border: rgba(232,114,58,0.4);
+      --green: #10B981;
+      --green-bg: rgba(16,185,129,0.12);
+      --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'DM Mono', 'SF Mono', monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: white;
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- Scrollbar --- */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+    /* --- Layout --- */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+    @media (max-width: 640px) { .container { padding: 0 20px; } }
+
+    /* --- Header --- */
+    .header { padding-top: 28px; animation: fadeIn 0.5s ease; }
+    .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .header-brand { display: flex; align-items: center; gap: 12px; }
+    .header-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), rgba(232,114,58,0.5));
+      display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+    .header-title { font-size: 18px; font-weight: 650; letter-spacing: -0.025em; color: var(--text-primary); }
+    .header-meta { display: flex; align-items: center; gap: 10px; }
+    .header-count { font-size: 11.5px; color: var(--text-tertiary); font-family: var(--mono); }
+    .header-subtitle { margin-left: 44px; font-size: 13px; color: var(--text-tertiary); font-weight: 400; }
+
+    /* --- Search + Filters --- */
+    .toolbar { padding-top: 24px; animation: fadeIn 0.5s ease 0.1s both; }
+    .search-wrap { position: relative; margin-bottom: 16px; }
+    .search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: rgba(255,255,255,0.2); font-size: 14px; pointer-events: none;
+    }
+    .search-input {
+      width: 100%; padding: 10px 16px 10px 38px; border-radius: 10px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+      color: white; font-size: 13px; font-family: var(--font); outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .search-input::placeholder { color: var(--text-tertiary); }
+    .search-input:focus { border-color: var(--border-hover); }
+
+    .filter-rows { display: flex; flex-direction: column; gap: 10px; }
+    .filter-row { display: flex; align-items: center; gap: 8px; }
+    .filter-label { font-size: 11px; color: rgba(255,255,255,0.2); font-weight: 500; width: 50px; flex-shrink: 0; }
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .pill {
+      padding: 5px 14px; border-radius: 99px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-secondary); font-size: 12px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s ease; letter-spacing: 0.01em;
+      font-family: var(--font);
+    }
+    .pill:hover { border-color: rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); }
+    .pill.active {
+      border-color: var(--accent-border); background: var(--accent-bg); color: var(--accent);
+    }
+
+    .clear-btn {
+      margin-top: 10px; padding: 4px 12px; border-radius: 6px;
+      border: none; background: rgba(255,255,255,0.05);
+      color: var(--text-secondary); font-size: 11px; cursor: pointer; font-family: var(--font);
+      display: none;
+    }
+    .clear-btn.visible { display: inline-block; }
+
+    /* --- Grid --- */
+    .grid-area { padding: 24px 0 80px; }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;
+    }
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface); border-radius: 14px;
+      border: 1px solid var(--border); overflow: hidden;
+      cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+      text-decoration: none; color: inherit; display: block;
+    }
+    .card:hover {
+      background: var(--surface-hover); border-color: var(--border-hover); transform: translateY(-2px);
+    }
+
+    .card-preview {
+      height: 160px; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .card-preview-lines { display: flex; flex-direction: column; gap: 6px; opacity: 0.5; width: 70%; }
+    .card-preview-line { border-radius: 3px; }
+
+    .card-hover-overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0); backdrop-filter: blur(0px);
+      transition: all 0.25s ease; opacity: 0;
+    }
+    .card:hover .card-hover-overlay {
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); opacity: 1;
+    }
+    .card-hover-label {
+      padding: 8px 20px; border-radius: 8px; background: white;
+      color: #111; font-size: 13px; font-weight: 600; letter-spacing: -0.01em;
+    }
+
+    .card-body { padding: 14px 16px 16px; }
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+    .card-title {
+      font-size: 14px; font-weight: 600; color: var(--text-primary);
+      letter-spacing: -0.01em; line-height: 1.3; flex: 1; padding-right: 8px;
+    }
+    .card-desc {
+      font-size: 12.5px; color: rgba(255,255,255,0.38); line-height: 1.5;
+      margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .card-author { display: flex; align-items: center; gap: 6px; }
+    .card-avatar {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: white;
+    }
+    .card-author-name { font-size: 12px; color: var(--text-secondary); font-weight: 450; }
+    .card-date { font-size: 11px; color: var(--text-tertiary); }
+
+    /* --- Status Badge --- */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px 3px 8px; border-radius: 99px;
+      font-size: 11px; font-weight: 560; letter-spacing: 0.01em; line-height: 1;
+    }
+    .badge-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .badge-draft { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
+    .badge-draft .badge-dot { background: rgba(255,255,255,0.3); }
+    .badge-review { background: var(--accent-bg); color: var(--accent); }
+    .badge-review .badge-dot { background: var(--accent); }
+    .badge-final { background: var(--green-bg); color: var(--green); }
+    .badge-final .badge-dot { background: var(--green); }
+
+    /* --- Empty State --- */
+    .empty { text-align: center; padding: 80px 20px; animation: fadeIn 0.3s ease; }
+    .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.3; }
+    .empty-text { color: rgba(255,255,255,0.35); font-size: 14px; }
+
+    /* --- Footer Hint --- */
+    .footer-hint {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      padding: 16px 40px; background: linear-gradient(transparent, var(--bg) 60%);
+      display: flex; justify-content: center; pointer-events: none;
+    }
+    .footer-cmd {
+      font-size: 11px; color: var(--text-muted); font-family: var(--mono);
+      background: rgba(255,255,255,0.04); padding: 6px 14px; border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* --- Loading --- */
+    .loading { text-align: center; padding: 80px 20px; }
+    .loading-spinner {
+      width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.7s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: var(--text-tertiary); font-size: 13px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="container header">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="header-icon">◈</div>
+        <h1 class="header-title">Prototype Playground</h1>
+      </div>
+      <div class="header-meta">
+        <span class="header-count" id="count"></span>
+      </div>
+    </div>
+    <p class="header-subtitle">Gorgias Design Team</p>
+  </header>
+
+  <!-- Toolbar -->
+  <div class="container toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input class="search-input" type="text" placeholder="Search prototypes…" id="search">
+    </div>
+    <div class="filter-rows">
+      <div class="filter-row">
+        <span class="filter-label">Status</span>
+        <div class="filter-pills" id="status-filters"></div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">Author</span>
+        <div class="filter-pills" id="author-filters"></div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">Tags</span>
+        <div class="filter-pills" id="tag-filters"></div>
+      </div>
+    </div>
+    <button class="clear-btn" id="clear-btn" onclick="clearFilters()">Clear filters ×</button>
+  </div>
+
+  <!-- Grid -->
+  <div class="container grid-area">
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none;">
+      <div class="empty-icon">◇</div>
+      <p class="empty-text">No prototypes match your filters</p>
+    </div>
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading prototypes…</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-hint">
+    <span class="footer-cmd">./publish.sh "prototype name" ./file.html</span>
+  </div>
+
+  <script>
+    // --- State ---
+    let prototypes = [];
+    let filters = { search: '', status: null, author: null, tag: null };
+
+    // --- Color palette for authors ---
+    const COLORS = ['#E8723A','#3A7BE8','#8B5CF6','#10B981','#F59E0B','#EC4899','#06B6D4','#84CC16','#F97316','#6366F1','#14B8A6','#EF4444'];
+    const authorColors = {};
+    let colorIdx = 0;
+    function getAuthorColor(name) {
+      if (!authorColors[name]) { authorColors[name] = COLORS[colorIdx % COLORS.length]; colorIdx++; }
+      return authorColors[name];
+    }
+
+    // --- Date formatting ---
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      const now = new Date();
+      const diff = Math.floor((now - d) / 86400000);
+      if (diff === 0) return 'Today';
+      if (diff === 1) return 'Yesterday';
+      if (diff < 7) return diff + 'd ago';
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    // --- Badge class ---
+    function badgeClass(status) {
+      if (status === 'In Review') return 'badge badge-review';
+      if (status === 'Final') return 'badge badge-final';
+      return 'badge badge-draft';
+    }
+
+    // --- Build card HTML ---
+    function cardHTML(p, index) {
+      const color = getAuthorColor(p.author);
+      const href = p.file ? 'prototypes/' + p.file : '#';
+      return `
+        <a class="card" href="${href}" target="_blank" rel="noopener" style="animation: cardIn 0.4s cubic-bezier(0.2,0,0,1) ${index * 0.04}s both;">
+          <div class="card-preview" style="background: linear-gradient(135deg, ${color}18, ${color}08);">
+            <div class="card-preview-lines">
+              <div class="card-preview-line" style="height:6px;background:${color};width:60%;opacity:0.4;"></div>
+              <div class="card-preview-line" style="height:4px;background:rgba(255,255,255,0.15);width:90%;"></div>
+              <div class="card-preview-line" style="height:4px;background:rgba(255,255,255,0.1);width:75%;"></div>
+              <div style="display:flex;gap:6px;margin-top:6px;">
+                <div style="height:22px;flex:1;background:rgba(255,255,255,0.06);border-radius:4px;"></div>
+                <div style="height:22px;width:50px;background:${color}30;border-radius:4px;"></div>
+              </div>
+              <div class="card-preview-line" style="height:4px;background:rgba(255,255,255,0.08);width:85%;margin-top:4px;"></div>
+              <div class="card-preview-line" style="height:4px;background:rgba(255,255,255,0.06);width:65%;"></div>
+            </div>
+            <div class="card-hover-overlay">
+              <span class="card-hover-label">Open Prototype →</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-header">
+              <h3 class="card-title">${p.name}</h3>
+              <span class="${badgeClass(p.status)}"><span class="badge-dot"></span>${p.status}</span>
+            </div>
+            <p class="card-desc">${p.description || ''}</p>
+            <div class="card-footer">
+              <div class="card-author">
+                <div class="card-avatar" style="background:linear-gradient(135deg,${color}90,${color}50);">${p.author[0]}</div>
+                <span class="card-author-name">${p.author}</span>
+              </div>
+              <span class="card-date">${formatDate(p.date)}</span>
+            </div>
+          </div>
+        </a>`;
+    }
+
+    // --- Render grid ---
+    function render() {
+      const q = filters.search.toLowerCase();
+      const filtered = prototypes.filter(p => {
+        if (q && !p.name.toLowerCase().includes(q) && !(p.description || '').toLowerCase().includes(q)) return false;
+        if (filters.status && p.status !== filters.status) return false;
+        if (filters.author && p.author !== filters.author) return false;
+        if (filters.tag && !(p.tags || []).includes(filters.tag)) return false;
+        return true;
+      });
+
+      const grid = document.getElementById('grid');
+      const empty = document.getElementById('empty');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        grid.innerHTML = filtered.map((p, i) => cardHTML(p, i)).join('');
+      }
+
+      // Update clear button
+      const hasFilters = filters.status || filters.author || filters.tag;
+      document.getElementById('clear-btn').classList.toggle('visible', !!hasFilters);
+    }
+
+    // --- Build filter pills ---
+    function buildFilters() {
+      const statuses = [...new Set(prototypes.map(p => p.status))].sort();
+      const authors = [...new Set(prototypes.map(p => p.author))].sort();
+      const tags = [...new Set(prototypes.flatMap(p => p.tags || []))].sort();
+
+      document.getElementById('status-filters').innerHTML = statuses.map(s =>
+        `<button class="pill" data-filter="status" data-value="${s}">${s}</button>`
+      ).join('');
+
+      document.getElementById('author-filters').innerHTML = authors.map(a =>
+        `<button class="pill" data-filter="author" data-value="${a}">${a}</button>`
+      ).join('');
+
+      document.getElementById('tag-filters').innerHTML = tags.map(t =>
+        `<button class="pill" data-filter="tag" data-value="${t}">${t}</button>`
+      ).join('');
+
+      // Bind clicks
+      document.querySelectorAll('.pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.filter;
+          const val = btn.dataset.value;
+          filters[key] = filters[key] === val ? null : val;
+          updatePillStates();
+          render();
+        });
+      });
+    }
+
+    function updatePillStates() {
+      document.querySelectorAll('.pill').forEach(btn => {
+        const key = btn.dataset.filter;
+        const val = btn.dataset.value;
+        btn.classList.toggle('active', filters[key] === val);
+      });
+    }
+
+    function clearFilters() {
+      filters.status = null;
+      filters.author = null;
+      filters.tag = null;
+      updatePillStates();
+      render();
+    }
+
+    // --- Search ---
+    document.getElementById('search').addEventListener('input', (e) => {
+      filters.search = e.target.value;
+      render();
+    });
+
+    // --- Load data ---
+    async function init() {
+      try {
+        const res = await fetch('prototypes.json');
+        if (!res.ok) throw new Error('Failed to load');
+        prototypes = await res.json();
+      } catch (e) {
+        // Fallback: show empty state
+        prototypes = [];
+      }
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('count').textContent = prototypes.length + ' prototype' + (prototypes.length !== 1 ? 's' : '');
+      buildFilters();
+      render();
+    }
+
+    init();
+  </script>
+</body>
+</html>

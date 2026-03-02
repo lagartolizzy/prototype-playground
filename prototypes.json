@@ -1,0 +1,29 @@
+[
+  {
+    "name": "AI Agent Onboarding V2",
+    "author": "Lisa",
+    "date": "2026-03-01",
+    "status": "In Review",
+    "tags": ["AI Agent", "Onboarding"],
+    "description": "Redesigned onboarding flow for AI Agent setup with guided configuration steps",
+    "file": "ai-agent-onboarding-v2.html"
+  },
+  {
+    "name": "SMS Campaign Builder",
+    "author": "Marcus",
+    "date": "2026-02-28",
+    "status": "Draft",
+    "tags": ["SMS", "Campaigns"],
+    "description": "New drag-and-drop interface for building SMS marketing campaigns",
+    "file": "sms-campaign-builder.html"
+  },
+  {
+    "name": "Conversation Summary Panel",
+    "author": "Sophie",
+    "date": "2026-02-27",
+    "status": "Final",
+    "tags": ["AI Agent", "Inbox"],
+    "description": "AI-generated conversation summaries displayed inline in the helpdesk inbox",
+    "file": "conversation-summary-panel.html"
+  }
+]
