@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing - Steve Madden</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    display: flex;
+    background: #f5f5f5;
+    color: #1a1a2e;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 250px;
+    height: 100%;
+    background: #fff;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 18px 12px;
+  }
+
+  .sidebar-header .icon-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-header .icon-circle svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .sidebar-header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a2e;
+  }
+
+  .store-selector {
+    margin: 6px 14px 16px;
+    padding: 9px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+
+  .store-selector:hover { background: #f9fafb; }
+
+  .store-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .store-info { flex: 1; min-width: 0; }
+
+  .store-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .store-url {
+    font-size: 11px;
+    color: #9ca3af;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .store-selector .chevron {
+    width: 16px;
+    height: 16px;
+    color: #9ca3af;
+    flex-shrink: 0;
+  }
+
+  .nav-section { padding: 0 10px; flex: 1; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { background: #f3f4f6; color: #1a1a2e; }
+
+  .nav-item.active {
+    background: #f0edff;
+    color: #6366f1;
+    font-weight: 600;
+  }
+
+  .nav-item .nav-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .nav-item.active .nav-icon { stroke: #6366f1; }
+
+  /* ── Welcome View (main content for welcome page) ── */
+  .main-welcome {
+    flex: 1;
+    min-height: 100vh;
+    background: #f9fafb;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 56px 40px 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Logo */
+  .hero-logo {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 28px;
+  }
+
+  /* Hero heading */
+  .hero-heading {
+    font-family: 'Georgia', 'Times New Roman', Times, serif;
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: #1a1a2e;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  /* Hero subtitle */
+  .hero-subtitle {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #6b7280;
+    margin-bottom: 44px;
+    max-width: 520px;
+    text-align: center;
+  }
+
+  /* Cards */
+  .cards-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+  }
+
+  .card:hover {
+    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .card-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .card-icon {
+    background: #f3f4f6;
+  }
+
+  .card-icon svg {
+    stroke: #6b7280;
+  }
+
+  .card-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 3px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.45;
+  }
+
+  .card-arrow {
+    width: 20px;
+    height: 20px;
+    color: #c5c9d1;
+    flex-shrink: 0;
+  }
+
+  /* ── Chat View (main content for chat page) ── */
+  .chat-main {
+    flex: 1;
+    height: 100%;
+    background:
+      radial-gradient(circle, #d1d5db 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-color: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  /* ── Chat header (sticky) ── */
+  .chat-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: rgba(249, 250, 251, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e5e7eb;
+    z-index: 10;
+  }
+
+  .chat-back-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    flex-shrink: 0;
+  }
+
+  .chat-back-btn:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+
+  .chat-back-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: #4b5563;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .chat-header-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+  }
+
+  .chat-container {
+    flex: 1 1 0;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 32px 0;
+    overflow-y: auto;
+  }
+
+  .messages {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: 24px;
+  }
+
+  /* User message */
+  .msg-user {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .msg-user .bubble {
+    background: #f0f0f2;
+    color: #1a1a2e;
+    padding: 14px 18px;
+    border-radius: 18px 18px 4px 18px;
+    font-size: 14px;
+    line-height: 1.55;
+    max-width: 80%;
+  }
+
+  /* Assistant message */
+  .msg-assistant {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .msg-assistant .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+
+  .msg-assistant .bubble {
+    color: #1a1a2e;
+    font-size: 14px;
+    line-height: 1.55;
+    max-width: 80%;
+    padding: 6px 14px 10px;
+    border-radius: 14px;
+    position: relative;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background: rgba(249, 250, 251, 0.82);
+  }
+
+  /* ── Input area — pinned to bottom ── */
+  .input-area {
+    padding: 24px 32px 32px;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    flex-shrink: 0;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  /* Regular input */
+  .text-input {
+    width: 100%;
+    padding: 14px 48px 14px 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1a1a2e;
+    background: #fff;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    resize: none;
+    overflow-y: auto;
+    line-height: 1.55;
+    min-height: 48px;
+    max-height: 400px;
+  }
+
+  .text-input::placeholder { color: #b0b5be; }
+  .text-input:focus {
+    border-color: #c7d2fe;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.08);
+  }
+
+  .send-btn {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: #e5e7eb;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .send-btn.active {
+    background: #1a1a2e;
+    cursor: pointer;
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .send-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── Selection cards ── */
+  .selection-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .45s ease, transform .45s ease;
+    pointer-events: none;
+    display: none;
+  }
+
+  .selection-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    display: block;
+  }
+
+  .selection-card.hiding {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+  }
+
+  .selection-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 14px;
+  }
+
+  .selection-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f7f7f8;
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    text-align: left;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  .option-btn:hover {
+    border-color: #c7d2fe;
+    background: #faf9ff;
+  }
+
+  .option-radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #d1d5db;
+    flex-shrink: 0;
+    transition: border-color .15s;
+  }
+
+  .option-btn:hover .option-radio {
+    border-color: #6366f1;
+  }
+
+  .option-other {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f7f7f8;
+    transition: border-color .15s;
+  }
+
+  .option-other input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-family: inherit;
+    color: #374151;
+    background: transparent;
+  }
+
+  .option-other input::placeholder { color: #b0b5be; }
+
+  /* Hidden state for text input */
+  .input-wrapper.hidden {
+    display: none;
+  }
+
+  /* ── Inline cards (inside chat messages) ── */
+  .inline-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin: 6px 0;
+    background: #fff;
+    position: relative;
+    transition: border-color .15s, box-shadow .15s;
+    cursor: default;
+  }
+
+  .inline-card:hover {
+    border-color: #c7d2fe;
+    box-shadow: 0 1px 6px rgba(99,102,241,.08);
+  }
+
+  .inline-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 3px;
+  }
+
+  .inline-card-desc {
+    font-size: 12.5px;
+    color: #6b7280;
+    line-height: 1.45;
+  }
+
+  .use-in-prompt-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    color: #6366f1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .15s, background .15s;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+
+  .inline-card:hover .use-in-prompt-btn {
+    opacity: 1;
+  }
+
+  .use-in-prompt-btn:hover {
+    background: #f0edff;
+    border-color: #c7d2fe;
+  }
+
+  /* ── Input chips ── */
+  .chip-input-area {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 6px;
+    width: 100%;
+    padding: 10px 48px 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #fff;
+    min-height: 48px;
+    max-height: 400px;
+    overflow-y: auto;
+    cursor: text;
+    transition: border-color .15s, box-shadow .15s;
+  }
+
+  .chip-input-area:focus-within {
+    border-color: #c7d2fe;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.08);
+  }
+
+  .input-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #f0edff;
+    color: #4338ca;
+    font-size: 12.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .chip-remove {
+    width: 14px;
+    height: 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #818cf8;
+    font-size: 14px;
+    line-height: 1;
+    border-radius: 50%;
+    transition: background .15s;
+  }
+
+  .chip-remove:hover {
+    background: rgba(99,102,241,.12);
+    color: #4338ca;
+  }
+
+  .chip-text-input {
+    flex: 1;
+    min-width: 60px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1a1a2e;
+    background: transparent;
+    padding: 2px 0;
+    resize: none;
+    overflow: hidden;
+    line-height: 1.55;
+    min-height: 24px;
+  }
+
+  .chip-text-input::placeholder { color: #b0b5be; }
+
+  .chip-input-wrapper {
+    position: relative;
+    display: none;
+  }
+
+  .chip-input-wrapper.visible {
+    display: block;
+  }
+
+  .chip-send-btn {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: #e5e7eb;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .chip-send-btn.active {
+    background: #1a1a2e;
+    cursor: pointer;
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .chip-send-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── Collapsible segment preview ── */
+  .segment-preview {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f2;
+  }
+
+  .segment-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 0;
+  }
+
+  .segment-toggle-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    stroke: #9ca3af;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform .2s ease;
+  }
+
+  .segment-toggle.open .segment-toggle-icon {
+    transform: rotate(90deg);
+  }
+
+  .segment-toggle-label {
+    font-size: 12.5px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  .segment-body {
+    display: none;
+    padding: 10px 0 4px 4px;
+  }
+
+  .segment-toggle.open + .segment-body {
+    display: block;
+  }
+
+  .segment-rule {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 12.5px;
+    color: #6b7280;
+    line-height: 1.45;
+  }
+
+  .segment-rule + .segment-rule {
+    border-top: 1px solid #f3f4f6;
+  }
+
+  .shopify-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    font-size: 11px;
+    font-weight: 500;
+    color: #15803d;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .shopify-tag svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .segment-connector {
+    font-size: 11px;
+    font-weight: 600;
+    color: #d1d5db;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 0;
+  }
+
+  /* ── Inline links in assistant messages ── */
+  .msg-assistant .bubble a {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(99,102,241,.25);
+    transition: border-color .15s;
+  }
+
+  .msg-assistant .bubble a:hover {
+    border-bottom-color: #6366f1;
+  }
+
+  /* ── Preview Panel (right side) ── */
+  .preview-panel {
+    width: 0;
+    min-width: 0;
+    background: #fff;
+    border-left: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: width .4s cubic-bezier(0.4, 0, 0.2, 1), min-width .4s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+  }
+
+  .preview-panel.open {
+    width: 380px;
+    min-width: 380px;
+  }
+
+  .preview-panel-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+  }
+
+  .preview-panel-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 12px;
+  }
+
+  .flow-select {
+    width: 100%;
+    padding: 8px 28px 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #1a1a2e;
+    background: #f9fafb;
+    outline: none;
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+
+  .flow-select:focus {
+    border-color: #c7d2fe;
+  }
+
+  .preview-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 20px;
+  }
+
+  .preview-gen-for {
+    font-size: 12.5px;
+    color: #9ca3af;
+    margin-bottom: 14px;
+  }
+
+  .shopper-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+
+  .shopper-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .shopper-card-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+  }
+
+  .shopper-card-link {
+    font-size: 12px;
+    color: #6366f1;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(99,102,241,.25);
+  }
+
+  .shopper-card-link:hover {
+    border-bottom-color: #6366f1;
+  }
+
+  .shopper-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .shopper-stat {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+  }
+
+  .shopper-stat .stat-label {
+    color: #6b7280;
+  }
+
+  .shopper-stat .stat-value {
+    font-weight: 500;
+    color: #1a1a2e;
+  }
+
+  .regen-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 9px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    background: #f9fafb;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .15s, border-color .15s;
+    margin-bottom: 18px;
+  }
+
+  .regen-btn:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+
+  .regen-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .preview-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #9ca3af;
+    margin-bottom: 8px;
+  }
+
+  .preview-reasoning {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  /* iMessage bubble */
+  .imessage-bubble {
+    background: #e9e9eb;
+    border-radius: 18px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #1a1a2e;
+    line-height: 1.55;
+    position: relative;
+    max-width: 100%;
+  }
+
+  .imessage-time {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  /* ── Preview panel loading state ── */
+  .preview-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+  }
+
+  .preview-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Content fade-in */
+  .preview-panel-body .preview-content {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+
+  .preview-panel-body .preview-content.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Nav item fade-in */
+  .nav-item.fade-in {
+    animation: navFadeIn .4s ease forwards;
+  }
+
+  @keyframes navFadeIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── View container ── */
+  #view-welcome {
+    display: flex;
+    flex: 1;
+  }
+
+  #view-chat {
+    display: none;
+    flex: 1;
+    height: 100%;
+  }
+
+  #view-chat.visible {
+    display: flex;
+  }
+
+  .chat-with-preview {
+    display: flex;
+    flex: 1;
+    height: 100%;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>
+      </div>
+      <h1>Marketing</h1>
+    </div>
+
+    <div class="store-selector">
+      <div class="store-avatar">S</div>
+      <div class="store-info">
+        <div class="store-name">Steve Madden</div>
+        <div class="store-url">stevemadden.com</div>
+      </div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+
+    <nav class="nav-section">
+      <a class="nav-item active" href="#welcome" onclick="switchToWelcome(event)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+          <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11.95A22 22 0 0 1 12 15z"/>
+          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 3 0 3 0"/>
+          <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-3 0-3"/>
+        </svg>
+        Welcome
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Welcome View -->
+  <main class="main-welcome" id="view-welcome">
+    <div class="main-inner">
+
+      <!-- Logo -->
+      <img class="hero-logo" src="logo.jpg" alt="Logo" />
+
+      <!-- Hero copy -->
+      <h2 class="hero-heading">Reach your customers, effortlessly</h2>
+      <p class="hero-subtitle">Create personalized outreach that converts. Whether it's a timely promotion or an always-on engagement, we'll help you craft the perfect message.</p>
+
+      <!-- Cards -->
+      <div class="cards-stack">
+
+        <!-- Card 1: Automated outreach — branching flow icon -->
+        <div class="card" onclick="switchToChat()">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="6" cy="6" r="2"/>
+              <circle cx="18" cy="6" r="2"/>
+              <circle cx="18" cy="18" r="2"/>
+              <path d="M6 8v2a4 4 0 0 0 4 4h4a4 4 0 0 1 4 4"/>
+              <path d="M6 8v0a4 4 0 0 1 4-4h4"/>
+            </svg>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Set up an automated outreach</div>
+            <div class="card-desc">Enable always-on messaging that is sent based on customer behavior</div>
+          </div>
+          <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+
+        <!-- Card 2: Campaign — bullseye icon -->
+        <div class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2"/>
+            </svg>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Craft targeted campaign</div>
+            <div class="card-desc">Perfect for time-sensitive promotions, announcements, or seasonal offers</div>
+          </div>
+          <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+
+        <!-- Card 3: Brainstorm — lightbulb icon -->
+        <div class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" stroke="currentColor">
+              <path d="M9 18h6"/>
+              <path d="M10 22h4"/>
+              <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>
+            </svg>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Brainstorm</div>
+            <div class="card-desc">Not sure where to start? Share your marketing goal and we'll suggest the best approach</div>
+          </div>
+          <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Chat View -->
+  <div id="view-chat" class="chat-with-preview">
+    <main class="chat-main">
+      <div class="chat-header">
+        <button class="chat-back-btn" onclick="switchToWelcome()" title="Back to Welcome">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        </button>
+        <span class="chat-header-title">Automated Outreach</span>
+      </div>
+
+      <div class="chat-container" id="chatContainer">
+        <div class="messages" id="messages">
+
+          <!-- User message 1 (appears immediately) -->
+          <div class="msg-user" id="userMsg1" style="opacity:0;">
+            <div class="bubble">Hey! I'd like to set up automated flows that will send messages to shoppers based on their behavior. Which flows do you have available for me to set up?</div>
+          </div>
+
+          <!-- Assistant message 1 (typed out) -->
+          <div class="msg-assistant" id="assistantMsg1" style="opacity:0;">
+            <img class="avatar" src="logo.jpg" alt="Assistant" />
+            <div class="bubble"><span id="typedText1"></span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Input area pinned at bottom -->
+      <div class="input-area" id="inputArea">
+        <!-- Regular text input -->
+        <div class="input-wrapper" id="textInputWrapper">
+          <textarea class="text-input" id="mainTextInput" placeholder="Type your message..." rows="1"></textarea>
+          <button class="send-btn" id="mainSendBtn">
+            <svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+          </button>
+        </div>
+
+        <!-- Chip input (shown when "Use in the prompt" is clicked) -->
+        <div class="chip-input-wrapper" id="chipInputWrapper">
+          <div class="chip-input-area" id="chipInputArea">
+            <textarea class="chip-text-input" id="chipTextInput" placeholder="Type your message..." rows="1"></textarea>
+          </div>
+          <button class="chip-send-btn" id="chipSendBtn">
+            <svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+          </button>
+        </div>
+
+        <!-- Selection card 1: confidence level -->
+        <div class="selection-card" id="selectionCard1">
+          <div class="selection-label">How confident are you with marketing automation flows?</div>
+          <div class="selection-options">
+            <button class="option-btn" id="optBasic">
+              <div class="option-radio"></div>
+              Some basic understanding, but need support enabling them
+            </button>
+            <button class="option-btn" id="optExpert">
+              <div class="option-radio"></div>
+              I'm an expert, let's get those set up
+            </button>
+            <div class="option-other">
+              <div class="option-radio"></div>
+              <input type="text" placeholder="Something else..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Selection card 2: confirm flows -->
+        <div class="selection-card" id="selectionCard2">
+          <div class="selection-label">Do those flows look like a good start to you?</div>
+          <div class="selection-options">
+            <button class="option-btn" id="optYesFlows">
+              <div class="option-radio"></div>
+              Yes, let's enable those
+            </button>
+            <div class="option-other">
+              <div class="option-radio"></div>
+              <input type="text" placeholder="Something else..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Selection card 3: segment confirmation -->
+        <div class="selection-card" id="selectionCard3">
+          <div class="selection-label">Who should receive these messages?</div>
+          <div class="selection-options">
+            <button class="option-btn">
+              <div class="option-radio"></div>
+              Proceed with default recipients (all shoppers opted in)
+            </button>
+            <div class="option-other">
+              <div class="option-radio"></div>
+              <input type="text" placeholder="Something else..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Selection card 4: create segment -->
+        <div class="selection-card" id="selectionCard4">
+          <div class="selection-label">Would you like to create this segment?</div>
+          <div class="selection-options">
+            <button class="option-btn" id="optCreateSegment">
+              <div class="option-radio"></div>
+              Yes, create segment
+            </button>
+            <div class="option-other">
+              <div class="option-radio"></div>
+              <input type="text" placeholder="Something else..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Selection card 5: message review -->
+        <div class="selection-card" id="selectionCard5">
+          <div class="selection-label">How do messages look?</div>
+          <div class="selection-options">
+            <button class="option-btn" id="optMessagesGood">
+              <div class="option-radio"></div>
+              Everything looks good
+            </button>
+            <div class="option-other">
+              <div class="option-radio"></div>
+              <input type="text" placeholder="Something else..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Selection card 6: enable flows -->
+        <div class="selection-card" id="selectionCard6">
+          <div class="selection-label">When would you like to enable these flows?</div>
+          <div class="selection-options">
+            <button class="option-btn" id="optEnableNow">
+              <div class="option-radio"></div>
+              Enable now
+            </button>
+            <button class="option-btn" id="optEnableScheduled">
+              <div class="option-radio"></div>
+              Enable on specific date and time
+            </button>
+            <button class="option-btn" id="optSaveDraft">
+              <div class="option-radio"></div>
+              Save as draft, I'll enable later
+            </button>
+            <div class="option-other">
+              <div class="option-radio"></div>
+              <input type="text" placeholder="Something else..." />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Preview Panel (right side) -->
+    <aside class="preview-panel" id="previewPanel">
+      <div class="preview-panel-header">
+        <div class="preview-panel-title">Message Preview</div>
+        <select class="flow-select" id="flowSelect" onchange="onFlowChange(this.value)">
+          <option value="Cart Abandonment">Cart Abandonment</option>
+          <option value="Browse Abandonment">Browse Abandonment</option>
+          <option value="Welcome Flow">Welcome Flow</option>
+        </select>
+      </div>
+      <div class="preview-panel-body">
+        <!-- Loading spinner (shown initially) -->
+        <div class="preview-loading" id="previewLoading" style="display:none;">
+          <div class="preview-spinner"></div>
+        </div>
+
+        <!-- Actual content (fades in after loading) -->
+        <div class="preview-content" id="previewContent">
+          <div class="preview-gen-for" id="previewGenFor">Message generated for Sara Jones</div>
+
+          <!-- Shopper card -->
+          <div class="shopper-card">
+            <div class="shopper-card-header">
+              <span class="shopper-card-name" id="previewShopperName">Sara Jones</span>
+              <a class="shopper-card-link" href="#profile" target="_blank">View Profile</a>
+            </div>
+            <div class="shopper-stats">
+              <div class="shopper-stat"><span class="stat-label">LTV</span><span class="stat-value" id="previewLTV">$1,847</span></div>
+              <div class="shopper-stat"><span class="stat-label">Orders</span><span class="stat-value" id="previewOrders">12</span></div>
+              <div class="shopper-stat"><span class="stat-label">Support tickets</span><span class="stat-value" id="previewTickets">0</span></div>
+              <div class="shopper-stat"><span class="stat-label">Last purchase</span><span class="stat-value" id="previewLastPurchase">15 days ago</span></div>
+            </div>
+          </div>
+
+          <!-- Regen button -->
+          <button class="regen-btn" onclick="cycleShopperPreview()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8a6 6 0 0111-3M14 8a6 6 0 01-11 3"/><path d="M14 2v4h-4M2 14v-4h4"/></svg>
+            Generate for a different shopper
+          </button>
+
+          <!-- Reasoning -->
+          <div class="preview-section-label">Reasoning</div>
+          <div class="preview-reasoning" id="previewReasoning"></div>
+
+          <!-- iMessage preview -->
+          <div class="preview-section-label">Message</div>
+          <div class="imessage-bubble" id="previewMessageText"></div>
+          <div class="imessage-time">Just now</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+<script>
+  // ─── View Switching Logic ───
+  let chatInitialized = false;
+
+  function switchToWelcome(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    document.getElementById('view-welcome').style.display = 'flex';
+    document.getElementById('view-chat').classList.remove('visible');
+    document.querySelector('.nav-item').classList.add('active');
+  }
+
+  function switchToChat() {
+    document.getElementById('view-welcome').style.display = 'none';
+    document.getElementById('view-chat').classList.add('visible');
+    document.querySelector('.nav-item').classList.remove('active');
+
+    // Initialize chat animation sequence ONLY on first visit
+    if (!chatInitialized) {
+      chatInitialized = true;
+      initializeChatAnimation();
+    }
+  }
+
+  // ─── Chat Initialization ───
+  const chatContainer = document.getElementById('chatContainer');
+  const messages = document.getElementById('messages');
+  const textInputWrapper = document.getElementById('textInputWrapper');
+  const selectionCard1 = document.getElementById('selectionCard1');
+  const selectionCard2 = document.getElementById('selectionCard2');
+  const selectionCard3 = document.getElementById('selectionCard3');
+  const selectionCard4 = document.getElementById('selectionCard4');
+  const selectionCard5 = document.getElementById('selectionCard5');
+  const selectionCard6 = document.getElementById('selectionCard6');
+
+  // Utility: type text character by character (supports HTML)
+  function typeText(element, text, speed, onDone) {
+    // If text contains HTML, use the reveal approach
+    if (text.includes('<')) {
+      // Set full HTML but hide it, then reveal char by char
+      element.innerHTML = text;
+      const fullHTML = element.innerHTML;
+
+      // Extract only visible text (no tags)
+      const tmp = document.createElement('div');
+      tmp.innerHTML = text;
+      const plainText = tmp.textContent;
+
+      // Now we'll rebuild by walking through plainText chars
+      // and map them back to the HTML string
+      let htmlIdx = 0;
+      let charIdx = 0;
+      element.innerHTML = '';
+
+      function nextChar() {
+        if (charIdx < plainText.length) {
+          // Advance htmlIdx past any tags
+          let slice = '';
+          while (htmlIdx < fullHTML.length) {
+            if (fullHTML[htmlIdx] === '<') {
+              const closeIdx = fullHTML.indexOf('>', htmlIdx);
+              slice += fullHTML.substring(htmlIdx, closeIdx + 1);
+              htmlIdx = closeIdx + 1;
+            } else {
+              slice += fullHTML[htmlIdx];
+              htmlIdx++;
+              charIdx++;
+              break;
+            }
+          }
+          element.innerHTML = fullHTML.substring(0, htmlIdx);
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+          setTimeout(nextChar, speed);
+        } else {
+          // Ensure full content is shown
+          element.innerHTML = fullHTML;
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+          if (onDone) onDone();
+        }
+      }
+      nextChar();
+    } else {
+      // Plain text — simple approach
+      let i = 0;
+      function next() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+          setTimeout(next, speed);
+        } else if (onDone) {
+          onDone();
+        }
+      }
+      next();
+    }
+  }
+
+  // Utility: add a user message bubble
+  function addUserMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'msg-user';
+    div.innerHTML = '<div class="bubble">' + text + '</div>';
+    div.style.opacity = '0';
+    messages.appendChild(div);
+    requestAnimationFrame(() => {
+      div.style.transition = 'opacity .3s ease';
+      div.style.opacity = '1';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    });
+    return div;
+  }
+
+  // Utility: add an assistant message with typing
+  function addAssistantMessage(text, speed, onDone) {
+    const div = document.createElement('div');
+    div.className = 'msg-assistant';
+    div.style.opacity = '0';
+    div.innerHTML =
+      '<img class="avatar" src="logo.jpg" alt="Assistant" />' +
+      '<div class="bubble"><span class="typed-span"></span></div>';
+    messages.appendChild(div);
+
+    requestAnimationFrame(() => {
+      div.style.transition = 'opacity .3s ease';
+      div.style.opacity = '1';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      const span = div.querySelector('.typed-span');
+
+      typeText(span, text, speed, () => {
+        if (onDone) onDone();
+      });
+    });
+  }
+
+  // Utility: show text input
+  function showTextInput() {
+    textInputWrapper.classList.remove('hidden');
+    const ti = document.getElementById('mainTextInput');
+    ti.value = '';
+    ti.style.height = 'auto';
+    // Reset send button
+    const sb = document.getElementById('mainSendBtn');
+    if (sb) sb.classList.remove('active');
+    // Also hide chip input if visible
+    const ciw = document.getElementById('chipInputWrapper');
+    if (ciw) ciw.classList.remove('visible');
+  }
+
+  // Utility: hide text input
+  function hideTextInput() {
+    textInputWrapper.classList.add('hidden');
+    // Also hide chip input if visible
+    const ciw = document.getElementById('chipInputWrapper');
+    if (ciw) ciw.classList.remove('visible');
+  }
+
+  function initializeChatAnimation() {
+    // ─── Phase 1: Initial messages ───
+
+    const response1 = "Hi Lisa! I'd love to help you set those up. Before I dive in, let me ask a couple of key questions to make sure we focus on the right things.";
+
+    // Show user message 1 immediately
+    setTimeout(() => {
+      const u1 = document.getElementById('userMsg1');
+      u1.style.transition = 'opacity .3s ease';
+      u1.style.opacity = '1';
+    }, 300);
+
+    // After 2s, type assistant response 1
+    setTimeout(() => {
+      const a1 = document.getElementById('assistantMsg1');
+      a1.style.transition = 'opacity .3s ease';
+      a1.style.opacity = '1';
+
+      const span1 = document.getElementById('typedText1');
+
+      typeText(span1, response1, 25, () => {
+        // Show selection card 1
+        setTimeout(() => {
+          hideTextInput();
+          selectionCard1.style.display = 'block';
+          requestAnimationFrame(() => {
+            selectionCard1.classList.add('visible');
+          });
+        }, 400);
+      });
+    }, 2300);
+  }
+
+  // ─── Phase 2: User clicks "basic understanding" ───
+
+  const fullResponse2 =
+    "Great, I'll make sure to provide additional context while we go through the setup process. You can always ask me follow-up questions if anything is unclear." +
+    "<br><br>Based on your store, I'd recommend starting with three foundational flows that are essential for any e-commerce business:" +
+    '<br><br><div class="inline-card" data-chip="Cart Abandonment"><div class="inline-card-title">Cart Abandonment</div><div class="inline-card-desc">Sends a message to any shopper who added a product to their cart but didn\'t complete checkout. This is typically the highest-revenue automation for online stores.</div><button class="use-in-prompt-btn" onclick="insertChip(\'Cart Abandonment\')">Use in the prompt</button></div>' +
+    '<div class="inline-card" data-chip="Browse Abandonment"><div class="inline-card-title">Browse Abandonment</div><div class="inline-card-desc">Targets shoppers who viewed specific products on your site but left without adding anything to their cart. A gentle nudge to bring them back.</div><button class="use-in-prompt-btn" onclick="insertChip(\'Browse Abandonment\')">Use in the prompt</button></div>' +
+    '<div class="inline-card" data-chip="Welcome Flow"><div class="inline-card-title">Welcome Flow</div><div class="inline-card-desc">Automatically greets new subscribers with a warm introduction to your brand, often paired with an exclusive offer to drive their first purchase.</div><button class="use-in-prompt-btn" onclick="insertChip(\'Welcome Flow\')">Use in the prompt</button></div>';
+
+  document.getElementById('optBasic').addEventListener('click', () => {
+    // Hide selection card 1
+    selectionCard1.classList.add('hiding');
+    selectionCard1.classList.remove('visible');
+    setTimeout(() => {
+      selectionCard1.style.display = 'none';
+      selectionCard1.classList.remove('hiding');
+    }, 450);
+
+    // Show text input while typing
+    showTextInput();
+
+    // Add user message
+    setTimeout(() => {
+      addUserMessage("I have some basic understanding, but I need some support enabling flows.");
+
+      // After 2s, type assistant response 2
+      setTimeout(() => {
+        addAssistantMessage(fullResponse2, 18, () => {
+          // After typing is done, show selection card 2
+          setTimeout(() => {
+            hideTextInput();
+            selectionCard2.style.display = 'block';
+            requestAnimationFrame(() => {
+              selectionCard2.classList.add('visible');
+            });
+          }, 400);
+        });
+      }, 2000);
+    }, 300);
+  });
+
+  // ─── Phase 3: User clicks "Yes, let's enable those" ───
+
+  const fullResponse3 =
+    "Excellent! Let's get all three flows set up." +
+    "<br><br>Now let's define who should receive the messages. By default, these flows will target <strong style=\"font-weight:700\">all SMS subscribers who have opted in</strong> to receive marketing materials from your store." +
+    "<br><br>That said, here are a few common exclusions you might want to consider:" +
+    '<br><br><div class="inline-card" data-chip="Exclude VIP customers"><div class="inline-card-title">VIP customers</div><div class="inline-card-desc">Some brands prefer to handle VIP outreach separately with more personalized messaging, rather than including them in automated flows.</div><button class="use-in-prompt-btn" onclick="insertChip(\'Exclude VIP customers\')">Use in the prompt</button></div>' +
+    '<div class="inline-card" data-chip="Exclude recent support inquiries"><div class="inline-card-title">Recent support inquiries</div><div class="inline-card-desc">Shoppers who have open or recently resolved support tickets — especially those with negative sentiment — may not respond well to a promotional message right away.</div><button class="use-in-prompt-btn" onclick="insertChip(\'Exclude recent support inquiries\')">Use in the prompt</button></div>' +
+    '<div class="inline-card" data-chip="Exclude recent purchasers (24h)"><div class="inline-card-title">Recent purchasers (last 24h)</div><div class="inline-card-desc">Customers who just completed a purchase might find an immediate cart or browse abandonment nudge confusing or redundant.</div><button class="use-in-prompt-btn" onclick="insertChip(\'Exclude recent purchasers (24h)\')">Use in the prompt</button></div>' +
+    "<br>Let me know if you'd like to exclude any of these groups, or we can proceed with the default audience.";
+
+  // ─── Chip insertion logic ───
+
+  const chipInputWrapper = document.getElementById('chipInputWrapper');
+  const chipInputArea = document.getElementById('chipInputArea');
+  const chipTextInput = document.getElementById('chipTextInput');
+
+  function insertChip(name) {
+    // Hide any visible selection card
+    [selectionCard1, selectionCard2, selectionCard3, selectionCard4, selectionCard5, selectionCard6].forEach(card => {
+      if (card.classList.contains('visible')) {
+        card.classList.add('hiding');
+        card.classList.remove('visible');
+        setTimeout(() => {
+          card.style.display = 'none';
+          card.classList.remove('hiding');
+        }, 450);
+      }
+    });
+
+    // Hide regular text input, show chip input
+    textInputWrapper.classList.add('hidden');
+    chipInputWrapper.classList.add('visible');
+
+    // Check if chip already exists
+    const existingChips = chipInputArea.querySelectorAll('.input-chip');
+    for (let c of existingChips) {
+      if (c.dataset.chipName === name) return; // already added
+    }
+
+    // Create chip element
+    const chip = document.createElement('span');
+    chip.className = 'input-chip';
+    chip.dataset.chipName = name;
+    chip.innerHTML = name + '<button class="chip-remove" onclick="removeChip(this)">×</button>';
+
+    // Insert chip before the text input
+    chipInputArea.insertBefore(chip, chipTextInput);
+    chipTextInput.focus();
+  }
+
+  function removeChip(btn) {
+    const chip = btn.parentElement;
+    chip.remove();
+
+    // If no chips left, switch back to regular text input
+    const remaining = chipInputArea.querySelectorAll('.input-chip');
+    if (remaining.length === 0) {
+      chipInputWrapper.classList.remove('visible');
+      textInputWrapper.classList.remove('hidden');
+      document.getElementById('mainTextInput').focus();
+    }
+  }
+
+  // Make chip input area focus the text input when clicked
+  chipInputArea.addEventListener('click', (e) => {
+    if (e.target === chipInputArea) {
+      chipTextInput.focus();
+    }
+  });
+
+  // ─── Send button activation logic ───
+
+  const mainSendBtn = document.getElementById('mainSendBtn');
+  const mainTextInput = document.getElementById('mainTextInput');
+  const chipSendBtn = document.getElementById('chipSendBtn');
+
+  // Activate main send button when text input has content + auto-grow
+  mainTextInput.addEventListener('input', () => {
+    if (mainTextInput.value.trim().length > 0) {
+      mainSendBtn.classList.add('active');
+    } else {
+      mainSendBtn.classList.remove('active');
+    }
+    // Auto-grow textarea
+    mainTextInput.style.height = 'auto';
+    mainTextInput.style.height = mainTextInput.scrollHeight + 'px';
+  });
+
+  // Activate chip send button when chips exist or text is typed
+  function updateChipSendBtn() {
+    const hasChips = chipInputArea.querySelectorAll('.input-chip').length > 0;
+    const hasText = chipTextInput.value.trim().length > 0;
+    if (hasChips || hasText) {
+      chipSendBtn.classList.add('active');
+    } else {
+      chipSendBtn.classList.remove('active');
+    }
+  }
+
+  chipTextInput.addEventListener('input', () => {
+    updateChipSendBtn();
+    // Auto-grow textarea
+    chipTextInput.style.height = 'auto';
+    chipTextInput.style.height = chipTextInput.scrollHeight + 'px';
+  });
+
+  // Watch for chip additions/removals
+  const chipObserver = new MutationObserver(updateChipSendBtn);
+  chipObserver.observe(chipInputArea, { childList: true });
+
+  document.getElementById('optYesFlows').addEventListener('click', () => {
+    // Hide selection card 2
+    selectionCard2.classList.add('hiding');
+    selectionCard2.classList.remove('visible');
+    setTimeout(() => {
+      selectionCard2.style.display = 'none';
+      selectionCard2.classList.remove('hiding');
+    }, 450);
+
+    // Show text input while typing
+    showTextInput();
+
+    // Add user message
+    setTimeout(() => {
+      addUserMessage("Let's set up all three flows.");
+
+      // After 2s, type assistant response 3
+      setTimeout(() => {
+        addAssistantMessage(fullResponse3, 18, () => {
+          // After typing is done, show selection card 3
+          setTimeout(() => {
+            hideTextInput();
+            selectionCard3.style.display = 'block';
+            requestAnimationFrame(() => {
+              selectionCard3.classList.add('visible');
+            });
+          }, 400);
+        });
+      }, 2000);
+    }, 300);
+  });
+
+  // Track the last created segment title (used in Phase 5)
+  let lastSegmentTitle = '';
+
+  // ─── Phase 4: User sends chip message via send button ───
+
+  const shopifyIcon = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M15.5 3.5l.9 3.6-2.4.7c-.1-.6-.4-1.2-.8-1.6-.5-.5-1.1-.7-1.7-.7h-.3l-.5-.8c-.7-.4-1.5-.5-2.3-.3-2.1.6-3.2 3-3.5 4.4l-2.5.7L2 7.2 7.5 1l.3.1c1 .3 1.7 1 2.1 1.8.5-.5 1.2-.8 2-.9 1.2-.2 2.4.2 3.2 1.1l.4.4z" fill="#95BF47"/><path d="M16.4 7.1l-.1.1c0-.1-.1-.3-.1-.4l-1-1.2c-.3-.3-.6-.5-1-.6l.5 2.5 1.7-.4zm-4.6-3.3c-.1 0-.2 0-.3.1.7.3 1.2.9 1.5 1.6l1.8-.5c-.3-1-.9-1.3-1.5-1.3-.5 0-1 .1-1.5.1z" fill="#5E8E3E"/><path d="M12.8 8.5L11.6 12c0 0-1.3-.6-1.3-.6-.1 2.5-.5 5-1.6 6.8l-.2.3c-.1.1-.2.2-.3.2 0 0-.1 0-.1 0-.7-.1-1-1.1-1-1.1C5.8 14.4 8.1 8 8.1 8l2.1-.6c0 0 .1.4.1.6.1.4.2.6.2.6l2.3-.6v.5z" fill="#5E8E3E"/><path d="M16.3 7.2s-3.7 1.1-5 1.5c0 0 1.2 8.1 1.2 8.5 0 .3.2.5.4.5.3 0 .8-.5.8-.5s2.5-2.9 2.9-7.8l-.1-.1-.2-2.1z" fill="#95BF47"/><path d="M14.5 22l4.5-1s-1.6-10.6-1.6-10.7h-.1l-1.7.5c-.4 4.8-2.9 7.8-2.9 7.8s-.5.5-.8.5c-.1 0-.2 0-.3-.1L14.5 22z" fill="#5E8E3E"/></svg>';
+
+  function buildSegmentResponse(chipNames) {
+    // Determine what segment the user is asking about based on chips
+    const segmentName = chipNames.join(', ');
+
+    // Build the segment definition based on what was selected
+    let segmentRules = '';
+    let segmentTitle = '';
+
+    if (segmentName.toLowerCase().includes('recent purchasers') || segmentName.toLowerCase().includes('24h')) {
+      segmentTitle = 'Recent Purchasers (last 24h)';
+      segmentRules =
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify</span> All shoppers who match the following:</div>' +
+        '<div class="segment-connector">AND</div>' +
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify Orders</span> Has placed at least 1 order</div>' +
+        '<div class="segment-connector">AND</div>' +
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify Orders</span> Order created within the last 24 hours</div>';
+    } else if (segmentName.toLowerCase().includes('vip')) {
+      segmentTitle = 'VIP Customers';
+      segmentRules =
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify</span> All shoppers who match the following:</div>' +
+        '<div class="segment-connector">AND</div>' +
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify Customers</span> Customer tag contains "VIP"</div>' +
+        '<div class="segment-connector">OR</div>' +
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify Orders</span> Total spent is greater than $500</div>';
+    } else if (segmentName.toLowerCase().includes('support')) {
+      segmentTitle = 'Recent Support Inquiries';
+      segmentRules =
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify</span> All shoppers who match the following:</div>' +
+        '<div class="segment-connector">AND</div>' +
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify Customers</span> Has an open or recently resolved support ticket</div>' +
+        '<div class="segment-connector">AND</div>' +
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify Customers</span> Ticket updated within the last 7 days</div>';
+    } else {
+      segmentTitle = segmentName;
+      segmentRules =
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify</span> All shoppers who match the following:</div>' +
+        '<div class="segment-connector">AND</div>' +
+        '<div class="segment-rule"><span class="shopify-tag">' + shopifyIcon + ' Shopify Customers</span> Custom segment criteria based on your selection</div>';
+    }
+
+    const responseText =
+      "It looks like the segment <strong style=\"font-weight:700\">" + segmentTitle + "</strong> doesn't currently exist in your system. However, based on the data available in your Shopify store, I can create it for you." +
+      '<br><br><div class="segment-preview">' +
+        '<div class="segment-toggle" onclick="this.classList.toggle(\'open\')">' +
+          '<span class="segment-toggle-label">Segment definition preview created</span>' +
+          '<svg class="segment-toggle-icon" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>' +
+        '</div>' +
+        '<div class="segment-body">' + segmentRules + '</div>' +
+      '</div>';
+
+    return responseText;
+  }
+
+  function sendChipMessage() {
+    // Collect chips and text
+    const chips = chipInputArea.querySelectorAll('.input-chip');
+    const chipNames = [];
+    chips.forEach(c => chipNames.push(c.dataset.chipName));
+    const extraText = chipTextInput.value.trim();
+
+    if (chipNames.length === 0 && extraText.length === 0) return;
+
+    // Build plain text user message
+    let msgParts = [];
+    chipNames.forEach(n => msgParts.push(n));
+    if (extraText) msgParts.push(extraText);
+    const userMsgText = msgParts.join(' · ');
+
+    // Hide chip input
+    chipInputWrapper.classList.remove('visible');
+
+    // Clear chips and text
+    chips.forEach(c => c.remove());
+    chipTextInput.value = '';
+    chipTextInput.style.height = 'auto';
+    chipSendBtn.classList.remove('active');
+
+    // Show text input (will be hidden again when selection card appears)
+    showTextInput();
+
+    // Add user message
+    setTimeout(() => {
+      addUserMessage(userMsgText);
+
+      // Build response and store the segment title for Phase 5
+      const response4 = buildSegmentResponse(chipNames);
+      // Extract segment title from chip names for later use
+      const sn = chipNames.join(', ').toLowerCase();
+      if (sn.includes('recent purchasers') || sn.includes('24h')) lastSegmentTitle = 'Recent Purchasers (last 24h)';
+      else if (sn.includes('vip')) lastSegmentTitle = 'VIP Customers';
+      else if (sn.includes('support')) lastSegmentTitle = 'Recent Support Inquiries';
+      else lastSegmentTitle = chipNames.join(', ');
+
+      // After 2s, type assistant response
+      setTimeout(() => {
+        addAssistantMessage(response4, 18, () => {
+          // After typing is done, show selection card 4
+          setTimeout(() => {
+            hideTextInput();
+            selectionCard4.style.display = 'block';
+            requestAnimationFrame(() => {
+              selectionCard4.classList.add('visible');
+            });
+          }, 400);
+        });
+      }, 2000);
+    }, 300);
+  }
+
+  chipSendBtn.addEventListener('click', sendChipMessage);
+
+  // Also allow Enter to send from chip input (Shift+Enter for newline)
+  chipTextInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (chipSendBtn.classList.contains('active')) {
+        sendChipMessage();
+      }
+    }
+  });
+
+  // Also allow Enter to send from main input
+  mainTextInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+    }
+  });
+
+  // ─── Phase 5: User clicks "Yes, create segment" ───
+
+  document.getElementById('optCreateSegment').addEventListener('click', () => {
+    // Hide selection card 4
+    selectionCard4.classList.add('hiding');
+    selectionCard4.classList.remove('visible');
+    setTimeout(() => {
+      selectionCard4.style.display = 'none';
+      selectionCard4.classList.remove('hiding');
+    }, 450);
+
+    // Show text input while typing
+    showTextInput();
+
+    // Add user message
+    setTimeout(() => {
+      addUserMessage("Yes, create segment");
+
+      // Build the confirmation response
+      const segTitle = lastSegmentTitle || 'Recent Purchasers (last 24h)';
+      const segSlug = segTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+      const response5 =
+        "Done! The segment <a href=\"#segment/" + segSlug + "\" target=\"_blank\">" + segTitle + "</a> has been created and is now available in your <a href=\"#segments\" target=\"_blank\">Segments directory</a>. I've also applied it as an exclusion across all three flows we're setting up." +
+        "<br><br>Now I'll go ahead and generate message previews for all three flows. I'll use your <a href=\"#tone-of-voice\" target=\"_blank\">Tone of Voice guidelines</a> to make sure the messaging stays on brand.";
+
+      // After 2s, type assistant response
+      setTimeout(() => {
+        addAssistantMessage(response5, 18, () => {
+          // After typing is done, expand the preview panel
+          setTimeout(() => {
+            showTextInput();
+            openPreviewPanel();
+          }, 600);
+        });
+      }, 2000);
+    }, 300);
+  });
+
+  // ─── Preview Panel Logic ───
+
+  const SHOPPERS = [
+    { name: 'Sara Jones', orders: 12, ltv: '$1,847', lastPurchase: '15 days ago', tickets: 0, prefs: 'blue hues and natural materials', style: 'stylized' },
+    { name: 'Michael Chen', orders: 3, ltv: '$420', lastPurchase: '45 days ago', tickets: 2, prefs: 'minimalist basics and dark tones', style: 'casual' },
+    { name: 'Emily Rodriguez', orders: 8, ltv: '$1,230', lastPurchase: '7 days ago', tickets: 1, prefs: 'oversized fits and earthy palettes', style: 'relaxed' },
+    { name: 'David Kim', orders: 1, ltv: '$89', lastPurchase: '60 days ago', tickets: 0, prefs: 'athletic wear and bold colors', style: 'sporty' },
+  ];
+
+  const FLOW_MESSAGES = {
+    'Cart Abandonment': {
+      'Sara Jones': { msg: "Hey Sara! You left something behind 👀 That light blue linen overshirt is still in your cart — and it's totally your style. Complete your order before it sells out: bit.ly/cart-3x7k9", reasoning: "Sara is a high-value repeat shopper (12 orders, $1,847 LTV) with a strong preference for blue hues and natural materials. She left a linen overshirt in her cart that perfectly matches her style profile. Given her high engagement history, a friendly, light nudge is more appropriate than an aggressive discount — she already loves the brand." },
+      'Michael Chen': { msg: "Michael, your black pima cotton crew is waiting! You added it to your cart but didn't finish checking out. Grab it before it's gone — plus enjoy 10% off to sweeten the deal: bit.ly/cart-8m2p1", reasoning: "Michael is an early-stage customer (3 orders, $420 LTV) who gravitates toward minimalist basics in dark tones. He hasn't purchased in 45 days, so he's at risk of churning. Adding a small incentive (10% off) on his abandoned cart item can help bring him back while the product interest is still fresh." },
+      'Emily Rodriguez': { msg: "Emily, don't forget about your picks! That oversized sage linen shirt is still in your cart and it's perfect for spring. Finish your order here: bit.ly/cart-5k9r2", reasoning: "Emily is a loyal customer (8 orders, $1,230 LTV) who loves oversized fits and earthy palettes. Her last purchase was just 7 days ago, showing high engagement. The abandoned cart item aligns with her preferences, so a simple reminder without a discount feels right — she's already an active buyer." },
+      'David Kim': { msg: "David! That cobalt performance tee is still in your cart. It's lightweight, moisture-wicking, and built for your active lifestyle. Come back and save 15%: bit.ly/cart-7j4n8", reasoning: "David is a one-time buyer ($89 LTV) who hasn't returned in 60 days. His single purchase was athletic wear in a bold color. Since he's at high churn risk, pairing the cart reminder with a stronger incentive (15%) can help convert him from a one-time to a repeat buyer." },
+    },
+    'Browse Abandonment': {
+      'Sara Jones': { msg: "Sara, still thinking about that natural linen collection? We noticed you were browsing our blue hues — here are some picks we think you'll love: bit.ly/browse-3x7k9", reasoning: "Sara browsed several items in the natural materials category without adding to cart. Given her established preference for blue hues and her high LTV, surfacing a curated selection rather than a single product creates a more personalized experience and increases the chance of conversion." },
+      'Michael Chen': { msg: "Hey Michael — saw you checking out our basics collection. The restocked charcoal tees and black crews are exactly your vibe. Take another look: bit.ly/browse-8m2p1", reasoning: "Michael browsed the basics collection but left without adding anything. His minimalist style profile and 45-day gap since last purchase suggest he's evaluating options. A straightforward message highlighting the exact products he viewed keeps things aligned with his no-fuss preferences." },
+      'Emily Rodriguez': { msg: "Emily! Those oversized linen pieces you were eyeing just got restocked in new earthy tones. Don't miss out — check them out: bit.ly/browse-5k9r2", reasoning: "Emily was browsing oversized linen items in earthy tones — perfectly aligned with her purchase history. A restock notification creates urgency without feeling pushy. Her high engagement level means a simple nudge is enough to drive a return visit." },
+      'David Kim': { msg: "David, we noticed you checking out our performance gear. That cobalt tee you viewed comes in new colors too. Come take another look and save 15%: bit.ly/browse-7j4n8", reasoning: "David browsed athletic wear but didn't engage further. As a single-purchase customer at churn risk, adding an incentive to the browse abandonment message helps lower the barrier to a second purchase while the product interest is warm." },
+    },
+    'Welcome Flow': {
+      'Sara Jones': { msg: "Welcome to Steve Madden, Sara! 🎉 We're so glad you're here. As a thank you for joining, here's 20% off your first order. We think you'll love our natural linen collection: bit.ly/welcome-3x7k9", reasoning: "Sara just subscribed and her early browsing behavior suggests an interest in premium natural materials. The welcome message pairs a generous first-order discount with a personalized product suggestion to create a strong first impression and drive an immediate purchase." },
+      'Michael Chen': { msg: "Hey Michael, welcome aboard! Thanks for signing up. Here's 15% off your first order — check out our essentials collection for clean, minimal basics you'll live in: bit.ly/welcome-8m2p1", reasoning: "Michael is a new subscriber with browsing patterns suggesting he favors minimalist basics. The welcome message directs him to the essentials collection that matches his style, with a first-order discount to lower the barrier for his initial purchase." },
+      'Emily Rodriguez': { msg: "Welcome, Emily! 🌿 Thanks for joining the Steve Madden community. Start strong with 20% off — we think you'll love our new oversized collection in warm earthy tones: bit.ly/welcome-5k9r2", reasoning: "Emily's initial browsing shows a clear preference for oversized silhouettes and earthy palettes. The welcome message leverages this data immediately, making her feel understood and driving her toward products she's already interested in." },
+      'David Kim': { msg: "David, welcome to the crew! 💪 Here's 15% off your first order. Check out our performance gear — lightweight, bold, and built for your active lifestyle: bit.ly/welcome-7j4n8", reasoning: "David subscribed after browsing athletic wear. The welcome message reflects his sporty style with energetic copy and directs him to performance gear. The incentive encourages a quick first purchase to establish the customer relationship." },
+    }
+  };
+
+  let currentShopperIdx = 0;
+  let currentFlow = 'Cart Abandonment';
+
+  function openPreviewPanel() {
+    const panel = document.getElementById('previewPanel');
+    const loading = document.getElementById('previewLoading');
+    const content = document.getElementById('previewContent');
+
+    currentShopperIdx = 0;
+    currentFlow = 'Cart Abandonment';
+
+    // Reset content to hidden, show loading spinner
+    content.classList.remove('visible');
+    loading.style.display = 'flex';
+
+    // Step 1: After a brief delay, slide the panel open (with loading spinner visible)
+    setTimeout(() => {
+      panel.classList.add('open');
+
+      // Step 2: After panel has slid in (~500ms for animation), populate content and fade it in
+      setTimeout(() => {
+        renderPreview();
+        loading.style.display = 'none';
+        requestAnimationFrame(() => {
+          content.classList.add('visible');
+        });
+
+        // Step 3: After a few seconds, show selection card 5
+        setTimeout(() => {
+          hideTextInput();
+          selectionCard5.style.display = 'block';
+          requestAnimationFrame(() => {
+            selectionCard5.classList.add('visible');
+          });
+        }, 2000);
+      }, 600);
+    }, 400);
+  }
+
+  function renderPreview() {
+    const shopper = SHOPPERS[currentShopperIdx % SHOPPERS.length];
+    const flowData = FLOW_MESSAGES[currentFlow] || FLOW_MESSAGES['Cart Abandonment'];
+    const data = flowData[shopper.name] || flowData['Sara Jones'];
+
+    document.getElementById('previewShopperName').textContent = shopper.name;
+    document.getElementById('previewLTV').textContent = shopper.ltv;
+    document.getElementById('previewOrders').textContent = shopper.orders;
+    document.getElementById('previewTickets').textContent = shopper.tickets;
+    document.getElementById('previewLastPurchase').textContent = shopper.lastPurchase;
+    document.getElementById('previewGenFor').textContent = 'Message generated for ' + shopper.name;
+    document.getElementById('previewReasoning').textContent = data.reasoning;
+    document.getElementById('previewMessageText').textContent = data.msg;
+    document.getElementById('flowSelect').value = currentFlow;
+  }
+
+  function cycleShopperPreview() {
+    currentShopperIdx = (currentShopperIdx + 1) % SHOPPERS.length;
+    renderPreview();
+  }
+
+  function onFlowChange(val) {
+    currentFlow = val;
+    renderPreview();
+  }
+
+  // ─── Phase 6: User clicks "Everything looks good" ───
+
+  document.getElementById('optMessagesGood').addEventListener('click', () => {
+    // Hide selection card 5
+    selectionCard5.classList.add('hiding');
+    selectionCard5.classList.remove('visible');
+    setTimeout(() => {
+      selectionCard5.style.display = 'none';
+      selectionCard5.classList.remove('hiding');
+    }, 450);
+
+    // Show text input while typing
+    showTextInput();
+
+    // Add user message
+    setTimeout(() => {
+      addUserMessage("Everything looks good");
+
+      const response6 =
+        "Great, the messages are locked in! All three flows — <strong style=\"font-weight:700\">Cart Abandonment</strong>, <strong style=\"font-weight:700\">Browse Abandonment</strong>, and <strong style=\"font-weight:700\">Welcome Flow</strong> — are fully configured and ready to go.";
+
+      // After 2s, type assistant response
+      setTimeout(() => {
+        addAssistantMessage(response6, 18, () => {
+          // After typing is done, show selection card 6
+          setTimeout(() => {
+            hideTextInput();
+            selectionCard6.style.display = 'block';
+            requestAnimationFrame(() => {
+              selectionCard6.classList.add('visible');
+            });
+          }, 400);
+        });
+      }, 2000);
+    }, 300);
+  });
+
+  // ─── Phase 7: User clicks "Enable now" ───
+
+  function addFlowsNavItem() {
+    const navSection = document.querySelector('.nav-section');
+    const flowsNav = document.createElement('a');
+    flowsNav.className = 'nav-item fade-in';
+    flowsNav.href = '#flows';
+    flowsNav.innerHTML =
+      '<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+        '<circle cx="6" cy="6" r="2"/>' +
+        '<circle cx="18" cy="6" r="2"/>' +
+        '<circle cx="18" cy="18" r="2"/>' +
+        '<path d="M6 8v2a4 4 0 0 0 4 4h4a4 4 0 0 1 4 4"/>' +
+        '<path d="M6 8v0a4 4 0 0 1 4-4h4"/>' +
+      '</svg>' +
+      'Flows';
+    navSection.appendChild(flowsNav);
+  }
+
+  document.getElementById('optEnableNow').addEventListener('click', () => {
+    // Hide selection card 6
+    selectionCard6.classList.add('hiding');
+    selectionCard6.classList.remove('visible');
+    setTimeout(() => {
+      selectionCard6.style.display = 'none';
+      selectionCard6.classList.remove('hiding');
+    }, 450);
+
+    // Show text input while typing
+    showTextInput();
+
+    // Add user message
+    setTimeout(() => {
+      addUserMessage("Enable now");
+
+      const response7 =
+        "All three flows are now live! <strong style=\"font-weight:700\">Cart Abandonment</strong>, <strong style=\"font-weight:700\">Browse Abandonment</strong>, and <strong style=\"font-weight:700\">Welcome Flow</strong> are enabled and will start sending messages to eligible shoppers right away." +
+        "<br><br>You can find and manage them anytime in your <a href=\"#flows\" target=\"_blank\">Flows</a> section.";
+
+      // After 2s, type assistant response 7
+      setTimeout(() => {
+        addAssistantMessage(response7, 18, () => {
+          // Add "Flows" to the sidebar nav
+          setTimeout(() => {
+            addFlowsNavItem();
+          }, 300);
+
+          // Phase 8: After a brief delay, type the follow-up suggestions message
+          setTimeout(() => {
+            const response8 =
+              "You can always come back and share any updates or new goals with me — I'm here whenever you need." +
+              "<br><br>In the meantime, here are a couple of things we could tackle next:" +
+              '<br><br><div class="inline-card"><div class="inline-card-title">Craft a targeted campaign</div><div class="inline-card-desc">I can help you create a one-time campaign for a specific promotion, seasonal sale, or product launch — tailored to the right audience at the right time.</div></div>' +
+              '<div class="inline-card"><div class="inline-card-title">Brainstorm new opportunities</div><div class="inline-card-desc">Share your marketing goals and I\'ll suggest strategies, channels, and ideas to help you reach more customers and grow your store.</div></div>' +
+              "<br>Whenever you're ready, just let me know!";
+
+            addAssistantMessage(response8, 18, () => {
+              showTextInput();
+            });
+          }, 1800);
+        });
+      }, 2000);
+    }, 300);
+  });
+</script>
+
+</body>
+</html>
