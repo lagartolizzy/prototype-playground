@@ -6,7 +6,8 @@
     "status": "Draft",
     "tags": [],
     "description": "Provocation prototype exploring the agentic approach with 3 agents",
-    "file": "aij-agentic-vision-3-agents.html"
+    "file": "aij-agentic-vision-3-agents.html",
+    "image": "aij-agentic-vision-3-agents.png"
   },
   {
     "name": "AIJ Lifecycle onboarding",
