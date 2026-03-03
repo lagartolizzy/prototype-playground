@@ -259,9 +259,9 @@
 
     function cardHTML(p, index) {
       const color = getAuthorColor(p.author);
-      const href = p.file ? 'prototypes/' + p.file : '#';
+      const href = p.file ? 'viewer.html?file=' + encodeURIComponent(p.file) : '#';
       return `
-        <a class="card" href="${href}" target="_blank" rel="noopener" style="animation: cardIn 0.4s cubic-bezier(0.2,0,0,1) ${index * 0.04}s both;">
+        <a class="card" href="${href}" style="animation: cardIn 0.4s cubic-bezier(0.2,0,0,1) ${index * 0.04}s both;">
           <div class="card-preview" style="${p.image ? '' : 'background: linear-gradient(135deg, ' + color + '10, ' + color + '06);'}">
             ${previewHTML(p, color)}
             <div class="card-hover-overlay">
