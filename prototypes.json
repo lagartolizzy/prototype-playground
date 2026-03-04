@@ -28,5 +28,15 @@
     "description": "Conversational Onboarding, inspired by Claude",
     "file": "gorgias-chat-onboarding.html",
     "image": "gorgias-chat-onboarding.png"
+  },
+  {
+    "name": "Marketing agent onboarding",
+    "author": "Lisa Timanova",
+    "date": "2026-03-03",
+    "status": "Draft",
+    "tags": [],
+    "description": "Agentic onboarding experience leveraging playbooks concept",
+    "file": "lifecycle-onboarding-agentic.html",
+    "image": "lifecycle-onboarding-agentic.png"
   }
 ]
