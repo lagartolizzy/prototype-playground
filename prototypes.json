@@ -46,7 +46,8 @@
     "status": "Draft",
     "tags": [],
     "description": "Prototype exploring the scenario of the new Glamnetic shopper getting RCS campaign from AI Journey",
-    "file": "rcs-new-shopper.html"
+    "file": "rcs-new-shopper.html",
+    "image": "rcs-new-shopper.png"
   },
   {
     "name": "Loyal shopper RCS",
@@ -55,6 +56,7 @@
     "status": "Draft",
     "tags": [],
     "description": "Prototype exploring the scenario of the loyal Glamnetic shopper getting RCS campaign from AI Journey",
-    "file": "rcs-loyal-shopper.html"
+    "file": "rcs-loyal-shopper.html",
+    "image": "rcs-loyal-shopper.png"
   }
 ]
