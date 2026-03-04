@@ -80,6 +80,13 @@ const BORDER = "#e8e8e3";
 const TEXT = "#1a1a1a";
 const TEXT_MUTED = "#7a7a72";
 const SURFACE = "#f3f3ee";
+
+const LIFECYCLE_CHIPS = {
+  Prospect:    { bg: "#E8F5E9", text: "#2E7D32" },
+  Active:      { bg: "#FFF3E0", text: "#E65100" },
+  Loyal:       { bg: ACCENT + "0c", text: ACCENT },
+  Disengaged:  { bg: "#FCE4EC", text: "#C62828" },
+};
 const NAV_WIDTH = 56;
 const LANDING_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAe5ElEQVR4nO19eZQkVZX+d++LyMzKWntvpBUQR6Fx0J+o46hnqlpZutlcIEt6VHCBbsBxUDk6OjJkJ+oAAtMtyNIgsjgLVg5727QgVNXgzxlHHHVs6sj8lEGUpbvprq4tl4j33v398SIis5qtGaorizG+c+qcqsyoyIh4995373e/9xJIkSJFihQpUqRIkSJFihQpUqRIkSJFihQpUqRIkSJFihQpUqRIkSJFihQpUqRIkSJFitkCRT8p/gBAhcKAKvYOekUIT39LqLd30BsoiBJIahD/21AoDKg9X2MFiAx6IkJ7xoBCaggvC3PmwRWLRS6VLrCAQKTonX9q77vGx/i9QYC368Duby3aCNDK451t7erhTF4/sGTpr+89d/0ZuwBnOOVyv2n1fbzSMCcMIB48VsC5J9139u4ddJbijjcqlYc2BtoYGCOAAIo9ZLMeiDUCM/E0+8F3lh7w5KWla07dXiiIKpcpNYKXgJYbQDxoX1pz1yFjv+++2tY6+2phHVpCy8yWiKLkj0AWIEAIJBqWQL7yVQakxp/onF85Z/3AylsLGFBlpJFgb9FSA+jtHfSGh1foz33ozuOrowv/Xmx7dzWY0kKWIcwAgchdpAigAFgQYAWWBEIiJGQ85Xu5rEKmY9cFG247qlg4WVS5TBaAtPL+XgngFz9k36BQGFDDwyv0OR+6a9Xu7T131qrorulJDRKPwEzEoMQ8BUTiRlOicSUCg4mZPCuhrVbrpjq65Pwzj9vyt+Uymd7ewWclkymejZYYQLEoXC73my+v2XxwdbTnFmMyZEgMoDwiBQK7op8IgEBAADEEAAmBwSARNzEQgcBsxXKlPhmitvRLnzl584eHh1fo56ooUkxHyyKAiPAzv/VvhunsIjKWSCkRF+odyDk6GABBxELIQtiZBBBVhALAWgAgpUQFOrDV8a4rv/yxLa8ulwu2WCy27B5fCZj1h9PbO+iVSmQ/e/K9H4Ve/M56WNMgT1FM9Anw7NREBCBLIBEiCBNYKRApiAACctGCiK0Nreju7l3b/a8DJCMjh7U80Z3LaMHDERoYWOffe92fbbVhz+sM6uISvqZ8TaLwTyKwsCBSRD6MNSAxhhSIoFhEXE4gSExZxAJgm/Es5i/d/eaL//G4XxaLwqUS2dm/17mPWY0Abk4m+bd/fscKlq4/MrYmBGI3jzeTfAKxgTCE2tralPKqdYtdvxWMj7W1ZVXW81nEWIkSQmKAINEPgyCW0cm7t2fWAsDQ0FA6DTwPZvXBbN++iABgakL1i2QEQlZs5LXJ6BNARkQ8WBitcjvOX3rQ+KGHn/Cfhx7y5u1v6Ji388Pk1X8HybCVUIgFIBc9RASABQAOTQ0GatXAwEBmeHiFwRzgPOYiZv2hDAwU1Jbrzvwlwu5Dta1bAjEAkHNjAAZiYZkh+Xm7ClfefsLte57jnA/904GjT+/3L4ralwlpgRA3ZY8uYyArni/onj91+GUDx2xNp4HnxqxFABHXsPn5psJSGD5QoF1N5+q9JAMgZp3LdLCfm/rWlbefcPvKlZuzUSZPAqFPr9yc/cZ3Vz/WsXDs021tiiAkViKOIJoEXP6gDEknTUyaNwPpNPB8mLWH0t9fZgAYnci9CuK3WTFCUBSxvCBy4VvEKstT0r3AXFtEkTs7J3WpVLKIKOArthwbFFHkK/+5vim0Y4+y+CqeQxoVJEGsgFiBvczBANA3Wzf6CsOsewWBFzBlAMs2JnuiKRwiImQVGRvsWrBs4jcllGy5XNgzbMsIDiOifhNq/QiJBxZIo4pokAkMAkMtBoChWbm7Vx682f5AFqJG+94ROiB2ThyFchtYlvH8ixunJXKJnySniiMBKYIIYA1mlQ0UCK0rgkZGQMu3DxEAjCzuk+XLIetKLorN5vW8GGbdAARmtzEBrIA5onyjNwAQiRjxONuzbWf9oCJkbKRQpnIZzd09Wl4siKwbUGuP9g4JdQgLRE3D6AACYADyAEV2J+CmgOF9d1dUKIBRLoNABqXnbkKVABQwoFAooFyGxRwwhlkzgOXLHxYA6FkoT0/uqoeMvE/O5V2bhwAXGazJ+J2eqdXWlEBnFh7emikWi1IqrRMR4C9X3ZMplahe+dW9hSx3HRiiZohiLycQLOKZjcgik5FH9+FtUaEwwOUymdhIN150X/eTv6KDK1O0TODNt8aCSUZz3ebxN7wp/M1Hzzl2HGX3z3NBvzDrZeBDD230r/rCwY+QzDtI28AiKgMRhXKCgBnWUwq5rh0fvvz2E27Z8xznnX7nYdt+M+9+Y3KLhDQExBauqHDnAEAi2QxTx7yJt182cNRPZlox1FxWri/e0PP41lcfrwP/pHpN/lSHtMTjHAhZR2+RgeEKPF+eIpgfeX7ttre++5d3nvr5z0/tea7ZxqwaQGzxZx33g+9KsKRQqU8ZJngCQKwjdJgAESNiCcozaOsIL5q/LLxpwZLaNj3Z1b3j93Tk6DP+hUHdW2QRCiuPKKYBXL8YIrAee8z+1NP7v+uRg0ultRUXXmYm5Mb3MbC1kPm/f33mOROT/l961LGMmBHqOrQOI0aKJJqaCBCllA+GD0UWrKqP+u219d+4/ciriGBbJWmbVQMo9g56peEV+pyT7y1UxxYP1OtVk3R04MaHxEbjaEDEyGc7ENrdxhqzk1i6st68XC0IEeq6EHsRjyQukLgpBLCiPZVX8J75x+t/cORHZjLUxiKWvzlj89tGn+q+uj7ZcURd1yGoG1IEAnHk9pG5ReWpa1/HtS48yqlcLgOrRv+1a8GuT138nff/LH4+M3Gde4tZLQNLw30GAHkHPL25rkefZM6wiNhE9gMkXgxWAAuq9UkTBr6yJr9Yh7ncZHXKaAmEPI+mEUgS9QLcuVioTvmu2vXu3fKMXH88+J86YfNp2x/reTCo5I8I7JQGh0JMCoCCCFHETktyUwQwA8QEYgVSyiKwlfqEDqsdf7rriaUPfvoDm08uDa/Qvb2Ds5qYzzIPQNLbO6guu+zUKT+jr2ZkiAAbJ/AiBklJLwKxBBFSRCJCWkAixKwATkaerAAGgLFwgjFrspk8c2biR5ffevxQEU588nKvPB78M4//3qfqE/NvrFYkW9cVQ4o8ZnZVSDzosRgt/jsRLkR8pTuUrYgX6orRmtvDyYXlz52y5RPDwyt0cRaNYNaJoOHhPgMI7X/I5DctjW7zlK8AsSI28mCAiRxLHCV1ThFGhJhDEE7ej5cLCcgZkGhiL0THPPM3RJCRQvllT3OxfO1zp9yzmupLvlkPQyNsBSDlek8EJ2FTkedLpGOyEHG2R01ql4YpMIiVsqRtXVtb3b3w+k9/cPMJpVlUM7WAHycp9g6p0jc+sLuju/71jJ8lY6KmvpN3uelSmhwHcG5DFIVVpw3GtLxZIAKjqJ1Fdg9uuOWYB2bC+2P52pc+fMfyymjn9dUgtMwgdhN+HKyQkFtxqikWJNbpmawFbGzUEimdGg1wImYrBtUK7OTOzu+cW7jzIKdm2nNV1MyjJQ0SlwsUef6bqtdUwmd+x/AV3COCjXOAOI5GzaJY+MEAYMUpgch5vmUClIsfRmrgXP08AJgB7ycAGBwc9HZt77xR13NtIkaIPW5OW+IrhhVnuLG+gRwZ7Ywjimjx9IZkQnC/CbGVus1wd3dlsuNaIpKRkZcfvV4MLeqQkfT29nGpdGIl1xZclMlkiCNSN3qCLtrHXtLc6kU0RcQhgiLmT2CyfgezP7Xp6juP/9FMlFW9vYOqVCJ7+wZZI+GCtwW6qkFKuQ9VSExAJKpaGv0IZkoMt+HtUWUQ/TjuSyIVE0BMXt1MarILj/zch35wcrncbwoF2adTQctapMPDfaaIIr/jbU9+m7zdv1GccxUB4udDsW/AgiDkxKEQNLUSBIJEFUSsqmbRfHseZqS8FRoe7jPF4sb85Di+FOhAnGghfjtK8JKLicJ5rGEVMWKtFhEtsEZgxVWAEpWH0YrGJuMmEISEg8DI2A7+SrFYzDjKeN+hhT1ykqHePv546eO1TK72VaV8gkx367g84HjwKXb36Axx80egM14HixofuHhg5S8cPfsy5/7eIQWQPPPT177f4+5llmq22QDimaqxLNWZrVhrmTzyVYfyVZeXy3Z5Ga9diQhpa2y8xoEhIGPg5jxKLIdAHJqqhe05ZNcv3r0KIBnYh1GgpSKJ4eEVpogi//Gxj/2DweiIUjkWFzMbGSBzMtdL7HCxiCSaLSDMoZkMO+fVLwCEli8vvHzGb7jPeZ71PyGgSHjoRjvJ5SnmdmJJmrVK5VlUGKj86D3U/sxFlN91ETKj91rSNuPlmT1rQQIRgbiSJ5rmYsN3pyLyJJjyVgNAeYZ4jOdCy3VycX199ombTw4ml5ZDXTNgqCigQp618luiqTVpAeus6vAks+2G675/1CdmYu53K5VL9qufGd7vsV/Sr4318jYZscQ6ES1UAwQw1lhftTFnx4a796+ffdkNx440n/Mz/fe8pTbVfoWtd76zUpuyCszkxRVNM19gAFhRlCWmyo79D9n22tJV/ZMzSWU3o+UyqeHhFboI4b6PTN5uMPYzphzDwkynBqPwCgBwah8RcYUfmIUnaosX2a/MlPePjKwjAHj61+GfQLfnrRUDMMUlaBwBktlfxOT8DiZ/7ME/Pu6OYy674diRAkT19g56vb2DXgGiNgys+o+2199+ZGB3/9Tndga7e5RYykKOJxBhAIqMaAu0L9r5ROf/AYBCobxPxqrlBgC4cq2/v9/ku2vrYi63UV9Lo3ZOxB/RUAhMW6aDlV/51tf+/pj/LhQwI1217ZGQox7gCIIPcbmbS0pjQidJ+EWIFbNfqy579ejHzjnninqxd9Arg8zw8Ao9PLxCl0FmzREP+evXr6+2zXvmE8T1gMAkURiL7sX1QijKCaxY38tBRL0FAJZHiuqZxpwwgHK53xSLwt+8bdXd5I/+yPfaFKyYOMNqFv3EEBFhUsrY3eNLXjV1ofP+dTMSIhcv7hMAUL53MFgSQ0Tcz3Erk6MShYyn2gne1F2lG05+tPd5GjrX/vStYaEwoK6+tfCfKlt5wKd2hiVLrmSIqhnE5AZiJwgC+iNg30na5oQBAMDISJmIIN3zgvNYBYipPhHriNW4q4pI9WthfMoTeZVrSt9+/5O9vUMqEo++fJRd0mWNXZTMznHaTw0WL7E2I1Bi7weE+l7gtM6LhXI5f4hd31usxJcck0SIIhzBaIEJsB/QMMqZxpwxAEd6DKj1AysHyZu6P+t3sBhrmh9KVAsAJMKc4VB2jb9mudkACPUND81YvVxGwRIBJpROGzN7MQ3dSPqRxAMx8DP+jr1L0kh8pbe5vkVc9SZ8d/QnQcSSNQbWoC16QDN1e9MwZwygGe1d9fNDUxEj4hIvamwUAQFYYNvb8uznq5eet2HVU729Q6qEGfJ+AMC6KO1gE3WnEA9OQuHFUwEAYoZok2tmBZ4fQkFAeRfVbBMr6KqbuAkiUdKr1L4lgmZdFPpCKJf7TQED6u++u/JHp/bdu8n3Fp5gZcqAlYqfrbXWKs4qTaM79ltOVxa6BjLz5nVKH/auhTqyeIcMlAv2hdS5BRxGZQBK8U4RduxdMrTNzJ8bOfYVhPktAN0CDD7vZw+5/5MgHDwCzA1eidCILu6Q5CUDO+4uqjBTsoZpmFMGAAAoACgLdS+4pzi+s3YcrJpOvwhcj40mv1Bav2rX/+QjCLGs67mVudt7FxGGAYY8Ydz0EweiaQWAa/i4dYgw/uqNG+9a9+TavlrMIzSf0+n+1tkLv7hp3qMPee8PTEXAcH0FWCQGBbjdUAhQikHgJ4BGZTLTmHMGEOcCV5T7f3b6qvsGlFlySr0+ZQSiBAJiUlrGTL5DHXruKcPnsQeIIbEWMG6jiGQhgIkUwsqz8JhhA65ahL9+3VuqD579JRoFGqRP8zX0wUnILdlfIfb+JgeNOxUuAyA2OjCodi576LbKhutAa1AqcrF30BtZvEMAl/yVSjBASX679YENkK75IpOGmJWrain5jCT4E4GVhZeTkeZrmmnMOQMAAEfmCC3cf3Nx9PeTHwQpD6LFaSwFYj1V29XzhVAxmAGIisrEqKuGxGkR7zUkIrDWgijEyINtT537waFrXn/MI5euXbu2sqcRxAOXy+sfV3QFkChXSshHN/jOZwWAqCCYNMosOOOs4+8fv+ruf/ki0fRS8KGH1vjfLg1eEkz1nBoEk4aZFGx0xdIkbYvzCyFlMCndPdV/BwD09dl9YQEtp4KfD7GQ8/Sj779OgsWnB2Z3nYiUo+QjztS4LaOY41zW9Q7jlQFEbt8JYwTWCpQS8hUrIs/zVQ4hPfPQqw6cOql07YmPTzcCR7tedtlA28i9i//L1vPLtNGWaM90sJEQOk6HTFtbXnF24ud+NrwZXNtqiUXqmTdXp/ijbHsOD4KqEVjF7BbF2KjmJ5p2PuurHENN/r+zLmw/7K1vPUI3Ms+ZxZw1gGKxyCgBtdPe8ZqnHu0YyXoL2pTvlvlLpAaxSXnYdCPNdY1QwiMwE5QSaF1FaEKtjZH2TLefyY9tXfbu3e+s/NX7ptahsXQr7lF88pj7rkV90RlBOKVJOfY+IaUojgeNrAAQ43tZpUhBmxpABE/lEGqNMKwZIlKk4vnETSUiiCqNmGmEzmW6PMps27Dxnvd+Nr6WffGc5+QUAAClUskWUeSLb1r12Jrj73ovC38SsFkrhiBwrp+oB5qY+WmFrQAWLuFWDJB0mRDvJunq8XjKGpkMKVzwxscfDNdfSXT6yMkDCtEKn8XxNNBWvaFSq55BBKbI4ASAcMPoGsoFAEIqCGoWAivRllYhhRbEzMyq+fg485+2N4oAVsD1cMwsWlS/AQD6+vrs8L5IADCHI0ADM9sF++u1d++/8/HOS5XtOiWsV4zWILCmha+uHnrJP6x6pHmVThHCFxDZTx51/w9JL3hXEEwaARQITuYtSCRgcXbgosM0tih6ytw4hiJCSygyg7gcFABiGO1K0/YtNw8dvaoI4RL23aqhORsBGiApFoVf7gYPixf3yfbtQ/S3G1c8QYzVZ60aXCxB13sMpuodmZ5sbTxcDWAd3OdYADisUCYpAz3z9AXjO/X3k5YtNZHBETVso0xRKE5C3WTSrPohYsRb3AGAsEUcVdzZXDhgVZPujuArQKRr3HdygFeCAQCRR86IF6xZ85B/7bVHaM+/u1izufewIia2EFG9ABpCEAD9UZOqVKJ7T+u7f9CjBSuMTBohVk1EUDKoFk4KDsSSdndMTPgkSR7FsnEgMQYXNEwm06Hg79h0xQzpGl8Mc5IK3pe49tojNEBy5Cr8B1TlKV9l/EBr1Gp00NatAxkXbhuUbqzMbe+pny8qgBAnO1RKo3gHoto9InUbAp+Ixm4YC5Ko4b4Lg11eIRYCJisV09ETnN904n2KPzgDiMn29515YiWT5R3EHuqhhhFq/8lP/DwwvdaKW9VX3XHsD1Vu4r5spoNFYOJZ3kIaUkbYJskaolq0mTkEkPD/kaG4FfIQIe157WzV2K1/d8uxP5sJXePe4A/QAIQElq676I5OEO+nTQBFDDJ27GMf65kEpmflQCMK5DrD84xUnKs3japE1K1QHNQbMvAEscBVKPJ4JBUAEUSI2dhx09U1ccHeNZVmBn8oBpCMRrHwsE8g+dUvsu/xqXMRkQ18LyvE5tdETp6GPQiXmJ7+Znnlv1uauNtDGwNikoP2cHt6no1gYsaC4/xBkvzQ5DJt7PmT/7Th1sLDhUJ5VrwfmNsGQIXCgCpgQM2ARyR1Wan8xuCSc29ePDHadmm9boRIkMkoynbg+wCA3heqNoTaF+iSoCIQIkoCAYGsuB9BrFec/vFNlaGgiUsUKyDFUBPB0mXhzKma9xJzkgd4VvZLgPofKuPdvEsIA0tDQzdmt9z0qnfuesK/XAfth1nUTcbLkpepTyw+YMfrS9ectF1EiOi5eYf4utYc+8DtUl/0/rp2vEBiBkINTV9MX0Q8gY16/pJcFKKtDKzOZro81fb0tzZ+76gzZnvbmDlXBsYPeeNDR/i/vPDCk/VU5n0Q9Vo/yx3WCIl1LKAb2KaaOjlDvO+022iCHNmOTx37Q4BflwP8A8UytFQthIyifIYzY18tXXPS9kJBFNGLPnyat9icv+upyvGkmd2SdjTN+U0+FVPG0tzsRWM/DBYh8Vjb3fUl+4cXOe+feb7/BW9mNj/sxRAP/uf/fNOKYLJnfVDJvykInFcRu+1jCARr93iySW+OktlCkgnWNYKIAPIAS6EltsZakIdOT/Pv7l5139QHyv1Audz/ol8zE1/j6cc88B2pL/pIEI5r8siLa//mgY6EHY3ta6Kn3SCvRecynR5lt2285ntHndmKbWLmTASIb/6sE+78yO5t825W1EZGqlpYTGCEWTMxEYjjpxjzsAKyhGh3AcfGxe3VaCVmzMbZUMjzWWVVO3s5A40dNx516tTafko2o3xR74tb1V1Lv/+1nY9N9AvY42iJEkiiUB/Rw7GRJkpfJNOC29KElcbuqQNfY76GGVQ1vxTMiQgQD/4XVm95+86n2/4tDBnsiVHMXtbvhLEhtI56/REN6zT0DW9qZlkS+RZRwwgEMCaEsWGlo5N+nJ83teGSm1fd5Q58af2GeJ7++JE/uF7ZJZ8Iw0ktBK851jMIsFHLJ84Bp/NGOptp95DbvuG6zUd9tlVbxs2JCLC8/LCIFPlTJ3pXedxOIU9qsZ5nCaDsMzfm2mt3ZgVTljkaJA+AjqQ/7ncPAAygo1egGr8bVuLBA1tT75yHx794+VGPA67ZU4rDyEu53uXrBBCaf+BdXx377dhq0l5WRLvvNSUAlh0tzOS2NYhzwogAJkBYKdYYndhv2fjXW+X9wByIALHl/8UH7jnOVhduCnRNG0MsgM137/7wVXccPzDznyr0cmvtRLCy6t4rUV96dq0+psljD2RBwk2JaiP8N0ZYTFu2U3n5p79+1V1H/1UrN4xseQRIlmFV1GrSLAKYfK7D0/TkRVfdcfxAYfnWDA4bmbGHs3z5w1Iqkd1j+9mXfp6yiwJt82+7cOyJ3KlMXh6wQlDx7nBIqJ9maklEiHwO9ehox9IdlwBCA2XYVnliyyMA4Jzkk++9/xdWtx8uCMX3zeQBy7YfHLymsBNYhxlb8TPDSKLAMd+/VNml59bqkxogL1YmJg+XGkmhWKtzXqeH7BPrrt2ysrQv1T57g5ZGANdPI7npppvbh2+SRcZqMHlUr0/99rwb+3dIS2bFvUecCxz0hvsvefy/xk8n8rusCd0GlhGokfQBEKuUr4RGd77q0PErsEVoaBimlV44h6hgTlhyVqSsnftfCV8qlWxv75D68uVHbhOqfFNRGwFsKFrlS1H56RayO4445+fIz1UvLq3v39XbO6RavX18Sw0gvvnTTjt1yhi7nckHoCXj5Q742me3LC0Whef6Fz/29Q1ZQGi/A3C5ofHdTMp9U0Hzchan+rFMPmu788lFB45djWgPolZeOzAHcoB4Djz9qB/czGbhRwRT9azfkaPstq9ccdfR5xeWb80UDjvM7MttUl4ulk50eFdsObZ+9gn3fdVU9/tyPZjQIPIsbIMDsNZk/S7l55/4zNXfW/WNVs/9MVpuADEJ9JkP3HNcUFm8qV6vaREwK2N6FlZWXzqw8tZWX+PeQqTIZ6x8z3/rav41VsJkUykisSQ+EU/8/h2rJw9Zu/anNWDdS+Yf9gVabgAAUESR+wbBt1z8Zz/WtZ63aDOhQex5HpDvDm/K5PUmCfSYNSxIqjeV8EHuNQU8Z2XXWCjWOGYfbLrlM8NqXZ3Knl2bmHeSlbphhnICUjHZTLtS2SfPvGrTqo1zxfuBOWIAcRQ456RNfzK2s+tftWZhDsRTvspnuwAY6FCj8U0g0zdomLZ9CyHePaxJtzm9Q+dOMv0ld3gs0Gw6iJo6+01dvaTMJwIrAZTAaEKlVnMK4UgrwASbzWaJMuOPvuOteONjpaGgNEe8H5gjBgA0jGDtcbeeGlSW3uhxlqzUNCyMtUJi3SI/IgaiRRlus6jGLdjmXhzFXyUbNZCiTZ0BNFH/zYszYsj03k3jjAAiE2wSdriyRRrb1zLY1fuJtej29s5Mruupj20oH3NTK74T4IUwZwwAaBjBX/RvOhLVnm/YoH15UIPbLggAooWeQPyN8c1oHvw9vJ7iCNF0aIzn80NKzGPaP0gzOUHUiDxxQzCi/UQAaw0Ut8Oo3z9y3Jmjhz/c/7AuodSkDWo95pQBAA0juOGGYu7nm97955Ux/2iBfa3yvQ73FYNRl02SQAygiXDB9Nfde844XDWGpujbvHijcZ7mM8SHP9eIxfsFNMcLAkBMYIIYQ1bEPN6zZPTzX7/5fQ8/11L0VmPOGQDwHJIwBjx+cbfZG8d+of/b83/2DP8v9RwEQOtpf84Zz38FQMhtsjgjotCWoYi5T2alSJEiRYoUKVKkSJEiRYoUKVKkSJEiRYoUKVKkSJEiRYoUKVKkSJEiRYoUKVKkSJEiRYoUKVKkSJEiRYoUKVKkSJHilYD/DyruOAo7HM1oAAAAAElFTkSuQmCC";
 
@@ -1969,13 +1976,6 @@ function LifecycleStagesPage({ stages, stageConfigs, onNavigateToPlaybooks, copi
     "Disengaged": "Disengaged",
   };
 
-  const LIFECYCLE_CHIPS = {
-    Prospect:    { bg: "#E8F5E9", text: "#2E7D32" },
-    Active:      { bg: "#FFF3E0", text: "#E65100" },
-    Loyal:       { bg: ACCENT + "0c", text: ACCENT },
-    Disengaged:  { bg: "#FCE4EC", text: "#C62828" },
-  };
-
   // All playbooks with their stage mappings (same as PlaybooksPage)
   const allPlaybooks = [
     { name: "Welcome & Onboard", desc: "Introduce new subscribers to your brand, set expectations, and guide them toward their first purchase", stages: ["Prospect"] },
@@ -2451,16 +2451,14 @@ function PlaceholderPage({ title, description }) {
 }
 
 /* ─── Playbooks Page Component ─── */
-function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handleOpenCopilot, copilotReady, copilotMessages, copilotInput, setCopilotInput, handleCopilotSend, copilotEndRef }) {
+function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handleOpenCopilot, copilotReady, copilotMessages, setCopilotMessages, copilotInput, setCopilotInput, handleCopilotSend, copilotEndRef, addCopilotMessage }) {
   // ─── State ───
   const [selectedPlaybook, setSelectedPlaybook] = useState(null);
-
-  const LIFECYCLE_CHIPS = {
-    Prospect:    { bg: "#E8F5E9", text: "#2E7D32" },
-    Active:      { bg: "#FFF3E0", text: "#E65100" },
-    Loyal:       { bg: ACCENT + "0c", text: ACCENT },
-    Disengaged:  { bg: "#FCE4EC", text: "#C62828" },
-  };
+  const fieldSettersRef = useRef(null);
+  const [copilotQuickOptions, setCopilotQuickOptions] = useState(null);
+  const [freeformText, setFreeformText] = useState("");
+  const [freeformActive, setFreeformActive] = useState(false);
+  const freeformRef = useRef(null);
 
   const playbooks = [
     { name: "Welcome & Onboard", desc: "Introduce new subscribers to your brand, set expectations, and guide them toward their first purchase", stages: ["Prospect"], mode: "always-on" },
@@ -2529,7 +2527,10 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
   );
 
   // ─── Playbook Detail Component ───
-  const PlaybookDetailPage = ({ playbook, onBack, copilotReady, copilotOpen, handleOpenCopilot }) => {
+  // Store in ref so the component identity is stable across parent re-renders
+  const _PlaybookDetailPageRef = useRef(null);
+  if (!_PlaybookDetailPageRef.current) {
+    _PlaybookDetailPageRef.current = ({ playbook, onBack, copilotReady, copilotOpen, handleOpenCopilot, onFieldSave, fieldSettersRef }) => {
     const [name, setName] = useState(playbook.name);
     const [description, setDescription] = useState(playbook.desc);
     const [nameEditing, setNameEditing] = useState(false);
@@ -2550,27 +2551,113 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
     const [useEmojis, setUseEmojis] = useState(true);
     const [noOfferMode, setNoOfferMode] = useState(true);
     const [expandedStages, setExpandedStages] = useState({});
+    const [expandedSections, setExpandedSections] = useState({
+      goal: true,
+      instructions: false,
+      voice: false,
+      offers: false,
+    });
+    const [editingField, setEditingField] = useState(null);
+    const prefilledRef = useRef(null);
 
-    // Pre-fill content for Browse Recovery playbook
+    // Expose field setters to parent via ref
     useEffect(() => {
-      if (playbook.name === "Browse Recovery") {
-        setGoal("Recover abandoned browse and drive add-to-cart or purchase");
-        setTrigger("Visitor viewed 2+ product pages without adding to cart, then left the site. Wait 1 hour after last activity.");
-        setApproach("Open with a warm, curious message about what they were browsing. Don't lead with a sales pitch — ask if they have questions or need help deciding. If they respond, have a real conversation. If no response after 24h, send one follow-up with a different angle. Stop after 2 unreturned messages.");
-        setStageGuidance({
-          Prospect: "Focus on building trust — mention return policy, share reviews, ask if they have questions. Don't assume they know the brand.",
-          Active: "Reference their last purchase if relevant. Suggest complementary products. Be more direct — skip the brand intro.",
-        });
-        setThingsToMention(["Satisfaction guarantee", "Free returns", "Product benefits", "Free shipping over $75"]);
-        setThingsToAvoid(["Discounts in first message", "Limited stock urgency", "Competitor mentions", "Surveillance-y language"]);
+      if (fieldSettersRef) fieldSettersRef.current = { setTrigger };
+    });
+
+    // Pre-fill content for each playbook (only once per playbook)
+    useEffect(() => {
+      if (prefilledRef.current === playbook.name) return;
+      prefilledRef.current = playbook.name;
+      const playbookContent = {
+        "Welcome & Onboard": {
+          goal: "Introduce new subscribers to the brand, build trust through our story and values, and guide them toward their first purchase — without being pushy.",
+          trigger: "When a shopper subscribes to SMS marketing for the first time. Wait 2 days after opt-in, then start the conversation. Skip if they already made a purchase within those 2 days.",
+          approach: "Start with a warm welcome that makes the subscriber feel valued. Share the brand story in a natural, conversational way. Guide toward first purchase without pressure.",
+          mentions: ["Brand story", "Welcome offer", "Free shipping", "Return policy"],
+          avoids: ["Hard sells", "Too many messages", "Generic language"],
+        },
+        "Educational Nurture": {
+          goal: "Deepen the shopper's connection to the brand by sharing useful content — how-to guides, product knowledge, and brand stories — that builds trust and keeps us top of mind between purchases.",
+          trigger: "After the Welcome & Onboard playbook completes without a purchase, or 14 days after a shopper's first order. Send one educational touchpoint every 7–10 days. Pause if the shopper enters another active playbook.",
+          approach: "Share genuinely useful content that helps the shopper. Focus on education over selling. Build trust through expertise and helpfulness.",
+          mentions: ["How-to guides", "Product tips", "Brand values", "Customer stories"],
+          avoids: ["Salesy language", "Too frequent messages", "Irrelevant content"],
+        },
+        "Browse Recovery": {
+          goal: "Re-engage shoppers who browsed products but didn't add anything to their cart — help them find what they're looking for, answer hesitations, and surface relevant alternatives.",
+          trigger: "When a shopper views 2 or more products in a single session without adding to cart, and then leaves the site. Wait 4 hours after the session ends, then reach out. Only trigger once per shopper every 14 days.",
+          approach: "Open with a warm, curious message about what they were browsing. Don't lead with a sales pitch — ask if they have questions or need help deciding. If they respond, have a real conversation. If no response after 24h, send one follow-up with a different angle. Stop after 2 unreturned messages.",
+          mentions: ["Satisfaction guarantee", "Free returns", "Product benefits", "Free shipping over $75"],
+          avoids: ["Discounts in first message", "Limited stock urgency", "Competitor mentions", "Surveillance-y language"],
+          stageGuidance: {
+            Prospect: "Focus on building trust — mention return policy, share reviews, ask if they have questions. Don't assume they know the brand.",
+            Active: "Reference their last purchase if relevant. Suggest complementary products. Be more direct — skip the brand intro.",
+          },
+        },
+        "Cart Abandonment": {
+          goal: "Win back shoppers who added items to their cart but didn't complete checkout — address what held them back, remind them what they loved, and offer contextual nudges to close the purchase.",
+          trigger: "When a shopper adds one or more items to their cart and leaves without completing checkout. Wait 1 hour after cart abandonment, then start the conversation. Don't trigger if the shopper already received a Browse Recovery message in the last 24 hours.",
+          approach: "Acknowledge what they left behind. Ask if something went wrong or if they need help. Offer relevant info like shipping details or product reviews.",
+          mentions: ["Cart contents", "Free shipping threshold", "Easy checkout", "Support availability"],
+          avoids: ["Aggressive urgency", "Multiple discount offers", "Guilt-tripping"],
+        },
+        "Promotional Push": {
+          goal: "Drive urgency and conversions around a specific time-sensitive offer, product launch, or seasonal moment — make it feel personal and relevant, not like a mass blast.",
+          trigger: "On a scheduled date set by the marketer. This playbook runs during a defined window (e.g., March 15–29) and reaches out to eligible shoppers within that period. Respect frequency limits from other active playbooks.",
+          approach: "Lead with the value proposition. Make the offer feel exclusive and personalized. Create natural urgency without being manipulative.",
+          mentions: ["Offer details", "Expiry date", "Exclusivity", "Product highlights"],
+          avoids: ["Spam-like language", "False urgency", "Misleading claims"],
+        },
+        "Post-Purchase Care": {
+          goal: "Build product confidence after a purchase with helpful tips, check-ins, and contextual suggestions — turn a one-time buyer into a repeat customer by making them feel supported, not sold to.",
+          trigger: "When a shopper's order is marked as delivered. Wait 2 days after delivery, then start the conversation. If delivery status isn't available, fall back to 5 days after order placement.",
+          approach: "Check in warmly. Share product care tips or usage ideas. Ask about their experience. Only suggest related products if the conversation feels natural.",
+          mentions: ["Product tips", "Care instructions", "Support contact", "Review request"],
+          avoids: ["Immediate upselling", "Assuming satisfaction", "Generic follow-ups"],
+        },
+        "Replenishment Nudge": {
+          goal: "Remind customers to reorder consumable products before they run out — make it effortless by referencing their past purchase and suggesting the right moment to restock.",
+          trigger: "When the estimated time since a shopper's last purchase of a consumable product approaches the typical reorder window for that product category. The agent uses average consumption patterns and adjusts based on the individual shopper's purchase history.",
+          approach: "Reference their specific past purchase. Make reordering easy with a direct link. Be helpful, not pushy — they may not need it yet.",
+          mentions: ["Past purchase details", "Easy reorder link", "Bundle savings", "Subscription option"],
+          avoids: ["Wrong timing assumptions", "Pushy language", "Irrelevant products"],
+        },
+        "VIP Recognition": {
+          goal: "Celebrate high-value customers when they hit key milestones — make them feel seen and appreciated with personalized messages, exclusive early access, or loyalty rewards.",
+          trigger: "When a shopper reaches a loyalty milestone: 5th order, 10th order, $500 lifetime spend, $1,000 lifetime spend, or 1-year anniversary as a customer. Trigger once per milestone. Space VIP messages at least 30 days apart to keep them feeling special, not routine.",
+          approach: "Celebrate genuinely. Acknowledge their loyalty with specifics. Offer something exclusive — early access, special discount, or personal thank you.",
+          mentions: ["Milestone reached", "Exclusive offer", "Loyalty appreciation", "Early access"],
+          avoids: ["Generic messages", "Treating VIPs like everyone else", "Over-frequent recognition"],
+        },
+        "Win-Back": {
+          goal: "Re-engage lapsed customers who haven't purchased or interacted in a while — remind them why they loved the brand, surface what's new, and offer a personalized reason to come back.",
+          trigger: "When a previously active shopper hasn't made a purchase in 60 days and hasn't opened or clicked a marketing message in 30 days. Reach out once. If no response after 14 days, try one more time with a different angle. Don't trigger if the shopper has already opted out or is in the Graceful Sunset playbook.",
+          approach: "Lead with what's new or what they might have missed. Reference their past favorites. Offer a compelling reason to return without desperation.",
+          mentions: ["New arrivals", "Past favorites", "Special comeback offer", "What's changed"],
+          avoids: ["Guilt-tripping", "Too many messages", "Ignoring opt-out signals"],
+        },
+        "Graceful Sunset": {
+          goal: "Respectfully wind down communication with long-unresponsive contacts — give them a clear choice to stay, adjust their preferences, or opt out, so we protect our sender reputation and respect their inbox.",
+          trigger: "When a shopper has not engaged with any marketing message (no opens, no clicks, no replies) for 90 days, and the Win-Back playbook has already been attempted without response. Send one final check-in message. If no response within 7 days, automatically suppress from future marketing outreach.",
+          approach: "Be respectful and transparent. Give clear options: stay subscribed, change preferences, or opt out. Make it easy and pressure-free.",
+          mentions: ["Preference options", "Easy opt-out", "What they'll miss", "Respect for their time"],
+          avoids: ["Guilt-tripping", "Hiding unsubscribe", "False urgency"],
+        },
+      };
+
+      const content = playbookContent[playbook.name];
+      if (content) {
+        setGoal(content.goal);
+        setTrigger(content.trigger);
+        setApproach(content.approach);
+        setStageGuidance(content.stageGuidance || {});
+        setThingsToMention(content.mentions || []);
+        setThingsToAvoid(content.avoids || []);
       } else {
-        // Generate sensible defaults for other playbooks
-        const defaultGoal = `Drive engagement for ${playbook.name}`;
-        const defaultTrigger = `Activated when conditions are met for ${playbook.name}`;
-        const defaultApproach = `Personalized ${playbook.name} approach tailored to customer segment and context.`;
-        setGoal(defaultGoal);
-        setTrigger(defaultTrigger);
-        setApproach(defaultApproach);
+        setGoal(`Drive engagement for ${playbook.name}`);
+        setTrigger(`Activated when conditions are met for ${playbook.name}`);
+        setApproach(`Personalized ${playbook.name} approach tailored to customer segment and context.`);
         setStageGuidance({});
         setThingsToMention([]);
         setThingsToAvoid([]);
@@ -2586,10 +2673,13 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
       }
     };
 
-    const cycleStatus = () => {
-      const statuses = ["Draft", "Active", "Paused"];
-      const nextIndex = (statuses.indexOf(status) + 1) % statuses.length;
-      setStatus(statuses[nextIndex]);
+    const handleActivateToggle = () => {
+      if (status === "Draft" || status === "Paused") {
+        setStatus("Activating");
+        setTimeout(() => setStatus("Active"), 2000);
+      } else if (status === "Active") {
+        setStatus("Paused");
+      }
     };
 
     const allStages = ["Prospect", "Active", "Loyal", "Disengaged"];
@@ -2663,7 +2753,7 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
             )}
           </div>
 
-          {/* Title row with status */}
+          {/* Title row with activate button */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
             <div style={{ flex: 1 }}>
               {!nameEditing ? (
@@ -2692,45 +2782,55 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
                 />
               )}
             </div>
+            {/* Activate / Pause button */}
             <button
-              onClick={cycleStatus}
+              onClick={handleActivateToggle}
+              disabled={status === "Activating"}
               style={{
-                padding: "4px 12px", borderRadius: 6, border: `1px solid ${BORDER}`,
-                background: status === "Draft" ? SURFACE : status === "Active" ? "#e8f5e9" : "#fce4ec",
-                color: status === "Draft" ? TEXT : status === "Active" ? "#2E7D32" : "#C62828",
-                fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all .2s", flexShrink: 0,
+                display: "flex", alignItems: "center", gap: 7,
+                padding: "8px 18px", borderRadius: 10, border: "none",
+                background: status === "Active" ? SURFACE : status === "Activating" ? SURFACE : ACCENT,
+                color: status === "Active" ? TEXT : status === "Activating" ? TEXT_MUTED : "white",
+                fontSize: 13, fontWeight: 500, cursor: status === "Activating" ? "default" : "pointer",
+                fontFamily: "'DM Sans', sans-serif", transition: "all .25s",
+                flexShrink: 0, opacity: status === "Activating" ? 0.8 : 1,
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.8"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
+              onMouseEnter={(e) => {
+                if (status === "Activating") return;
+                if (status === "Active") { e.currentTarget.style.background = "#e8e8e3"; }
+                else { e.currentTarget.style.background = ACCENT_DARK; }
+              }}
+              onMouseLeave={(e) => {
+                if (status === "Activating") return;
+                if (status === "Active") { e.currentTarget.style.background = SURFACE; }
+                else { e.currentTarget.style.background = ACCENT; }
+              }}
             >
-              {status}
+              {status === "Activating" ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ animation: "spin 1s linear infinite" }}>
+                    <circle cx="7" cy="7" r="5.5" stroke={TEXT_MUTED} strokeWidth="1.5" strokeDasharray="20 12" strokeLinecap="round" />
+                  </svg>
+                  <span>Activating…</span>
+                </>
+              ) : status === "Active" ? (
+                <>
+                  <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                    <rect x="2" y="2" width="3.5" height="10" rx="1" fill={TEXT} />
+                    <rect x="8.5" y="2" width="3.5" height="10" rx="1" fill={TEXT} />
+                  </svg>
+                  <span>Pause playbook</span>
+                </>
+              ) : (
+                <>
+                  <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                    <path d="M3 1.5l9 5.5-9 5.5V1.5z" fill="white" />
+                  </svg>
+                  <span>{status === "Paused" ? "Resume playbook" : "Activate playbook"}</span>
+                </>
+              )}
             </button>
           </div>
-
-          {/* Description — full width */}
-          {!descEditing ? (
-            <div
-              onClick={() => setDescEditing(true)}
-              style={{
-                fontSize: 13, color: TEXT_MUTED, lineHeight: 1.5,
-                cursor: "pointer", marginBottom: 4,
-              }}
-            >
-              {description}
-            </div>
-          ) : (
-            <textarea
-              autoFocus
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              onBlur={() => setDescEditing(false)}
-              style={{
-                fontSize: 13, border: `1px solid ${BORDER}`,
-                borderRadius: 8, padding: "6px 10px", fontFamily: "'DM Sans', sans-serif",
-                color: TEXT_MUTED, width: "100%", minHeight: 60, marginBottom: 4,
-              }}
-            />
-          )}
         </div>
 
         {/* ─── Tab Bar ─── */}
@@ -2740,18 +2840,18 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
           background: CARD_BG,
           display: "flex", gap: 32, flexShrink: 0,
         }}>
-          {["brief", "performance"].map((tab) => (
+          {["brief", "test", "performance"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               style={{
                 padding: "14px 0", fontSize: 13, fontWeight: 500, color: activeTab === tab ? TEXT : TEXT_MUTED,
                 background: "transparent", border: "none", cursor: "pointer",
-                borderBottom: activeTab === tab ? `2px solid ${ACCENT}` : "none",
+                borderBottom: activeTab === tab ? `2px solid ${ACCENT}` : "2px solid transparent",
                 transition: "all .2s",
               }}
             >
-              {tab === "brief" ? "Brief" : "Performance"}
+              {tab === "brief" ? "Brief" : tab === "test" ? "Test" : "Performance"}
             </button>
           ))}
         </div>
@@ -2760,405 +2860,556 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
         <div style={{ flex: 1, overflowY: "auto", padding: "24px 40px 40px", background: BG }}>
           {activeTab === "brief" ? (
             <div style={{ maxWidth: 800 }}>
-              {/* Section 1: Goal & Situation */}
+              {/* ─── Metadata Bar ─── */}
               <div className="animate-stageCardIn" style={{
                 background: CARD_BG, border: `1px solid ${BORDER}`,
-                borderRadius: 14, padding: "24px", marginBottom: 20,
-                opacity: 0, animationDelay: "0ms",
+                borderRadius: 14, padding: "16px 24px", marginBottom: 24,
+                opacity: 0, display: "flex", alignItems: "center", gap: 0,
               }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, textTransform: "uppercase", marginBottom: 14, letterSpacing: ".06em" }}>Goal & Situation</div>
-
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 6 }}>Goal</label>
-                  <textarea
-                    value={goal}
-                    onChange={(e) => setGoal(e.target.value)}
-                    style={{
-                      width: "100%", padding: "10px 12px", fontSize: 13, border: "none",
-                      borderRadius: 8, background: SURFACE, fontFamily: "'DM Sans', sans-serif",
-                      color: TEXT, minHeight: 70, resize: "vertical",
-                    }}
-                    onFocus={(e) => { e.currentTarget.style.borderBottom = `2px solid ${ACCENT}`; }}
-                    onBlur={(e) => { e.currentTarget.style.borderBottom = "none"; }}
-                  />
+                {/* Status column */}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 500, color: TEXT_MUTED, textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 6 }}>Status</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    {status === "Activating" ? (
+                      <svg width="10" height="10" viewBox="0 0 14 14" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                        <circle cx="7" cy="7" r="5.5" stroke={ACCENT} strokeWidth="1.5" strokeDasharray="20 12" strokeLinecap="round" />
+                      </svg>
+                    ) : (
+                      <div style={{
+                        width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                        background: status === "Draft" ? "#b0b0a8" : status === "Active" ? "#2E7D32" : status === "Paused" ? "#E65100" : "#b0b0a8",
+                      }} />
+                    )}
+                    <span style={{
+                      fontSize: 13, fontWeight: 500,
+                      color: status === "Activating" ? ACCENT : status === "Active" ? "#2E7D32" : TEXT,
+                    }}>
+                      {status === "Activating" ? "Activating…" : status}
+                    </span>
+                  </div>
                 </div>
-
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 6 }}>Trigger / Situation</label>
-                  <textarea
-                    value={trigger}
-                    onChange={(e) => setTrigger(e.target.value)}
-                    style={{
-                      width: "100%", padding: "10px 12px", fontSize: 13, border: "none",
-                      borderRadius: 8, background: SURFACE, fontFamily: "'DM Sans', sans-serif",
-                      color: TEXT, minHeight: 70, resize: "vertical",
-                    }}
-                    onFocus={(e) => { e.currentTarget.style.borderBottom = `2px solid ${ACCENT}`; }}
-                    onBlur={(e) => { e.currentTarget.style.borderBottom = "none"; }}
-                  />
+                {/* Divider */}
+                <div style={{ width: 1, height: 32, background: BORDER, margin: "0 24px" }} />
+                {/* Last used column */}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 500, color: TEXT_MUTED, textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 6 }}>Last used</div>
+                  <div style={{ fontSize: 13, color: (status === "Draft" || status === "Activating") ? TEXT_MUTED : TEXT }}>
+                    {(status === "Draft" || status === "Activating") ? <span style={{ textDecoration: "line-through" }}>—</span> : status === "Active" ? "Just now" : "2 days ago"}
+                  </div>
                 </div>
-
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 8 }}>Duration</label>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    {["always-on", "scheduled"].map((mode) => (
-                      <button
-                        key={mode}
-                        onClick={() => setDurationMode(mode)}
-                        style={{
-                          padding: "6px 14px", borderRadius: 20, border: "none", cursor: "pointer",
-                          background: durationMode === mode ? ACCENT : SURFACE,
-                          color: durationMode === mode ? "white" : TEXT_MUTED,
-                          fontSize: 12, fontWeight: 500, transition: "all .2s",
-                        }}
-                      >
-                        {mode === "always-on" ? "Always-on" : "Scheduled"}
-                      </button>
-                    ))}
+                {/* Divider */}
+                <div style={{ width: 1, height: 32, background: BORDER, margin: "0 24px" }} />
+                {/* Enabled column */}
+                <div style={{ flex: 1.5 }}>
+                  <div style={{ fontSize: 11, fontWeight: 500, color: TEXT_MUTED, textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 6 }}>Enabled for</div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {enabledStages.map((stage) => {
+                      const chip = LIFECYCLE_CHIPS[stage];
+                      return (
+                        <div key={stage} style={{
+                          padding: "2px 10px", borderRadius: 100,
+                          background: chip.bg, color: chip.text,
+                          fontSize: 11.5, fontWeight: 500, lineHeight: 1.5,
+                        }}>
+                          {stage}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
-              {/* Section 2: Lifecycle Stage Configuration */}
+              {/* Section 1: What triggers this playbook? — always open */}
               <div className="animate-stageCardIn" style={{
                 background: CARD_BG, border: `1px solid ${BORDER}`,
-                borderRadius: 14, padding: "24px", marginTop: 20, marginBottom: 20,
-                opacity: 0, animationDelay: "40ms",
+                borderRadius: 14, padding: "24px", marginBottom: 24,
+                opacity: 0,
               }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, textTransform: "uppercase", marginBottom: 16, letterSpacing: ".06em" }}>Lifecycle Stage Configuration</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: TEXT, marginBottom: 4 }}>What triggers this playbook?</div>
+                <div style={{ fontSize: 12.5, color: TEXT_MUTED, marginBottom: 18 }}>Define the goal and the moment this playbook should kick in.</div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {allStages.map((stage) => {
-                    const isEnabled = enabledStages.includes(stage);
-                    const chip = LIFECYCLE_CHIPS[stage];
-                    const isExpanded = expandedStages[stage];
+                <div style={{ marginBottom: 18 }}>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, display: "block", marginBottom: 4, letterSpacing: ".03em", textTransform: "uppercase" }}>Goal</label>
+                  {editingField === "goal" ? (
+                    <div>
+                      <textarea
+                        autoFocus
+                        value={goal}
+                        onChange={(e) => setGoal(e.target.value)}
+                        placeholder="What should this playbook achieve?"
+                        style={{
+                          width: "100%", padding: "10px 12px", fontSize: 13.5, border: `1px solid ${ACCENT}40`,
+                          borderRadius: 8, background: CARD_BG, fontFamily: "'DM Sans', sans-serif",
+                          color: TEXT, minHeight: 70, resize: "vertical", lineHeight: 1.6,
+                          outline: "none", boxShadow: `0 0 0 3px ${ACCENT}18`,
+                        }}
+                      />
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8, gap: 8 }}>
+                        <button onClick={() => setEditingField(null)} style={{ padding: "5px 14px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "transparent", color: TEXT_MUTED, fontSize: 12, cursor: "pointer" }}>Cancel</button>
+                        <button onClick={() => { setEditingField(null); if (onFieldSave) onFieldSave("goal", goal); }} style={{ padding: "5px 14px", borderRadius: 6, border: "none", background: ACCENT, color: "white", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>Save</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => setEditingField("goal")}
+                      style={{
+                        fontSize: 13.5, color: goal ? TEXT : TEXT_MUTED, lineHeight: 1.6,
+                        cursor: "pointer", padding: "4px 0",
+                        borderBottom: "1px dashed transparent", transition: "border-color .15s",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderBottomColor = BORDER; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderBottomColor = "transparent"; }}
+                    >
+                      {goal || "Click to define the goal..."}
+                    </div>
+                  )}
+                </div>
 
-                    return (
-                      <div key={stage}>
-                        <div style={{
-                          display: "flex", alignItems: "center", gap: 12,
-                          padding: "10px 0",
-                          borderBottom: `1px solid ${BORDER}`,
-                        }}>
-                          {/* Toggle switch */}
-                          <div
-                            onClick={() => toggleStage(stage)}
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, display: "block", marginBottom: 4, letterSpacing: ".03em", textTransform: "uppercase" }}>When to use the playbook</label>
+                  {editingField === "trigger" ? (
+                    <div>
+                      <textarea
+                        autoFocus
+                        value={trigger}
+                        onChange={(e) => setTrigger(e.target.value)}
+                        placeholder="Describe what triggers this playbook..."
+                        style={{
+                          width: "100%", padding: "10px 12px", fontSize: 13.5, border: `1px solid ${ACCENT}40`,
+                          borderRadius: 8, background: CARD_BG, fontFamily: "'DM Sans', sans-serif",
+                          color: TEXT, minHeight: 70, resize: "vertical", lineHeight: 1.6,
+                          outline: "none", boxShadow: `0 0 0 3px ${ACCENT}18`,
+                        }}
+                      />
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8, gap: 8 }}>
+                        <button onClick={() => setEditingField(null)} style={{ padding: "5px 14px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "transparent", color: TEXT_MUTED, fontSize: 12, cursor: "pointer" }}>Cancel</button>
+                        <button onClick={() => { setEditingField(null); if (onFieldSave) onFieldSave("trigger", trigger); }} style={{ padding: "5px 14px", borderRadius: 6, border: "none", background: ACCENT, color: "white", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>Save</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => setEditingField("trigger")}
+                      style={{
+                        fontSize: 13.5, color: trigger ? TEXT : TEXT_MUTED, lineHeight: 1.6,
+                        cursor: "pointer", padding: "4px 0",
+                        borderBottom: "1px dashed transparent", transition: "border-color .15s",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderBottomColor = BORDER; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderBottomColor = "transparent"; }}
+                    >
+                      {trigger || "Click to define the trigger..."}
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+
+              {/* Section 3: How should the agent behave? — collapsible */}
+              <div className="animate-stageCardIn" style={{
+                background: CARD_BG, border: `1px solid ${BORDER}`,
+                borderRadius: 14, marginBottom: 24,
+                opacity: 0, animationDelay: "80ms",
+                transition: "all .2s",
+                overflow: "hidden",
+              }}>
+                <div
+                  onClick={() => setExpandedSections({ ...expandedSections, instructions: !expandedSections.instructions })}
+                  style={{
+                    padding: "20px 24px", cursor: "pointer", display: "flex", alignItems: "center",
+                    transition: "background .15s",
+                  }}
+                  onMouseEnter={(e) => { if (!expandedSections.instructions) e.currentTarget.style.background = SURFACE + "80"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>How should the agent behave?</div>
+                    <div style={{ fontSize: 12.5, color: TEXT_MUTED, marginTop: 2 }}>Define approach, examples, and guardrails</div>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ transform: expandedSections.instructions ? "rotate(180deg)" : "rotate(0deg)", transition: "transform .2s", flexShrink: 0 }}>
+                    <path d="M3 5.5l4 4 4-4" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+
+                {expandedSections.instructions && (
+                  <div style={{ padding: "0 24px 24px" }}>
+                    <div style={{ marginBottom: 18 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, display: "block", marginBottom: 4, letterSpacing: ".03em", textTransform: "uppercase" }}>General approach</label>
+                      {editingField === "approach" ? (
+                        <div>
+                          <textarea
+                            autoFocus
+                            value={approach}
+                            onChange={(e) => setApproach(e.target.value)}
+                            placeholder="How should the agent handle conversations?"
                             style={{
-                              width: 36, height: 20, borderRadius: 10,
-                              background: isEnabled ? ACCENT : "#d1d1cc",
-                              cursor: "pointer", position: "relative",
-                              transition: "background .2s", flexShrink: 0,
+                              width: "100%", padding: "10px 12px", fontSize: 13.5, border: `1px solid ${ACCENT}40`,
+                              borderRadius: 8, background: CARD_BG, fontFamily: "'DM Sans', sans-serif",
+                              color: TEXT, minHeight: 120, resize: "vertical", lineHeight: 1.6,
+                              outline: "none", boxShadow: `0 0 0 3px ${ACCENT}18`,
                             }}
-                          >
-                            <div style={{
-                              width: 16, height: 16, borderRadius: "50%",
-                              background: "white",
-                              position: "absolute", top: 2,
-                              left: isEnabled ? 18 : 2,
-                              transition: "left .2s",
-                              boxShadow: "0 1px 3px rgba(0,0,0,.15)",
-                            }} />
+                          />
+                          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8, gap: 8 }}>
+                            <button onClick={() => setEditingField(null)} style={{ padding: "5px 14px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "transparent", color: TEXT_MUTED, fontSize: 12, cursor: "pointer" }}>Cancel</button>
+                            <button onClick={() => { setEditingField(null); if (onFieldSave) onFieldSave("approach", approach); }} style={{ padding: "5px 14px", borderRadius: 6, border: "none", background: ACCENT, color: "white", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>Save</button>
                           </div>
-
-                          {/* Stage chip */}
-                          <div style={{
-                            padding: "3px 10px", borderRadius: 100,
-                            background: chip.bg, color: chip.text,
-                            fontSize: 12, fontWeight: 500,
-                          }}>
-                            {stage}
-                          </div>
-
-                          <div style={{ flex: 1 }} />
-
-                          {/* Add custom guidelines button — only when enabled */}
-                          {isEnabled && (
-                            <button
-                              onClick={() => toggleExpandedStage(stage)}
-                              style={{
-                                padding: "5px 12px", borderRadius: 8,
-                                border: `1px solid ${BORDER}`,
-                                background: isExpanded ? ACCENT_LIGHT : "transparent",
-                                color: isExpanded ? ACCENT : TEXT_MUTED,
-                                fontSize: 12, fontWeight: 500, cursor: "pointer",
-                                transition: "all .15s",
-                              }}
-                              onMouseEnter={(e) => { if (!isExpanded) e.currentTarget.style.background = SURFACE; }}
-                              onMouseLeave={(e) => { if (!isExpanded) e.currentTarget.style.background = "transparent"; }}
-                            >
-                              {isExpanded ? "Hide guidelines" : "Add custom guidelines"}
-                            </button>
-                          )}
                         </div>
+                      ) : (
+                        <div
+                          onClick={() => setEditingField("approach")}
+                          style={{
+                            fontSize: 13.5, color: approach ? TEXT : TEXT_MUTED, lineHeight: 1.6,
+                            cursor: "pointer", padding: "4px 0",
+                            borderBottom: "1px dashed transparent", transition: "border-color .15s",
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.borderBottomColor = BORDER; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.borderBottomColor = "transparent"; }}
+                        >
+                          {approach || "Click to describe the approach..."}
+                        </div>
+                      )}
+                    </div>
 
-                        {/* Expanded guidance area */}
-                        {isEnabled && isExpanded && (
-                          <div style={{ padding: "12px 0 4px 48px" }}>
-                            <textarea
-                              value={stageGuidance[stage] || ""}
-                              onChange={(e) => setStageGuidance({ ...stageGuidance, [stage]: e.target.value })}
-                              placeholder="Add specific guidance for this stage..."
-                              style={{
-                                width: "100%", padding: "10px 12px", fontSize: 13, border: `1px solid ${BORDER}`,
-                                borderRadius: 8, background: SURFACE, fontFamily: "'DM Sans', sans-serif",
-                                color: TEXT, minHeight: 70, resize: "vertical",
-                              }}
-                            />
+                    {/* Message examples */}
+                    <div style={{ marginBottom: 18 }}>
+                      <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 6 }}>Message examples</label>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {playbook.name === "Browse Recovery" ? (
+                          <>
+                            <div style={{ padding: "12px 14px", background: SURFACE, borderRadius: 10 }}>
+                              <div style={{ fontSize: 12, fontWeight: 500, color: TEXT, marginBottom: 4 }}>Example 1: Opening message</div>
+                              <div style={{ fontSize: 12, color: TEXT_MUTED, lineHeight: 1.5 }}>"Hey! I noticed you were checking out our [product]. It's one of our most popular picks — want me to help you find the right option?"</div>
+                              <div style={{ fontSize: 11, color: TEXT_MUTED, fontStyle: "italic", marginTop: 6 }}>What I like about this: warm, specific, not pushy</div>
+                            </div>
+                            <div style={{ padding: "12px 14px", background: SURFACE, borderRadius: 10 }}>
+                              <div style={{ fontSize: 12, fontWeight: 500, color: TEXT, marginBottom: 4 }}>Example 2: Follow-up</div>
+                              <div style={{ fontSize: 12, color: TEXT_MUTED, lineHeight: 1.5 }}>"Just checking in — still thinking about [product]? Happy to answer any questions. By the way, shipping is free over $75."</div>
+                              <div style={{ fontSize: 11, color: TEXT_MUTED, fontStyle: "italic", marginTop: 6 }}>What I like about this: gentle nudge, adds value with free shipping info</div>
+                            </div>
+                          </>
+                        ) : (
+                          <div style={{ padding: "16px", background: SURFACE, borderRadius: 10, textAlign: "center", color: TEXT_MUTED, fontSize: 13 }}>
+                            Add example messages to guide the agent's tone and approach
                           </div>
                         )}
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
+                    </div>
 
-              {/* Section 3: Agent Instructions */}
-              <div className="animate-stageCardIn" style={{
-                background: CARD_BG, border: `1px solid ${BORDER}`,
-                borderRadius: 14, padding: "24px", marginTop: 20, marginBottom: 20,
-                opacity: 0, animationDelay: "80ms",
-              }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, textTransform: "uppercase", marginBottom: 14, letterSpacing: ".06em" }}>Agent Instructions</div>
-
-                <div style={{ marginBottom: 20 }}>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 6 }}>Approach / Strategy</label>
-                  <textarea
-                    value={approach}
-                    onChange={(e) => setApproach(e.target.value)}
-                    style={{
-                      width: "100%", padding: "10px 12px", fontSize: 13, border: "none",
-                      borderRadius: 8, background: SURFACE, fontFamily: "'DM Sans', sans-serif",
-                      color: TEXT, minHeight: 120, resize: "vertical",
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: 20 }}>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 10 }}>Message examples</label>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {["Example 1: Opening message", "Example 2: Follow-up"].map((ex, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          background: SURFACE, border: `1px solid ${BORDER}`,
-                          borderRadius: 12, padding: "14px", fontSize: 13,
-                        }}
-                      >
-                        <div style={{ fontWeight: 500, color: TEXT, marginBottom: 8 }}>{ex}</div>
-                        <div style={{ color: TEXT_MUTED, fontSize: 12, lineHeight: 1.5, marginBottom: 8 }}>
-                          {idx === 0
-                            ? "Hi! I noticed you were browsing some great products the other day. Do you have any questions about them, or would you like some personalized recommendations?"
-                            : "Just checking in — we'd love to help if you need anything! Feel free to reach out anytime."}
-                        </div>
-                        <div style={{ fontSize: 11, color: TEXT_MUTED, fontStyle: "italic" }}>
-                          What I like about this: {idx === 0 ? "Warm, conversational tone" : "Brief and friendly, respects their time"}
+                    {/* Good to mention / Better to skip */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 18 }}>
+                      <div>
+                        <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 6 }}>Good to mention</label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                          {thingsToMention.map((item, idx) => (
+                            <div key={idx} style={{
+                              padding: "4px 10px", borderRadius: 8, background: SURFACE,
+                              border: `1px solid ${BORDER}`, fontSize: 12, color: TEXT,
+                              display: "flex", alignItems: "center", gap: 6,
+                            }}>
+                              {item}
+                              <span onClick={() => removeMentionItem(thingsToMention, setThingsToMention, idx)} style={{ cursor: "pointer", color: TEXT_MUTED, fontSize: 14, lineHeight: 1 }}>&times;</span>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => addMentionItem(thingsToMention, setThingsToMention)}
+                            style={{
+                              padding: "4px 10px", borderRadius: 8, border: `1px dashed ${BORDER}`,
+                              background: "transparent", fontSize: 12, color: TEXT_MUTED,
+                              cursor: "pointer", transition: "all .15s",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.color = ACCENT; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_MUTED; }}
+                          >+ Add</button>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
-                  <div>
-                    <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 8 }}>Things to mention</label>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
-                      {thingsToMention.map((item, idx) => (
-                        <div
-                          key={idx}
-                          style={{
-                            padding: "4px 12px", borderRadius: 100,
-                            background: SURFACE, fontSize: 12, color: TEXT,
-                            display: "flex", alignItems: "center", gap: 8, cursor: "pointer",
-                          }}
-                          onClick={() => removeMentionItem(thingsToMention, setThingsToMention, idx)}
-                        >
-                          {item}
-                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                            <path d="M2 2l8 8M10 2l-8 8" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" />
-                          </svg>
+                      <div>
+                        <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 6 }}>Better to skip</label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                          {thingsToAvoid.map((item, idx) => (
+                            <div key={idx} style={{
+                              padding: "4px 10px", borderRadius: 8, background: SURFACE,
+                              border: `1px solid ${BORDER}`, fontSize: 12, color: TEXT,
+                              display: "flex", alignItems: "center", gap: 6,
+                            }}>
+                              {item}
+                              <span onClick={() => removeMentionItem(thingsToAvoid, setThingsToAvoid, idx)} style={{ cursor: "pointer", color: TEXT_MUTED, fontSize: 14, lineHeight: 1 }}>&times;</span>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => addMentionItem(thingsToAvoid, setThingsToAvoid)}
+                            style={{
+                              padding: "4px 10px", borderRadius: 8, border: `1px dashed ${BORDER}`,
+                              background: "transparent", fontSize: 12, color: TEXT_MUTED,
+                              cursor: "pointer", transition: "all .15s",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.color = ACCENT; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_MUTED; }}
+                          >+ Add</button>
                         </div>
-                      ))}
+                      </div>
                     </div>
-                    <button
-                      onClick={() => addMentionItem(thingsToMention, setThingsToMention)}
-                      style={{
-                        padding: "6px 12px", borderRadius: 100, border: `1px dashed ${BORDER}`,
-                        background: "transparent", cursor: "pointer", fontSize: 12,
-                        color: TEXT_MUTED, transition: "all .2s",
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.color = ACCENT; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_MUTED; }}
-                    >
-                      + Add
-                    </button>
-                  </div>
 
-                  <div>
-                    <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 8 }}>Things to avoid</label>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
-                      {thingsToAvoid.map((item, idx) => (
-                        <div
-                          key={idx}
-                          style={{
-                            padding: "4px 12px", borderRadius: 100,
-                            background: SURFACE, fontSize: 12, color: TEXT,
-                            display: "flex", alignItems: "center", gap: 8, cursor: "pointer",
-                          }}
-                          onClick={() => removeMentionItem(thingsToAvoid, setThingsToAvoid, idx)}
-                        >
-                          {item}
-                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                            <path d="M2 2l8 8M10 2l-8 8" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" />
-                          </svg>
+                    {/* Guardrails */}
+                    <div>
+                      <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 6 }}>Guardrails</label>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                        <div>
+                          <div style={{ fontSize: 11, color: TEXT_MUTED, marginBottom: 4 }}>Stop after _ unanswered</div>
+                          <input type="number" defaultValue={2} style={{
+                            width: "100%", padding: "8px 10px", fontSize: 13,
+                            border: `1px solid ${BORDER}`, borderRadius: 8, color: TEXT,
+                            fontFamily: "'DM Sans', sans-serif",
+                          }} />
                         </div>
-                      ))}
+                        <div>
+                          <div style={{ fontSize: 11, color: TEXT_MUTED, marginBottom: 4 }}>Max messages</div>
+                          <input type="number" defaultValue={10} style={{
+                            width: "100%", padding: "8px 10px", fontSize: 13,
+                            border: `1px solid ${BORDER}`, borderRadius: 8, color: TEXT,
+                            fontFamily: "'DM Sans', sans-serif",
+                          }} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 11, color: TEXT_MUTED, marginBottom: 4 }}>Wait before retrying</div>
+                          <select defaultValue="7" style={{
+                            width: "100%", padding: "8px 10px", fontSize: 13,
+                            border: `1px solid ${BORDER}`, borderRadius: 8, color: TEXT,
+                            fontFamily: "'DM Sans', sans-serif", background: CARD_BG,
+                          }}>
+                            <option value="7">7 days</option>
+                            <option value="14">14 days</option>
+                            <option value="30">30 days</option>
+                          </select>
+                        </div>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => addMentionItem(thingsToAvoid, setThingsToAvoid)}
-                      style={{
-                        padding: "6px 12px", borderRadius: 100, border: `1px dashed ${BORDER}`,
-                        background: "transparent", cursor: "pointer", fontSize: 12,
-                        color: TEXT_MUTED, transition: "all .2s",
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.color = ACCENT; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_MUTED; }}
-                    >
-                      + Add
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 10 }}>Conversation limits</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-                    <div>
-                      <label style={{ fontSize: 11, color: TEXT_MUTED, display: "block", marginBottom: 4 }}>Max unreturned messages</label>
-                      <input type="number" defaultValue={2} style={{
-                        width: "100%", padding: "8px 10px", fontSize: 13, border: `1px solid ${BORDER}`,
-                        borderRadius: 8, fontFamily: "'DM Sans', sans-serif",
-                      }} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: 11, color: TEXT_MUTED, display: "block", marginBottom: 4 }}>Max conversation length</label>
-                      <input type="number" defaultValue={10} style={{
-                        width: "100%", padding: "8px 10px", fontSize: 13, border: `1px solid ${BORDER}`,
-                        borderRadius: 8, fontFamily: "'DM Sans', sans-serif",
-                      }} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: 11, color: TEXT_MUTED, display: "block", marginBottom: 4 }}>Cool-down period</label>
-                      <select style={{
-                        width: "100%", padding: "8px 10px", fontSize: 13, border: `1px solid ${BORDER}`,
-                        borderRadius: 8, fontFamily: "'DM Sans', sans-serif",
-                      }}>
-                        <option>7 days</option>
-                        <option>14 days</option>
-                        <option>30 days</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Section 4: Brand Voice & Tone */}
-              <div className="animate-stageCardIn" style={{
-                background: CARD_BG, border: `1px solid ${BORDER}`,
-                borderRadius: 14, padding: "24px", marginBottom: 20,
-                opacity: 0, animationDelay: "120ms",
-              }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, textTransform: "uppercase", marginBottom: 14, letterSpacing: ".06em" }}>Brand Voice & Tone</div>
-
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={inheritGlobalSettings}
-                      onChange={(e) => setInheritGlobalSettings(e.target.checked)}
-                      style={{ width: 16, height: 16, cursor: "pointer" }}
-                    />
-                    Inherit from global settings
-                  </label>
-                </div>
-
-                {!inheritGlobalSettings && (
-                  <div style={{ marginBottom: 18 }}>
-                    <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 6 }}>Tone</label>
-                    <textarea
-                      value={toneText}
-                      onChange={(e) => setToneText(e.target.value)}
-                      placeholder="Describe the tone and voice for this playbook..."
-                      style={{
-                        width: "100%", padding: "10px 12px", fontSize: 13, border: "none",
-                        borderRadius: 8, background: SURFACE, fontFamily: "'DM Sans', sans-serif",
-                        color: TEXT, minHeight: 70, resize: "vertical",
-                      }}
-                    />
                   </div>
                 )}
+              </div>
 
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 8 }}>Message length</label>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    {["concise", "conversational", "detailed"].map((pill) => (
-                      <button
-                        key={pill}
-                        onClick={() => setMessageLengthPill(pill)}
+              {/* Section 4: Voice & style — collapsible */}
+              <div className="animate-stageCardIn" style={{
+                background: CARD_BG, border: `1px solid ${BORDER}`,
+                borderRadius: 14, marginBottom: 24,
+                opacity: 0, animationDelay: "120ms",
+                transition: "all .2s",
+                overflow: "hidden",
+              }}>
+                <div
+                  onClick={() => setExpandedSections({ ...expandedSections, voice: !expandedSections.voice })}
+                  style={{
+                    padding: "20px 24px", cursor: "pointer", display: "flex", alignItems: "center",
+                    transition: "background .15s",
+                  }}
+                  onMouseEnter={(e) => { if (!expandedSections.voice) e.currentTarget.style.background = SURFACE + "80"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>Voice & style</div>
+                    <div style={{ fontSize: 12.5, color: TEXT_MUTED, marginTop: 2 }}>Message tone, length, and emoji preferences</div>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ transform: expandedSections.voice ? "rotate(180deg)" : "rotate(0deg)", transition: "transform .2s", flexShrink: 0 }}>
+                    <path d="M3 5.5l4 4 4-4" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+
+                {expandedSections.voice && (
+                  <div style={{ padding: "0 24px 24px" }}>
+                    <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                      <div
+                        onClick={() => setInheritGlobalSettings(!inheritGlobalSettings)}
                         style={{
-                          padding: "6px 14px", borderRadius: 20, border: "none", cursor: "pointer",
-                          background: messageLengthPill === pill ? ACCENT : SURFACE,
-                          color: messageLengthPill === pill ? "white" : TEXT_MUTED,
-                          fontSize: 12, fontWeight: 500, transition: "all .2s",
+                          width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${inheritGlobalSettings ? ACCENT : "#c8c8c0"}`,
+                          background: inheritGlobalSettings ? ACCENT : "transparent", cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s",
                         }}
                       >
-                        {pill.charAt(0).toUpperCase() + pill.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                        {inheritGlobalSettings && (
+                          <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+                            <path d="M3 7l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 13, color: TEXT }}>Use my brand's global voice</span>
+                    </div>
 
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={useEmojis}
-                      onChange={(e) => setUseEmojis(e.target.checked)}
-                      style={{ width: 16, height: 16, cursor: "pointer" }}
-                    />
-                    Use emojis
-                  </label>
-                </div>
-              </div>
+                    {!inheritGlobalSettings && (
+                      <div style={{ marginBottom: 16 }}>
+                        <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, display: "block", marginBottom: 4, letterSpacing: ".03em", textTransform: "uppercase" }}>Tone</label>
+                        {editingField === "tone" ? (
+                          <div>
+                            <textarea
+                              autoFocus
+                              value={toneText}
+                              onChange={(e) => setToneText(e.target.value)}
+                              placeholder="Describe the tone and voice for this playbook..."
+                              style={{
+                                width: "100%", padding: "10px 12px", fontSize: 13.5, border: `1px solid ${ACCENT}40`,
+                                borderRadius: 8, background: CARD_BG, fontFamily: "'DM Sans', sans-serif",
+                                color: TEXT, minHeight: 70, resize: "vertical", lineHeight: 1.6,
+                                boxShadow: `0 0 0 3px ${ACCENT}10`,
+                              }}
+                            />
+                            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8, gap: 8 }}>
+                              <button onClick={() => setEditingField(null)} style={{ padding: "5px 14px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "transparent", color: TEXT_MUTED, fontSize: 12, cursor: "pointer" }}>Cancel</button>
+                              <button onClick={() => { setEditingField(null); if (onFieldSave) onFieldSave("tone", toneText); }} style={{ padding: "5px 14px", borderRadius: 6, border: "none", background: ACCENT, color: "white", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>Save</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            onClick={() => setEditingField("tone")}
+                            style={{
+                              fontSize: 13.5, color: toneText ? TEXT : TEXT_MUTED, lineHeight: 1.6,
+                              cursor: "pointer", padding: "4px 0",
+                              borderBottom: "1px dashed transparent", transition: "border-color .15s",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderBottomColor = BORDER; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderBottomColor = "transparent"; }}
+                          >
+                            {toneText || "Click to describe the tone..."}
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-              {/* Section 5: Offers & Incentives */}
-              <div className="animate-stageCardIn" style={{
-                background: CARD_BG, border: `1px solid ${BORDER}`,
-                borderRadius: 14, padding: "24px", marginBottom: 40,
-                opacity: 0, animationDelay: "160ms",
-              }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, textTransform: "uppercase", marginBottom: 14, letterSpacing: ".06em" }}>Offers & Incentives</div>
+                    <div style={{ marginBottom: 16 }}>
+                      <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 6 }}>Message length</label>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {["concise", "conversational", "detailed"].map((pill) => (
+                          <button
+                            key={pill}
+                            onClick={() => setMessageLengthPill(pill)}
+                            style={{
+                              padding: "6px 16px", borderRadius: 8, border: `1px solid ${BORDER}`,
+                              background: messageLengthPill === pill ? ACCENT : "transparent",
+                              color: messageLengthPill === pill ? "white" : TEXT_MUTED,
+                              fontSize: 12, fontWeight: 500, cursor: "pointer",
+                              transition: "all .2s", textTransform: "capitalize",
+                            }}
+                          >
+                            {pill}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={noOfferMode}
-                      onChange={(e) => setNoOfferMode(e.target.checked)}
-                      style={{ width: 16, height: 16, cursor: "pointer" }}
-                    />
-                    No-offer mode (personalization only, no promotions)
-                  </label>
-                </div>
-
-                {!noOfferMode && (
-                  <div>
-                    <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 10 }}>Active offers</label>
-                    <div style={{ padding: "14px", background: SURFACE, borderRadius: 10, marginBottom: 12 }}>
-                      <div style={{ fontSize: 12, fontWeight: 500, color: TEXT, marginBottom: 8 }}>Offer 1: Welcome discount</div>
-                      <div style={{ fontSize: 12, color: TEXT_MUTED, marginBottom: 8 }}>15% off first order</div>
-                      <div style={{ fontSize: 11, color: TEXT_MUTED }}>Condition: New customers only</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div
+                        onClick={() => setUseEmojis(!useEmojis)}
+                        style={{
+                          width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${useEmojis ? ACCENT : "#c8c8c0"}`,
+                          background: useEmojis ? ACCENT : "transparent", cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s",
+                        }}
+                      >
+                        {useEmojis && (
+                          <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+                            <path d="M3 7l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 13, color: TEXT }}>Use emojis</span>
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Section 5: Offers & promotions — collapsible */}
+              <div className="animate-stageCardIn" style={{
+                background: CARD_BG, border: `1px solid ${BORDER}`,
+                borderRadius: 14, marginBottom: 24,
+                opacity: 0, animationDelay: "160ms",
+                transition: "all .2s",
+                overflow: "hidden",
+              }}>
+                <div
+                  onClick={() => setExpandedSections({ ...expandedSections, offers: !expandedSections.offers })}
+                  style={{
+                    padding: "20px 24px", cursor: "pointer", display: "flex", alignItems: "center",
+                    transition: "background .15s",
+                  }}
+                  onMouseEnter={(e) => { if (!expandedSections.offers) e.currentTarget.style.background = SURFACE + "80"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>Offers & promotions</div>
+                    <div style={{ fontSize: 12.5, color: TEXT_MUTED, marginTop: 2 }}>Configure available offers and discount rules</div>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ transform: expandedSections.offers ? "rotate(180deg)" : "rotate(0deg)", transition: "transform .2s", flexShrink: 0 }}>
+                    <path d="M3 5.5l4 4 4-4" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+
+                {expandedSections.offers && (
+                  <div style={{ padding: "0 24px 24px" }}>
+                    <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                      <div
+                        onClick={() => setNoOfferMode(!noOfferMode)}
+                        style={{
+                          width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${noOfferMode ? ACCENT : "#c8c8c0"}`,
+                          background: noOfferMode ? ACCENT : "transparent", cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s",
+                        }}
+                      >
+                        {noOfferMode && (
+                          <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+                            <path d="M3 7l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 13, color: TEXT }}>Skip promotions — personalization only</span>
+                    </div>
+
+                    {!noOfferMode && (
+                      <div>
+                        <label style={{ fontSize: 12, fontWeight: 500, color: TEXT, display: "block", marginBottom: 8 }}>Active offers</label>
+                        <div style={{ padding: "12px 14px", background: SURFACE, borderRadius: 10 }}>
+                          <div style={{ fontSize: 13, fontWeight: 500, color: TEXT }}>Welcome discount</div>
+                          <div style={{ fontSize: 12, color: TEXT_MUTED, marginTop: 2 }}>15% off first order</div>
+                          <div style={{ fontSize: 11, color: TEXT_MUTED, marginTop: 2 }}>New customers only</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : activeTab === "test" ? (
+            // ─── Test Tab ───
+            <div style={{ maxWidth: 800 }}>
+              <div className="animate-stageCardIn" style={{
+                background: CARD_BG, border: `1px solid ${BORDER}`,
+                borderRadius: 14, padding: "48px 40px", opacity: 0,
+                display: "flex", flexDirection: "column", alignItems: "center",
+                textAlign: "center",
+              }}>
+                {/* Construction icon */}
+                <div style={{
+                  width: 56, height: 56, borderRadius: 16, background: ACCENT + "0c",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  marginBottom: 20,
+                }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h3 className="fraunces" style={{ fontSize: 18, fontWeight: 600, color: TEXT, marginBottom: 8 }}>
+                  Test this playbook
+                </h3>
+                <p style={{ fontSize: 13.5, color: TEXT_MUTED, lineHeight: 1.6, maxWidth: 420, marginBottom: 20 }}>
+                  Run this playbook for a specific shopper to preview the messages it would generate. Pick a real customer profile, trigger the playbook, and see exactly how the agent would engage — before anything goes live.
+                </p>
+                <div style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  padding: "6px 14px", borderRadius: 8,
+                  background: ACCENT + "08", border: `1px solid ${ACCENT}15`,
+                }}>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <circle cx="6" cy="6" r="5" stroke={ACCENT} strokeWidth="1.2" />
+                    <path d="M6 3.5v3l2 1" stroke={ACCENT} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  <span style={{ fontSize: 12, fontWeight: 500, color: ACCENT }}>Coming soon</span>
+                </div>
               </div>
             </div>
           ) : (
@@ -3238,6 +3489,45 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
       </div>
     );
   };
+  }
+  const PlaybookDetailPage = _PlaybookDetailPageRef.current;
+
+  const handleFieldSave = (fieldName, value) => {
+    if (!copilotOpen) handleOpenCopilot();
+
+    // Special scenario: Welcome & Onboard playbook trigger edit
+    if (selectedPlaybook && selectedPlaybook.name === "Welcome & Onboard" && fieldName === "trigger") {
+      // Extract day count from value if present
+      const dayMatch = (value || "").match(/(\d+)\s*day/i);
+      const days = dayMatch ? dayMatch[1] : "3";
+
+      setTimeout(() => {
+        if (addCopilotMessage) addCopilotMessage({ role: "ai", text: `Got it. I'll start reaching out to new subscribers ${days} days after they opt in.` });
+      }, 500);
+      setTimeout(() => {
+        if (addCopilotMessage) addCopilotMessage({ role: "ai", text: `Just a heads up — with a ${days}-day delay, shoppers who opted in during a flash sale might miss the promotion window. Want to add an exception for active promotions?` });
+      }, 1800);
+      setTimeout(() => {
+        setCopilotQuickOptions([
+          { label: "Yes, add exception for promotions", icon: "check" },
+          { label: "Skip for now", icon: "skip" },
+          { label: "I have a different approach", icon: "edit" },
+        ]);
+      }, 2200);
+      return;
+    }
+
+    const reactions = {
+      goal: `Got it — I'll focus on: "${(value || "").slice(0, 50)}${(value || "").length > 50 ? "..." : ""}". This gives me a clear north star for every conversation in this playbook.`,
+      trigger: `Noted! I'll watch for that trigger. Just a heads up — make sure the timing aligns with your lifecycle stage definitions so nothing falls through the cracks.`,
+      approach: `Love the direction. I'll keep this conversational style consistent. Want me to draft a few example opening messages based on this guidance?`,
+      tone: `Understood — I'll adjust my voice. Want me to show you a before/after of how messages would sound with this tone?`,
+    };
+    const reaction = reactions[fieldName] || `Updated "${fieldName}" — I'll keep that in mind for this playbook.`;
+    setTimeout(() => {
+      if (addCopilotMessage) addCopilotMessage({ role: "ai", text: reaction });
+    }, 500);
+  };
 
   // ─── Conditional Rendering: List or Detail ───
   if (selectedPlaybook) {
@@ -3249,6 +3539,8 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
           copilotReady={copilotReady}
           copilotOpen={copilotOpen}
           handleOpenCopilot={handleOpenCopilot}
+          onFieldSave={handleFieldSave}
+          fieldSettersRef={fieldSettersRef}
         />
 
         {/* ─── Co-Pilot Side Panel ─── */}
@@ -3362,44 +3654,166 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
               <div ref={copilotEndRef} />
             </div>
 
-            {/* Copilot Input */}
+            {/* Copilot Input / Quick Options */}
             <div style={{
               padding: "12px 14px", borderTop: `1px solid ${BORDER}`,
               background: "rgba(250,250,248,.95)", flexShrink: 0,
             }}>
-              <div style={{
-                display: "flex", alignItems: "flex-end", gap: 8,
-                background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 4,
-              }}>
-                <textarea
-                  value={copilotInput}
-                  onChange={(e) => setCopilotInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleCopilotSend(); } }}
-                  placeholder="Ask anything..."
-                  rows={1}
-                  style={{
-                    flex: 1, border: "none", outline: "none", resize: "none",
-                    padding: "8px 10px", fontSize: 13, lineHeight: 1.5,
-                    color: TEXT, fontFamily: "'DM Sans', sans-serif", background: "transparent",
-                  }}
-                />
-                <button
-                  onClick={handleCopilotSend}
-                  style={{
-                    width: 30, height: 30, borderRadius: 8, border: "none",
-                    background: copilotInput.trim() ? ACCENT : "#e0e0db", color: "white",
-                    cursor: copilotInput.trim() ? "pointer" : "default",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0, margin: 2, transition: "all .2s",
-                  }}
-                  onMouseEnter={(e) => { if (copilotInput.trim()) e.currentTarget.style.background = ACCENT_DARK; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = copilotInput.trim() ? ACCENT : "#e0e0db"; }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M1 7h12M8 2l5 5-5 5" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
+              {copilotQuickOptions ? (
+                <div className="animate-fadeIn" style={{ display: "flex", flexDirection: "column", gap: 6, opacity: 0 }}>
+                  {copilotQuickOptions.filter((o) => o.icon !== "edit").map((opt, oi) => (
+                    <button
+                      key={oi}
+                      onClick={() => {
+                        setCopilotQuickOptions(null);
+                        setFreeformActive(false);
+                        setFreeformText("");
+                        if (addCopilotMessage) {
+                          addCopilotMessage({ role: "user", text: opt.label });
+                          if (opt.icon === "check") {
+                            setTimeout(() => addCopilotMessage({ role: "ai", text: "Done — I've added a promotion exception. When there's an active sale, I'll reach out within 24 hours instead of waiting the full delay. The standard timing stays in place for everything else." }), 800);
+                            if (fieldSettersRef.current && fieldSettersRef.current.setTrigger) {
+                              fieldSettersRef.current.setTrigger((prev) =>
+                                prev.includes("Exception:") ? prev : prev + "\n\nException: During active promotions, reach out within 24 hours of opt-in instead of the standard delay."
+                              );
+                            }
+                          } else {
+                            setTimeout(() => addCopilotMessage({ role: "ai", text: "No problem. I'll keep the current timing as-is. You can always revisit this later if you notice shoppers missing promotions." }), 800);
+                          }
+                        }
+                      }}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "10px 14px", borderRadius: 10,
+                        border: `1px solid ${BORDER}`, background: CARD_BG,
+                        cursor: "pointer", transition: "all .15s",
+                        textAlign: "left", fontFamily: "'DM Sans', sans-serif",
+                        width: "100%",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = ACCENT + "60"; e.currentTarget.style.background = ACCENT_LIGHT; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = CARD_BG; }}
+                    >
+                      <div style={{
+                        width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                        background: opt.icon === "check" ? ACCENT + "14" : SURFACE,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        {opt.icon === "check" && (
+                          <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
+                            <path d="M3 7l3 3 5-5" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                        {opt.icon === "skip" && (
+                          <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
+                            <path d="M3 11L11 3M11 3H5M11 3v6" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 12.5, color: TEXT, lineHeight: 1.4 }}>{opt.label}</span>
+                    </button>
+                  ))}
+                  {/* Freeform input option */}
+                  <div
+                    onClick={() => {
+                      setFreeformActive(true);
+                      setTimeout(() => { if (freeformRef.current) freeformRef.current.focus(); }, 50);
+                    }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 8,
+                      padding: "4px", borderRadius: 10,
+                      border: `1px solid ${freeformActive ? ACCENT + "50" : BORDER}`,
+                      background: CARD_BG, cursor: "text", transition: "all .15s",
+                      boxShadow: freeformActive ? `0 0 0 3px ${ACCENT}12` : "none",
+                    }}
+                  >
+                    <input
+                      ref={freeformRef}
+                      value={freeformText}
+                      onChange={(e) => setFreeformText(e.target.value)}
+                      onFocus={() => setFreeformActive(true)}
+                      onBlur={() => { if (!freeformText) setFreeformActive(false); }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && freeformText.trim()) {
+                          const text = freeformText.trim();
+                          setCopilotQuickOptions(null);
+                          setFreeformText("");
+                          setFreeformActive(false);
+                          if (addCopilotMessage) {
+                            addCopilotMessage({ role: "user", text });
+                            setTimeout(() => addCopilotMessage({ role: "ai", text: `Got it — I'll incorporate that guidance. Let me adjust the playbook accordingly.` }), 800);
+                          }
+                        }
+                      }}
+                      placeholder="Something else…"
+                      style={{
+                        flex: 1, border: "none", outline: "none",
+                        padding: "6px 10px", fontSize: 12.5, lineHeight: 1.4,
+                        color: TEXT, fontFamily: "'DM Sans', sans-serif",
+                        background: "transparent",
+                      }}
+                    />
+                    {freeformText.trim() && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const text = freeformText.trim();
+                          setCopilotQuickOptions(null);
+                          setFreeformText("");
+                          setFreeformActive(false);
+                          if (addCopilotMessage) {
+                            addCopilotMessage({ role: "user", text });
+                            setTimeout(() => addCopilotMessage({ role: "ai", text: `Got it — I'll incorporate that guidance. Let me adjust the playbook accordingly.` }), 800);
+                          }
+                        }}
+                        style={{
+                          width: 26, height: 26, borderRadius: 7, border: "none",
+                          background: ACCENT, color: "white", cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          flexShrink: 0, margin: 2, transition: "all .2s",
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                          <path d="M1 7h12M8 2l5 5-5 5" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div style={{
+                  display: "flex", alignItems: "flex-end", gap: 8,
+                  background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 4,
+                }}>
+                  <textarea
+                    value={copilotInput}
+                    onChange={(e) => setCopilotInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleCopilotSend(); } }}
+                    placeholder="Ask anything..."
+                    rows={1}
+                    style={{
+                      flex: 1, border: "none", outline: "none", resize: "none",
+                      padding: "8px 10px", fontSize: 13, lineHeight: 1.5,
+                      color: TEXT, fontFamily: "'DM Sans', sans-serif", background: "transparent",
+                    }}
+                  />
+                  <button
+                    onClick={handleCopilotSend}
+                    style={{
+                      width: 30, height: 30, borderRadius: 8, border: "none",
+                      background: copilotInput.trim() ? ACCENT : "#e0e0db", color: "white",
+                      cursor: copilotInput.trim() ? "pointer" : "default",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0, margin: 2, transition: "all .2s",
+                    }}
+                    onMouseEnter={(e) => { if (copilotInput.trim()) e.currentTarget.style.background = ACCENT_DARK; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = copilotInput.trim() ? ACCENT : "#e0e0db"; }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M1 7h12M8 2l5 5-5 5" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -4288,10 +4702,12 @@ const __default__ = function App() {
           handleOpenCopilot={handleSkillsCopilotOpen}
           copilotReady={skillsCopilotReady}
           copilotMessages={skillsCopilotMessages}
+          setCopilotMessages={setSkillsCopilotMessages}
           copilotInput={skillsCopilotInput}
           setCopilotInput={setSkillsCopilotInput}
           handleCopilotSend={handleSkillsCopilotSend}
           copilotEndRef={skillsCopilotEndRef}
+          addCopilotMessage={(msg) => setSkillsCopilotMessages((prev) => [...prev, msg])}
         />
       );
     } else if (activeNavItem === "overview") {
@@ -4726,6 +5142,29 @@ const __default__ = function App() {
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M2 8h12M10 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
+            </button>
+          </div>
+          {/* Skip to playbooks — testing shortcut */}
+          <div style={{ maxWidth: 700, margin: "6px auto 0", textAlign: "right" }}>
+            <button
+              onClick={() => {
+                setLifecycleComplete(true);
+                setNavExpanded(true);
+                setDraftingMode("exploring");
+                setDraftingState("done");
+                setDraftProgress(100);
+                setAppPage("lifecycle");
+                setActiveNavItem("skills");
+              }}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                fontSize: 11, color: BORDER, padding: "2px 6px",
+                transition: "color .2s", fontFamily: "'DM Sans', sans-serif",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = TEXT_MUTED; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = BORDER; }}
+            >
+              Skip to playbooks →
             </button>
           </div>
         </div>
