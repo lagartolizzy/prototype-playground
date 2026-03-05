@@ -58,5 +58,14 @@
     "description": "Prototype exploring the scenario of the loyal Glamnetic shopper getting RCS campaign from AI Journey",
     "file": "rcs-loyal-shopper.html",
     "image": "rcs-loyal-shopper.png"
+  },
+  {
+    "name": "One Agent, Two Skills",
+    "author": "Lisa Timanova",
+    "date": "2026-03-05",
+    "status": "Draft",
+    "tags": [],
+    "description": "Exploration for one Gorgias Agent with 2 skills: Support and Marketing",
+    "file": "one agent.html"
   }
 ]
