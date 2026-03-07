@@ -16,7 +16,6 @@
       --bg: #F8F7F6;
       --surface: #FFFFFF;
       --border: rgba(0,0,0,0.06);
-      --border-hover: rgba(0,0,0,0.12);
       --text-primary: #1A1A1A;
       --text-secondary: #6B6B6B;
       --text-tertiary: #9A9A9A;
@@ -44,21 +43,12 @@
       transition: all 0.15s ease;
     }
     .topbar-back:hover { border-color: var(--accent-border); color: var(--accent); }
-
     .topbar-breadcrumb {
-      display: flex; align-items: center; gap: 6px; min-width: 0;
-      font-size: 13px; color: var(--text-tertiary);
+      display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 13px; color: var(--text-tertiary);
     }
-    .topbar-breadcrumb-name {
-      font-weight: 600; color: var(--text-primary);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
+    .topbar-breadcrumb-name { font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .topbar-breadcrumb-sep { color: var(--text-muted); flex-shrink: 0; }
-    .topbar-breadcrumb-page {
-      color: var(--accent); font-weight: 500;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      max-width: 200px;
-    }
+    .topbar-breadcrumb-page { color: var(--accent); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
 
     .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .topbar-btn {
@@ -69,9 +59,7 @@
     }
     .topbar-btn.feedback { background: var(--accent); color: white; }
     .topbar-btn.feedback:hover { background: #5a34b3; }
-    .topbar-btn.open {
-      background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border);
-    }
+    .topbar-btn.open { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
     .topbar-btn.open:hover { border-color: var(--accent-border); color: var(--accent); }
 
     .proto-frame {
@@ -79,31 +67,23 @@
       border: none; width: 100%; height: calc(100vh - 44px);
     }
 
-    /* Modal */
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
       z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px;
     }
     .modal-backdrop.open { display: flex; }
     @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    @keyframes sent { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
     .modal {
       background: var(--surface); border-radius: 16px; width: 100%; max-width: 480px;
       box-shadow: var(--shadow-lg); overflow: hidden;
       animation: modalIn 0.25s cubic-bezier(0.2, 0, 0, 1);
     }
-    .modal-header {
-      padding: 20px 24px 0;
-    }
+    .modal-header { padding: 20px 24px 0; }
     .modal-title { font-size: 17px; font-weight: 650; color: var(--text-primary); margin-bottom: 2px; }
-    .modal-breadcrumb {
-      font-size: 12.5px; color: var(--text-tertiary); margin-bottom: 4px;
-      display: flex; align-items: center; gap: 6px;
-    }
+    .modal-breadcrumb { font-size: 12.5px; color: var(--text-tertiary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .modal-breadcrumb-page { color: var(--accent); font-weight: 500; }
-    .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 0; }
-
+    .modal-subtitle { font-size: 12px; color: var(--text-muted); }
     .modal-body { padding: 16px 24px 24px; }
     .modal-field { margin-bottom: 14px; }
     .modal-label { display: block; font-size: 12px; font-weight: 550; color: var(--text-secondary); margin-bottom: 6px; }
@@ -132,7 +112,7 @@
     .modal-btn.primary:hover { background: #5a34b3; }
     .modal-btn.primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .modal-success { text-align: center; padding: 32px 24px; animation: sent 0.3s ease; }
+    .modal-success { text-align: center; padding: 32px 24px; }
     .modal-success-icon { font-size: 36px; margin-bottom: 12px; }
     .modal-success-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
     .modal-success-subtitle { font-size: 12.5px; color: var(--text-tertiary); }
@@ -166,113 +146,75 @@
 
   <script>
     // ============================================================
-    // CONFIGURATION
+    // PASTE YOUR SLACK WORKFLOW BUILDER WEBHOOK URL BELOW
+    // It should start with: https://hooks.slack.com/triggers/...
     // ============================================================
-    const SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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";
+    const WEBHOOK_URL = "https://hooks.slack.com/triggers/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";
     // ============================================================
 
     const params = new URLSearchParams(window.location.search);
     const protoFile = params.get('proto');
-    const BASE_URL = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '');
-
     let protoData = null;
     let currentPage = '';
 
-    // --- Detect current page/screen from iframe ---
+    // --- Breadcrumb detection ---
     function detectCurrentPage() {
       try {
         const iframe = document.getElementById('proto-frame');
         const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
         const iframeWin = iframe.contentWindow;
 
-        // Priority 1: page title if it differs from the prototype name
-        const title = iframeDoc.title || '';
-
-        // Priority 2: hash route (e.g., #/settings, #step-2)
         const hash = iframeWin.location.hash;
-
-        // Priority 3: active nav/tab element text
-        let activeNav = '';
-        const activeEls = iframeDoc.querySelectorAll('[class*="active"], [aria-selected="true"], [data-active="true"], .selected, .current');
-        for (const el of activeEls) {
-          const text = (el.textContent || '').trim();
-          if (text && text.length < 50 && text.length > 1) {
-            activeNav = text;
-            break;
-          }
+        if (hash && hash.length > 1) {
+          return hash.replace(/^#\/?/, '').replace(/[/-]/g, ' / ').replace(/\b\w/g, c => c.toUpperCase()).trim();
         }
 
-        // Priority 4: first visible h1 or h2
-        let heading = '';
+        const activeEls = iframeDoc.querySelectorAll('[class*="active"], [aria-selected="true"], .selected, .current');
+        for (const el of activeEls) {
+          const text = (el.textContent || '').trim();
+          if (text && text.length < 50 && text.length > 1) return text;
+        }
+
         const headings = iframeDoc.querySelectorAll('h1, h2');
         for (const h of headings) {
           const rect = h.getBoundingClientRect();
           if (rect.top >= 0 && rect.top < iframeWin.innerHeight) {
-            heading = (h.textContent || '').trim();
-            if (heading.length > 40) heading = heading.substring(0, 40) + '…';
-            break;
+            let t = (h.textContent || '').trim();
+            if (t.length > 40) t = t.substring(0, 40) + '…';
+            return t;
           }
         }
 
-        // Pick the best breadcrumb
-        let page = '';
+        const title = iframeDoc.title || '';
+        if (title && protoData && title !== protoData.name) return title;
 
-        if (hash && hash.length > 1) {
-          // Clean up hash: #/settings/general → Settings / General
-          page = hash.replace(/^#\/?/, '').replace(/[/-]/g, ' / ').replace(/\b\w/g, c => c.toUpperCase()).trim();
-        } else if (activeNav) {
-          page = activeNav;
-        } else if (heading) {
-          page = heading;
-        } else if (title && protoData && title !== protoData.name) {
-          page = title;
-        }
-
-        return page;
-      } catch (e) {
-        // Cross-origin or access error
         return '';
-      }
+      } catch (e) { return ''; }
     }
 
     function updateBreadcrumb() {
       currentPage = detectCurrentPage();
-      const sep = document.getElementById('breadcrumb-sep');
-      const pageEl = document.getElementById('proto-page');
-
-      if (currentPage) {
-        sep.style.display = '';
-        pageEl.textContent = currentPage;
-      } else {
-        sep.style.display = 'none';
-        pageEl.textContent = '';
-      }
+      document.getElementById('breadcrumb-sep').style.display = currentPage ? '' : 'none';
+      document.getElementById('proto-page').textContent = currentPage || '';
     }
 
-    // Poll for page changes every second
     setInterval(updateBreadcrumb, 1000);
 
-    function openDirect() {
-      window.open('prototypes/' + protoFile, '_blank');
-    }
+    function openDirect() { window.open('prototypes/' + protoFile, '_blank'); }
 
     // --- Feedback Modal ---
     function openFeedback() {
-      updateBreadcrumb(); // grab latest page state
+      updateBreadcrumb();
       const name = protoData ? protoData.name : protoFile;
       const breadcrumbHTML = currentPage
-        ? '<div class="modal-breadcrumb">' +
-            '<span>' + name + '</span>' +
-            '<span style="color:var(--text-muted);">→</span>' +
-            '<span class="modal-breadcrumb-page">' + currentPage + '</span>' +
-          '</div>'
+        ? '<div class="modal-breadcrumb"><span>' + name + '</span><span style="color:var(--text-muted);">→</span><span class="modal-breadcrumb-page">' + currentPage + '</span></div>'
         : '';
 
       document.getElementById('modal').innerHTML =
         '<div class="modal-header">' +
           '<h2 class="modal-title">Leave Feedback</h2>' +
           breadcrumbHTML +
-          '<p class="modal-subtitle">Your feedback will be posted to #prototype-feedback on Slack</p>' +
+          '<p class="modal-subtitle">Your feedback will be posted to Slack</p>' +
         '</div>' +
         '<div class="modal-body">' +
           '<div class="modal-field">' +
@@ -285,7 +227,7 @@
           '</div>' +
           '<div class="modal-actions">' +
             '<button class="modal-btn secondary" onclick="closeModal()">Cancel</button>' +
-            '<button class="modal-btn primary" id="send-btn" onclick="sendFeedback()">Send to Slack</button>' +
+            '<button class="modal-btn primary" id="send-btn" onclick="sendFeedback()">Send Feedback</button>' +
           '</div>' +
         '</div>';
 
@@ -293,24 +235,17 @@
       document.getElementById('feedback-name').focus();
     }
 
-    function closeModal() {
-      document.getElementById('modal-backdrop').classList.remove('open');
-    }
-
-    document.getElementById('modal-backdrop').addEventListener('click', function(e) {
-      if (e.target === this) closeModal();
-    });
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeModal();
-    });
+    function closeModal() { document.getElementById('modal-backdrop').classList.remove('open'); }
+    document.getElementById('modal-backdrop').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
 
     async function sendFeedback() {
-      const nameVal = document.getElementById('feedback-name').value.trim();
-      const textVal = document.getElementById('feedback-text').value.trim();
+      const reviewer = document.getElementById('feedback-name').value.trim();
+      const feedback = document.getElementById('feedback-text').value.trim();
 
-      if (!nameVal || !textVal) {
-        if (!nameVal) document.getElementById('feedback-name').style.borderColor = '#EF4444';
-        if (!textVal) document.getElementById('feedback-text').style.borderColor = '#EF4444';
+      if (!reviewer || !feedback) {
+        if (!reviewer) document.getElementById('feedback-name').style.borderColor = '#EF4444';
+        if (!feedback) document.getElementById('feedback-text').style.borderColor = '#EF4444';
         return;
       }
 
@@ -319,74 +254,44 @@
       btn.textContent = 'Sending…';
 
       const p = protoData || { name: protoFile, author: 'Unknown' };
-      const protoURL = BASE_URL + '/viewer.html?proto=' + encodeURIComponent(protoFile);
-      const imageURL = p.image ? BASE_URL + '/images/' + p.image : null;
 
-      // Build breadcrumb string for Slack
-      const screenLabel = currentPage ? p.name + ' → ' + currentPage : p.name;
-
-      const blocks = [
-        {
-          type: "header",
-          text: { type: "plain_text", text: "💬 Feedback on: " + screenLabel }
-        },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: "*From:* " + nameVal +
-              "\n*Prototype:* <" + protoURL + "|" + p.name + ">" +
-              (currentPage ? "\n*Screen:* " + currentPage : "") +
-              "\n*Author:* " + p.author
-          }
-        },
-        {
-          type: "section",
-          text: { type: "mrkdwn", text: ">" + textVal.replace(/\n/g, "\n>") }
-        }
-      ];
-
-      if (imageURL) {
-        blocks.push({ type: "image", image_url: imageURL, alt_text: p.name + " preview" });
-      }
-
-      blocks.push({
-        type: "context",
-        elements: [{ type: "mrkdwn", text: "🕐 " + new Date().toLocaleString() + " · <" + BASE_URL + "|Dashboard>" }]
-      });
+      // Send flat JSON to Slack Workflow Builder
+      const payload = {
+        reviewer: reviewer,
+        prototype: p.name,
+        screen: currentPage || '(main)',
+        feedback: feedback
+      };
 
       try {
-        if (SLACK_WEBHOOK_URL !== "YOUR_SLACK_WEBHOOK_URL_HERE") {
-          await fetch(SLACK_WEBHOOK_URL, {
+        if (WEBHOOK_URL !== "YOUR_WORKFLOW_WEBHOOK_URL_HERE") {
+          await fetch(WEBHOOK_URL, {
             method: 'POST',
-            body: JSON.stringify({ blocks }),
-            mode: 'no-cors'
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
           });
         } else {
-          console.log("Slack payload:", JSON.stringify({ blocks }, null, 2));
+          console.log("Would send to Slack:", payload);
         }
 
         document.getElementById('modal').innerHTML =
           '<div class="modal-success">' +
             '<div class="modal-success-icon">✓</div>' +
             '<p class="modal-success-title">Feedback sent!</p>' +
-            '<p class="modal-success-subtitle">Posted to #prototype-feedback on Slack</p>' +
+            '<p class="modal-success-subtitle">Posted to Slack</p>' +
           '</div>';
-
         setTimeout(closeModal, 2000);
       } catch (err) {
         btn.disabled = false;
-        btn.textContent = 'Send to Slack';
-        alert('Failed to send. Check the webhook URL.');
+        btn.textContent = 'Send Feedback';
+        alert('Failed to send feedback. Check the webhook URL.');
       }
     }
 
     // --- Init ---
     async function init() {
       if (!protoFile) { window.location.href = 'index.html'; return; }
-
       document.getElementById('proto-frame').src = 'prototypes/' + protoFile;
-
       try {
         const res = await fetch('prototypes.json');
         const data = await res.json();
@@ -396,11 +301,7 @@
           document.title = protoData.name + ' — Prototype Playground';
         }
       } catch (e) {}
-
-      // Initial breadcrumb after iframe loads
-      document.getElementById('proto-frame').addEventListener('load', () => {
-        setTimeout(updateBreadcrumb, 500);
-      });
+      document.getElementById('proto-frame').addEventListener('load', () => { setTimeout(updateBreadcrumb, 500); });
     }
 
     init();
