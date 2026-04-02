@@ -148,7 +148,7 @@ function SidebarNav({ sidebarMode, activePage, onNavigate, onSwitchToSettings, o
       label: "Agent",
       items: [
         { id: "identity", label: "Identity and ToV" },
-        { id: "playbooks-nav", label: "Playbooks" },
+        { id: "playbooks-nav", label: "Behaviors" },
         { id: "tools", label: "Tools" },
         { id: "knowledge", label: "Knowledge" },
         { id: "guardrails-nav", label: "Guardrails" },
@@ -4169,6 +4169,7 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
   const [libraryChatMessages, setLibraryChatMessages] = useState([]);
   const [libraryChatInput, setLibraryChatInput] = useState("");
   const [libraryBrowseMode, setLibraryBrowseMode] = useState(false);
+  const [selectedCollection, setSelectedCollection] = useState(null);
   const fieldSettersRef = useRef(null);
   const [copilotQuickOptions, setCopilotQuickOptions] = useState(null);
   const [freeformText, setFreeformText] = useState("");
@@ -4191,14 +4192,34 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
 
   // Library playbooks (not yet activated — used for prompt ideas)
   const libraryPlaybooks = [
-    { name: "Win-Back Campaign", desc: "Re-engage lapsed customers with personalized incentives based on their purchase history", prompt: "I want to automatically re-engage customers who haven't purchased in 60+ days with personalized win-back offers", shortDesc: "Re-engage lapsed customers with personalized win-back offers" },
-    { name: "Damaged or Defective Item", desc: "Handle reports of damaged or defective products with empathy, offering replacements or refunds", prompt: "I need to automate the process of handling damaged product reports — collect photos, apologize, and offer a replacement or refund", shortDesc: "Automate damaged product reports and replacement flows" },
-    { name: "Promotional Push", desc: "Drive urgency around time-sensitive offers, product launches, and seasonal moments", prompt: "I want to create time-limited promotional campaigns that automatically target the right customer segments", shortDesc: "Run time-limited promotional campaigns to targeted segments" },
-    { name: "Subscription Management", desc: "Help customers pause, skip, modify, or cancel their subscriptions while offering retention alternatives", prompt: "I need to automate subscription management — let customers pause, skip, or cancel while offering retention alternatives", shortDesc: "Let customers pause, skip, or cancel subscriptions automatically" },
-    { name: "Educational Nurture", desc: "Share how-to content, brand stories, and product knowledge that builds trust and engagement", prompt: "I want to automatically nurture new subscribers with educational content about our products over their first 30 days" },
-    { name: "Graceful Sunset", desc: "Respectfully wind down communication with long-unresponsive contacts", prompt: "I want to gracefully reduce messaging to contacts who haven't engaged in 90+ days, offering preference options before opt-down" },
-    { name: "Warranty & Claims", desc: "Process warranty claims, verify eligibility, and guide customers through documentation", prompt: "I need to automate warranty claim processing — verify purchase dates, check eligibility, and guide customers through the steps" },
-    { name: "Billing & Payment Issues", desc: "Resolve failed charges, duplicate payments, and invoice requests", prompt: "I want to automatically handle failed payment notifications and guide customers through updating their payment methods" },
+    { name: "Win-Back Campaign", desc: "Re-engage lapsed customers with personalized incentives based on their purchase history", prompt: "I want to automatically re-engage customers who haven't purchased in 60+ days with personalized win-back offers", shortDesc: "Re-engage lapsed customers with personalized win-back offers", collection: "Retention & win-back" },
+    { name: "Damaged or Defective Item", desc: "Handle reports of damaged or defective products with empathy, offering replacements or refunds", prompt: "I need to automate the process of handling damaged product reports — collect photos, apologize, and offer a replacement or refund", shortDesc: "Automate damaged product reports and replacement flows", collection: "Order support" },
+    { name: "Promotional Push", desc: "Drive urgency around time-sensitive offers, product launches, and seasonal moments", prompt: "I want to create time-limited promotional campaigns that automatically target the right customer segments", shortDesc: "Run time-limited promotional campaigns to targeted segments", collection: "Retention & win-back" },
+    { name: "Subscription Management", desc: "Help customers pause, skip, modify, or cancel their subscriptions while offering retention alternatives", prompt: "I need to automate subscription management — let customers pause, skip, or cancel while offering retention alternatives", shortDesc: "Let customers pause, skip, or cancel subscriptions automatically", collection: "Retention & win-back" },
+    { name: "Educational Nurture", desc: "Share how-to content, brand stories, and product knowledge that builds trust and engagement", prompt: "I want to automatically nurture new subscribers with educational content about our products over their first 30 days", collection: "Post-purchase care" },
+    { name: "Graceful Sunset", desc: "Respectfully wind down communication with long-unresponsive contacts", prompt: "I want to gracefully reduce messaging to contacts who haven't engaged in 90+ days, offering preference options before opt-down", collection: "Retention & win-back" },
+    { name: "Warranty & Claims", desc: "Process warranty claims, verify eligibility, and guide customers through documentation", prompt: "I need to automate warranty claim processing — verify purchase dates, check eligibility, and guide customers through the steps", collection: "Returns & exchanges" },
+    { name: "Billing & Payment Issues", desc: "Resolve failed charges, duplicate payments, and invoice requests", prompt: "I want to automatically handle failed payment notifications and guide customers through updating their payment methods", collection: "Order support" },
+    { name: "Product Recommendation", desc: "Suggest relevant products based on browsing behavior, past purchases, and stated preferences", prompt: "I want to recommend products to shoppers based on what they're looking at and their purchase history", collection: "Guided shopping" },
+    { name: "Size & Fit Advisor", desc: "Guide shoppers to the right size using brand-specific fit data and conversational questions", prompt: "I want to help shoppers find their correct size through an interactive sizing conversation", collection: "Guided shopping" },
+    { name: "Gift Finder", desc: "Help shoppers choose the perfect gift based on recipient, occasion, and budget", prompt: "I want to create a guided gift recommendation experience based on occasion and budget", collection: "Guided shopping" },
+    { name: "Order Tracking", desc: "Provide real-time order status, shipping updates, and estimated delivery times", prompt: "I want to automatically answer order tracking questions with live shipping data", collection: "Order support" },
+    { name: "Order Modification", desc: "Allow customers to change shipping address, swap items, or update quantities before fulfillment", prompt: "I want to let customers modify their orders before they ship", collection: "Order support" },
+    { name: "Cancellation Request", desc: "Process order cancellations quickly, confirming timelines and offering alternatives", prompt: "I want to automate order cancellations while offering save attempts when appropriate", collection: "Order support" },
+    { name: "Return Initiation", desc: "Walk customers through the return process, generate labels, and set expectations", prompt: "I want to automate the return initiation flow with label generation", collection: "Returns & exchanges" },
+    { name: "Exchange Flow", desc: "Help customers swap items for different sizes, colors, or products seamlessly", prompt: "I want to make it easy for customers to exchange items for a different variant", collection: "Returns & exchanges" },
+    { name: "Review Request", desc: "Ask for product reviews at the right moment after delivery, with smart timing", prompt: "I want to automatically request reviews after delivery with the right timing", collection: "Post-purchase care" },
+    { name: "Cross-Sell Follow-Up", desc: "Suggest complementary products after purchase based on what the customer bought", prompt: "I want to recommend complementary products a few days after a customer's purchase", collection: "Post-purchase care" },
+    { name: "Loyalty Milestone", desc: "Celebrate customer milestones like order counts or anniversaries with personalized rewards", prompt: "I want to automatically recognize and reward customer loyalty milestones", collection: "Post-purchase care" },
+    { name: "Lead Capture", desc: "Engage first-time visitors with value-driven prompts to collect email or SMS opt-in", prompt: "I want to capture leads from first-time site visitors with a conversational opt-in", collection: "Lead qualification" },
+    { name: "Quiz-Based Discovery", desc: "Use a short quiz to understand shopper needs and recommend the best products", prompt: "I want to create a product discovery quiz that recommends the right items", collection: "Guided shopping" },
+    { name: "Churn Prevention", desc: "Detect at-risk subscribers and intervene with personalized retention offers", prompt: "I want to automatically detect and save at-risk subscribers before they cancel", collection: "Retention & win-back" },
+    { name: "Refund Status", desc: "Keep customers informed about refund processing timelines and status", prompt: "I want to proactively update customers on their refund status", collection: "Returns & exchanges" },
+    { name: "Delivery Issue Resolution", desc: "Handle missing, late, or wrong item deliveries with empathy and quick resolution", prompt: "I want to automate resolution for delivery issues like missing or wrong items", collection: "Order support" },
+    { name: "Welcome Discount", desc: "Greet new subscribers with a personalized discount to drive first purchase", prompt: "I want to send new subscribers a welcome discount to encourage their first order", collection: "Lead qualification" },
+    { name: "Reorder Reminder", desc: "Remind customers to repurchase consumable products based on typical usage cycles", prompt: "I want to send timely reorder reminders for consumable products", collection: "Post-purchase care" },
+    { name: "Intent Qualification", desc: "Identify high-intent visitors and route them to the right conversion path", prompt: "I want to qualify visitor intent and route high-intent shoppers appropriately", collection: "Lead qualification" },
+    { name: "Comparison Helper", desc: "Help shoppers compare products side-by-side to make confident purchase decisions", prompt: "I want to help shoppers compare similar products to make a decision", collection: "Guided shopping" },
   ];
 
   // Sparkline mini component with gradient fill for playbooks
@@ -4464,7 +4485,7 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
                 <path d="M10 12L4 7l6-5" stroke={TEXT_MUTED} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            <div style={{ fontSize: 13, color: TEXT_MUTED, flex: 1 }}>Playbooks / {name}</div>
+            <div style={{ fontSize: 13, color: TEXT_MUTED, flex: 1 }}>Behaviors / {name}</div>
             {copilotReady && !copilotOpen && (
               <button
                 onClick={handleOpenCopilot}
@@ -5578,7 +5599,7 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
               letterSpacing: "-0.02em",
               flex: 1,
             }}>
-              Playbooks
+              Behaviors
             </h1>
             {copilotReady && !copilotOpen && (
               <button
@@ -5753,13 +5774,98 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
                 Back to search
               </button>
             </div>
+            <div style={{ marginBottom: 28 }}>
+              <div style={{ marginBottom: 4 }}>
+                <div style={{ fontSize: 17, fontWeight: 500, color: TEXT, fontFamily: "'Lora', serif" }}>Collections</div>
+                <div style={{ fontSize: 13, color: TEXT_MUTED, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>Curated collections of pre-configured behaviors for common use cases</div>
+              </div>
+              <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8, marginTop: 12, scrollbarWidth: "thin" }}>
+                {[
+                  { name: "Guided shopping", desc: "Help shoppers find the right product through conversational recommendations", color: "#E8F5E9", iconColor: "#4CAF50" },
+                  { name: "Order support", desc: "Handle order tracking, modifications, cancellations, and delivery issues", color: "#E3F2FD", iconColor: "#2196F3" },
+                  { name: "Returns & exchanges", desc: "Walk shoppers through return policies, labels, and exchange options", color: "#FFF3E0", iconColor: "#FF9800" },
+                  { name: "Retention & win-back", desc: "Re-engage lapsed customers and save at-risk subscriptions", color: "#F3E5F5", iconColor: "#9C27B0" },
+                  { name: "Post-purchase care", desc: "Build loyalty with follow-ups, tips, and cross-sell moments", color: "#E0F7FA", iconColor: "#00ACC1" },
+                  { name: "Lead qualification", desc: "Qualify inbound interest and route high-intent shoppers to the right path", color: "#FBE9E7", iconColor: "#E64A19" },
+                ].map(function(collection, ci) {
+                  var isSelected = selectedCollection === collection.name;
+                  var collectionBehaviors = libraryPlaybooks.filter(function(pb) { return pb.collection === collection.name; });
+                  return (
+                    <div key={ci}
+                      onClick={function() { setSelectedCollection(isSelected ? null : collection.name); }}
+                      style={{
+                        minWidth: 200, maxWidth: 220, padding: "16px 18px",
+                        border: isSelected ? ("1.5px solid " + collection.iconColor + "60") : ("1px solid " + BORDER), borderRadius: 12,
+                        background: isSelected ? (collection.color + "80") : CARD_BG, cursor: "pointer", transition: "all .2s",
+                        flexShrink: 0, display: "flex", flexDirection: "column", gap: 8,
+                      }}
+                      onMouseEnter={function(e) { if (!isSelected) { e.currentTarget.style.borderColor = "#ccc"; e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,0,0,.06)"; } }}
+                      onMouseLeave={function(e) { if (!isSelected) { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = "none"; } }}
+                    >
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: collection.color, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        {ci === 0 ? (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="5" stroke={collection.iconColor} strokeWidth="1.3" /><path d="M10 10l4 4" stroke={collection.iconColor} strokeWidth="1.3" strokeLinecap="round" /><path d="M4 6h4M6 4v4" stroke={collection.iconColor} strokeWidth="1" strokeLinecap="round" /></svg>
+                        ) : ci === 1 ? (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="10" rx="1.5" stroke={collection.iconColor} strokeWidth="1.3" /><path d="M5 4V2.5a3 3 0 016 0V4" stroke={collection.iconColor} strokeWidth="1.3" /><circle cx="8" cy="9.5" r="1.5" stroke={collection.iconColor} strokeWidth="1" /></svg>
+                        ) : ci === 2 ? (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 8h8M8 4v8" stroke={collection.iconColor} strokeWidth="1.3" strokeLinecap="round" /><path d="M2 2l3 3M14 2l-3 3M2 14l3-3M14 14l-3-3" stroke={collection.iconColor} strokeWidth="1" strokeLinecap="round" /></svg>
+                        ) : ci === 3 ? (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v4l2.5 1.5" stroke={collection.iconColor} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><circle cx="8" cy="8" r="6" stroke={collection.iconColor} strokeWidth="1.3" /><path d="M12 12l2 2" stroke={collection.iconColor} strokeWidth="1.3" strokeLinecap="round" /></svg>
+                        ) : ci === 4 ? (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.8 3.6L14 5.3l-3 2.9.7 4.1L8 10.4 4.3 12.3l.7-4.1-3-2.9 4.2-.7L8 1z" stroke={collection.iconColor} strokeWidth="1.3" strokeLinejoin="round" fill="none" /></svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke={collection.iconColor} strokeWidth="1.3" /><circle cx="8" cy="8" r="2.5" stroke={collection.iconColor} strokeWidth="1.2" /><circle cx="8" cy="8" r="0.8" fill={collection.iconColor} /></svg>
+                        )}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: TEXT, marginBottom: 3 }}>{collection.name}</div>
+                        <div style={{ fontSize: 12, color: TEXT_MUTED, lineHeight: 1.45 }}>{collection.desc}</div>
+                      </div>
+                      <div style={{ fontSize: 11, color: TEXT_MUTED, fontWeight: 500 }}>{collectionBehaviors.length + " behaviors"}</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Expanded collection behaviors */}
+              {selectedCollection && (
+                <div style={{ marginTop: 16, animation: "fadeInUp .3s ease-out" }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: TEXT, marginBottom: 10, fontFamily: "'DM Sans', sans-serif" }}>{selectedCollection}</div>
+                  {libraryPlaybooks.filter(function(pb) { return pb.collection === selectedCollection; }).map(function(pb, idx) {
+                    return (
+                      <div key={pb.name}
+                        onClick={function() {
+                          setLibraryChatActive(true);
+                          setLibraryBrowseMode(false);
+                          setLibraryChatMessages([
+                            { role: "user", content: "I'd like to activate the \"" + pb.name + "\" behavior" },
+                            { role: "assistant", content: "I'll help you set up the \"" + pb.name + "\" behavior. This will " + pb.desc.charAt(0).toLowerCase() + pb.desc.slice(1) + ". Let me walk you through the configuration — what communication channels should this behavior use?" },
+                          ]);
+                        }}
+                        style={{
+                          padding: "12px 16px", background: CARD_BG,
+                          border: ("1px solid " + BORDER), borderRadius: 10,
+                          cursor: "pointer", transition: "all .2s", marginBottom: 8,
+                        }}
+                        onMouseEnter={function(e) { e.currentTarget.style.borderColor = "#ccc"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,.04)"; }}
+                        onMouseLeave={function(e) { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = "none"; }}
+                      >
+                        <div style={{ fontSize: 13, fontWeight: 600, color: TEXT, marginBottom: 3 }}>{pb.name}</div>
+                        <div style={{ fontSize: 12, color: TEXT_MUTED, lineHeight: 1.45 }}>{pb.desc}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 500, color: TEXT, fontFamily: "'Lora', serif", marginBottom: 14 }}>All behaviors</div>
             {libraryPlaybooks.map((pb, idx) => (
               <PlaybookCard key={pb.name} name={pb.name} desc={pb.desc} animDelay={idx * 40} onClick={() => {
                 setLibraryChatActive(true);
                 setLibraryBrowseMode(false);
                 setLibraryChatMessages([
-                  { role: "user", content: `I'd like to activate the "${pb.name}" playbook` },
-                  { role: "assistant", content: `I'll help you set up the "${pb.name}" playbook. This will ${pb.desc.charAt(0).toLowerCase() + pb.desc.slice(1)}. Let me walk you through the configuration — what communication channels should this playbook use?` },
+                  { role: "user", content: `I'd like to activate the "${pb.name}" behavior` },
+                  { role: "assistant", content: `I'll help you set up the "${pb.name}" behavior. This will ${pb.desc.charAt(0).toLowerCase() + pb.desc.slice(1)}. Let me walk you through the configuration — what communication channels should this behavior use?` },
                 ]);
               }} />
             ))}
@@ -5781,10 +5887,10 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
                   </svg>
                 </div>
                 <h2 className="fraunces" style={{ fontSize: 22, fontWeight: 600, color: TEXT, letterSpacing: "-0.02em", marginBottom: 10 }}>
-                  Tell your Agent when to act
+                  Tell your agent when and how to act
                 </h2>
                 <p style={{ fontSize: 14, lineHeight: 1.6, color: TEXT_MUTED }}>
-                  Playbooks are the strategies behind every shopper interaction — when to step in, what to say, and what outcome to aim for. Enable the ones that match your goals and your agent handles the judgment calls.
+                  Behaviors define how your agent responds in different situations — when to step in, what to say, and what outcome to aim for. Enable the ones that match your goals and your agent handles the rest.
                 </p>
               </div>
 
@@ -5801,7 +5907,7 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
                       setLibraryChatActive(true);
                       setLibraryChatMessages([
                         { role: "user", content: text },
-                        { role: "assistant", content: `Great choice! I'll help you set up the "${libraryPlaybooks.find(p => p.prompt === text)?.name || "custom"}" playbook. First, let me understand your requirements better. What communication channels do you want this playbook to use — email, SMS, or both?` },
+                        { role: "assistant", content: `Great choice! I'll help you set up the "${libraryPlaybooks.find(p => p.prompt === text)?.name || "custom"}" behavior. First, let me understand your requirements better. What communication channels do you want this behavior to use — email, SMS, or both?` },
                       ]);
                     }
                   }}
@@ -5836,7 +5942,7 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
                       setLibraryChatActive(true);
                       setLibraryChatMessages([
                         { role: "user", content: text },
-                        { role: "assistant", content: `Great choice! I'll help you set up this playbook. First, let me understand your requirements better. What communication channels do you want this playbook to use — email, SMS, or both?` },
+                        { role: "assistant", content: `Great choice! I'll help you set up this behavior. First, let me understand your requirements better. What communication channels do you want this behavior to use — email, SMS, or both?` },
                       ]);
                     }
                   }}
@@ -5926,7 +6032,7 @@ function PlaybooksPage({ copilotOpen, copilotClosing, handleCloseCopilot, handle
                   onMouseEnter={(e) => { e.currentTarget.style.color = TEXT; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = TEXT_MUTED; }}
                 >
-                  Browse 100+ playbooks →
+                  Browse 100+ behaviors →
                 </button>
               </div>
             </div>
@@ -6248,12 +6354,54 @@ function OnboardingChatPage({ profile, onComplete }) {
   const [laterTypingText, setLaterTypingText] = useState("");
   const [laterTypingActive, setLaterTypingActive] = useState(false);
   const [laterPhase, setLaterPhase] = useState("idle");
+  const [shopifyConnectPhase, setShopifyConnectPhase] = useState("idle");
+  const [shopifyConnectSteps, setShopifyConnectSteps] = useState([]);
+  const [shopifyConnectComplete, setShopifyConnectComplete] = useState(false);
+  const [shopifyConnectExpanded, setShopifyConnectExpanded] = useState(true);
+  const [shopifyConnected, setShopifyConnected] = useState(false);
+  const [channelPhase, setChannelPhase] = useState("idle");
+  const [channelTypingText, setChannelTypingText] = useState("");
+  const [channelTypingActive, setChannelTypingActive] = useState(false);
+  const [showChannelPicker, setShowChannelPicker] = useState(false);
+  const [channelPickerFreeform, setChannelPickerFreeform] = useState(false);
+  const [postChannelMessages, setPostChannelMessages] = useState([]);
+  const [emailConnectPhase, setEmailConnectPhase] = useState("idle");
+  const [emailConnectSteps, setEmailConnectSteps] = useState([]);
+  const [emailConnectComplete, setEmailConnectComplete] = useState(false);
+  const [emailConnectExpanded, setEmailConnectExpanded] = useState(true);
+  const [emailConnected, setEmailConnected] = useState(false);
+  const [migrationPhase, setMigrationPhase] = useState("idle");
+  const [migrationTypingText, setMigrationTypingText] = useState("");
+  const [migrationTypingActive, setMigrationTypingActive] = useState(false);
+  const [showMigrationPicker, setShowMigrationPicker] = useState(false);
+  const [migrationPickerFreeform, setMigrationPickerFreeform] = useState(false);
+  const [postMigrationMessages, setPostMigrationMessages] = useState([]);
+  const [postTourMessages, setPostTourMessages] = useState([]);
+  const [zdMigrationPhase, setZdMigrationPhase] = useState("idle");
+  const [zdMigrationSteps, setZdMigrationSteps] = useState([]);
+  const [zdMigrationCollapsed, setZdMigrationCollapsed] = useState(false);
+  const [zdMigrationExpanded, setZdMigrationExpanded] = useState(true);
+  const [zdMigrationProgress, setZdMigrationProgress] = useState(false);
+  const [tourPhase, setTourPhase] = useState("idle");
+  const [tourTypingText, setTourTypingText] = useState("");
+  const [tourTypingActive, setTourTypingActive] = useState(false);
+  const [showTourPicker, setShowTourPicker] = useState(false);
+  const [tourPickerFreeform, setTourPickerFreeform] = useState(false);
+  const [setupPhase, setSetupPhase] = useState("idle");
+  const [setupSteps, setSetupSteps] = useState([]);
+  const [setupComplete, setSetupComplete] = useState(false);
+  const [showHandoff, setShowHandoff] = useState(false);
+  const [handoffVisible, setHandoffVisible] = useState(false);
   const reportContentRef = useRef(null);
   const chatEndRef = useRef(null);
   const findingsStartedRef = useRef(false);
   const pfTypingStartedRef = useRef(false);
   const gapTypingStartedRef = useRef(false);
   const simTypingStartedRef = useRef(false);
+  const channelTypingStartedRef = useRef(false);
+  const emailConnectStartedRef = useRef(false);
+  const migrationTypingStartedRef = useRef(false);
+  const tourTypingStartedRef = useRef(false);
 
   const userName = profile.name ? profile.name.split(" ")[0] : "there";
   const shortUrl = (profile.storeUrl || "urbanstems.com").replace(/^https?:\/\//, "").replace(/\/$/, "");
@@ -6334,7 +6482,7 @@ function OnboardingChatPage({ profile, onComplete }) {
   }, [researchPhase]);
 
   // Findings message content
-  const findingsFullText = "Here\u2019s what I found about UrbanStems from publicly available data.\n\nYou\u2019re a modern flower delivery brand launched in 2014 in Washington DC. You offer same-day delivery in 8 major cities and next-day nationwide, with bouquets ranging from $44 to $224. You source from Rainforest Alliance Certified farms, which tells me sustainability is part of your brand identity.\n\nYour brand voice is warm and playful \u2014 \u201cHappiness, delivered on demand. Also flowers.\u201d\n\nHere are reports on your brand overview, tone of voice, and shopper personas.";
+  const findingsFullText = "Here\u2019s what I found about UrbanStems from publicly available data.\n\nYou\u2019re a modern flower delivery brand launched in 2014 in Washington DC. You offer same-day delivery in 8 major cities and next-day nationwide, with bouquets ranging from $44 to $224. You source from Rainforest Alliance Certified farms, which tells me sustainability is part of your brand identity.\n\nYour brand voice is warm and playful \u2014 \u201cHappiness, delivered on demand. Also flowers.\u201d\n\nHere\u2019s the summary of my findings.";
   const findingsFollowUp = "Take a quick look \u2014 does this feel like your brand? You can fine-tune these details in settings anytime.";
 
   // After research completes, type findings message
@@ -6362,10 +6510,10 @@ function OnboardingChatPage({ profile, onComplete }) {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatMessages, typingText, findingsText, researchSources, researchPhase, showReportCards, showQuickReplies, postFindingsMessages, pfTypingText, pfPhase, showUseCasePicker, thinkingSteps, thinkingPhase, checklistTypingText, showChecklistCard, shopifyTypingText, showShopifyPicker, postShopifyMessages, laterTypingText]);
+  }, [chatMessages, typingText, findingsText, researchSources, researchPhase, showReportCards, showQuickReplies, postFindingsMessages, pfTypingText, pfPhase, showUseCasePicker, thinkingSteps, thinkingPhase, checklistTypingText, showChecklistCard, shopifyTypingText, showShopifyPicker, postShopifyMessages, laterTypingText, shopifyConnectSteps, shopifyConnectPhase, shopifyConnectComplete, channelTypingText, showChannelPicker, postChannelMessages, emailConnectSteps, emailConnectPhase, emailConnectComplete, migrationTypingText, showMigrationPicker, postMigrationMessages, zdMigrationSteps, zdMigrationPhase, zdMigrationProgress, tourTypingText, showTourPicker, postTourMessages, setupSteps, setupPhase, setupComplete]);
 
   /* ─── Post-findings typing sequence ─── */
-  var pfIntroText = "Now that I have a picture of your brand, here\u2019s where I think I can make the biggest difference.\n\nUrbanStems is a gifting brand \u2014 most of your shoppers are buying for someone else, on a deadline, for a moment that matters. That shapes everything: what goes wrong, what questions come in, and where there\u2019s room to grow.\n\nI flagged four areas. If I had to start somewhere, it\u2019d be the first one \u2014 but you know your business best.";
+  var pfIntroText = "Now that I have a picture of your brand, here\u2019s where I think I can make the biggest difference.\n\nUrbanStems is a gifting brand \u2014 most of your shoppers are buying for someone else, on a deadline, for a moment that matters. That shapes everything: what goes wrong, what questions come in, and where there\u2019s room to grow.\n\nI drafted four areas below. If I had to start somewhere, it\u2019d be the first one \u2014 but you know your business best.";
   var pfClosingText = "We\u2019ll start with one and expand from there. You\u2019re not locking anything in.";
 
   useEffect(function() {
@@ -6400,12 +6548,12 @@ function OnboardingChatPage({ profile, onComplete }) {
     setTimeout(function() { setPfPhase("typing-closing"); }, 400);
   }, [pfPhase]);
 
-  /* Show use case picker after user opens focus areas panel */
+  /* Show use case picker after focus areas card is shown inline */
   useEffect(function() {
-    if (activeReport !== "focus") return;
+    if (pfPhase !== "done") return;
     var t = setTimeout(function() { setShowUseCasePicker(true); }, 1000);
     return function() { clearTimeout(t); };
-  }, [activeReport]);
+  }, [pfPhase]);
 
   /* ─── Simulation message typing effect ─── */
   var simIntroText = "Good \u2014 that\u2019s where I\u2019d start too.\n\nA late or damaged bouquet for a birthday isn\u2019t a logistics complaint. For a gifting brand, it\u2019s an emotional letdown for your shopper and a reputation risk for you.\n\nLet me simulate a real life scenario to show you how I\u2019d handle it. I\u2019m going to make some assumptions based on what I\u2019ve learned about UrbanStems. I\u2019ll flag what I\u2019m guessing so you can correct me.";
@@ -6603,6 +6751,306 @@ function OnboardingChatPage({ profile, onComplete }) {
     return function() { clearInterval(interval); };
   }, [laterPhase]);
 
+  /* ─── Shopify connection thinking animation ─── */
+  var allShopifyConnectSteps = [
+    "Connecting to Shopify...",
+    "Verifying store access...",
+    "Syncing product catalog...",
+    "Syncing customers and customer profiles...",
+  ];
+
+  useEffect(function() {
+    if (shopifyConnectPhase !== "running") return;
+    var cancelled = false;
+    var idx = 0;
+    var timerId = null;
+    var addStep = function() {
+      if (cancelled) return;
+      if (idx >= allShopifyConnectSteps.length) {
+        timerId = setTimeout(function() {
+          if (!cancelled) {
+            setShopifyConnectSteps(function(prev) {
+              var copy = prev.slice();
+              if (copy.length > 0) copy[copy.length - 1] = { text: copy[copy.length - 1].text, done: true };
+              return copy;
+            });
+            setTimeout(function() {
+              if (!cancelled) {
+                setShopifyConnectComplete(true);
+                setShopifyConnectExpanded(false);
+                setShopifyConnected(true);
+                setShopifyConnectPhase("done");
+              }
+            }, 400);
+          }
+        }, 600);
+        return;
+      }
+      if (idx > 0) {
+        setShopifyConnectSteps(function(prev) {
+          var copy = prev.slice();
+          if (copy.length > 0) copy[copy.length - 1] = { text: copy[copy.length - 1].text, done: true };
+          return copy;
+        });
+      }
+      var stepText = allShopifyConnectSteps[idx];
+      setShopifyConnectSteps(function(prev) { return prev.concat([{ text: stepText, done: false }]); });
+      idx++;
+      timerId = setTimeout(addStep, 800 + Math.random() * 500);
+    };
+    timerId = setTimeout(addStep, 400);
+    return function() { cancelled = true; clearTimeout(timerId); };
+  }, [shopifyConnectPhase]);
+
+  /* ─── Post-Shopify-connect typing sequence ─── */
+  var channelConnectedText = "Amazing! Your Shopify store urbanstems.myshopify.com is now connected. I can already see your product catalog, recent orders, and customer profiles \u2014 this is going to make a huge difference.\n\nNow, let\u2019s connect your primary support channel so I can start receiving and responding to shopper messages.";
+
+  useEffect(function() {
+    if (shopifyConnectPhase !== "done") return;
+    if (channelTypingStartedRef.current) return;
+    channelTypingStartedRef.current = true;
+    var t = setTimeout(function() { setChannelPhase("typing"); }, 800);
+    return function() { clearTimeout(t); };
+  }, [shopifyConnectPhase]);
+
+  useEffect(function() {
+    if (channelPhase !== "typing") return;
+    setChannelTypingActive(true);
+    var charIdx = 0;
+    var interval = setInterval(function() {
+      charIdx++;
+      if (charIdx >= channelConnectedText.length) {
+        clearInterval(interval);
+        setChannelTypingText(channelConnectedText);
+        setChannelTypingActive(false);
+        setChannelPhase("done");
+        return;
+      }
+      setChannelTypingText(channelConnectedText.slice(0, charIdx));
+    }, 14);
+    return function() { clearInterval(interval); };
+  }, [channelPhase]);
+
+  useEffect(function() {
+    if (channelPhase !== "done") return;
+    var t = setTimeout(function() { setShowChannelPicker(true); }, 800);
+    return function() { clearTimeout(t); };
+  }, [channelPhase]);
+
+  /* ─── Email connection thinking animation ─── */
+  var allEmailConnectSteps = [
+    "Verifying email access...",
+    "Connecting to support@urbanstems.com...",
+    "Syncing email templates...",
+  ];
+
+  useEffect(function() {
+    if (emailConnectPhase !== "running") return;
+    var cancelled = false;
+    var idx = 0;
+    var timerId = null;
+    var addStep = function() {
+      if (cancelled) return;
+      if (idx >= allEmailConnectSteps.length) {
+        timerId = setTimeout(function() {
+          if (!cancelled) {
+            setEmailConnectSteps(function(prev) {
+              var copy = prev.slice();
+              if (copy.length > 0) copy[copy.length - 1] = { text: copy[copy.length - 1].text, done: true };
+              return copy;
+            });
+            setTimeout(function() {
+              if (!cancelled) {
+                setEmailConnectComplete(true);
+                setEmailConnectExpanded(false);
+                setEmailConnected(true);
+                setEmailConnectPhase("done");
+              }
+            }, 400);
+          }
+        }, 600);
+        return;
+      }
+      if (idx > 0) {
+        setEmailConnectSteps(function(prev) {
+          var copy = prev.slice();
+          if (copy.length > 0) copy[copy.length - 1] = { text: copy[copy.length - 1].text, done: true };
+          return copy;
+        });
+      }
+      var stepText = allEmailConnectSteps[idx];
+      setEmailConnectSteps(function(prev) { return prev.concat([{ text: stepText, done: false }]); });
+      idx++;
+      timerId = setTimeout(addStep, 800 + Math.random() * 500);
+    };
+    timerId = setTimeout(addStep, 400);
+    return function() { cancelled = true; clearTimeout(timerId); };
+  }, [emailConnectPhase]);
+
+  /* ─── Post-email-connect migration typing ─── */
+  var migrationPromptText = "Email is connected \u2014 support@urbanstems.com is now live and ready to receive shopper messages.\n\nNow, the last step is migrating your information from your existing helpdesk. You can do this later as well, but the migration process usually takes about 24 hours, so I\u2019d suggest we start it now to avoid delays.";
+
+  useEffect(function() {
+    if (emailConnectPhase !== "done") return;
+    if (migrationTypingStartedRef.current) return;
+    migrationTypingStartedRef.current = true;
+    var t = setTimeout(function() { setMigrationPhase("typing"); }, 800);
+    return function() { clearTimeout(t); };
+  }, [emailConnectPhase]);
+
+  useEffect(function() {
+    if (migrationPhase !== "typing") return;
+    setMigrationTypingActive(true);
+    var charIdx = 0;
+    var interval = setInterval(function() {
+      charIdx++;
+      if (charIdx >= migrationPromptText.length) {
+        clearInterval(interval);
+        setMigrationTypingText(migrationPromptText);
+        setMigrationTypingActive(false);
+        setMigrationPhase("done");
+        return;
+      }
+      setMigrationTypingText(migrationPromptText.slice(0, charIdx));
+    }, 14);
+    return function() { clearInterval(interval); };
+  }, [migrationPhase]);
+
+  useEffect(function() {
+    if (migrationPhase !== "done") return;
+    var t = setTimeout(function() { setShowMigrationPicker(true); }, 800);
+    return function() { clearTimeout(t); };
+  }, [migrationPhase]);
+
+  /* ─── Zendesk migration thinking animation ─── */
+  var allZdMigrationSteps = [
+    "Connecting to Zendesk account...",
+    "Initiating Zendesk migration...",
+    "Estimating migration duration...",
+  ];
+
+  useEffect(function() {
+    if (zdMigrationPhase !== "running") return;
+    var cancelled = false;
+    var idx = 0;
+    var timerId = null;
+    var addStep = function() {
+      if (cancelled) return;
+      if (idx >= allZdMigrationSteps.length) {
+        timerId = setTimeout(function() {
+          if (!cancelled) {
+            setZdMigrationSteps(function(prev) {
+              var copy = prev.slice();
+              if (copy.length > 0) copy[copy.length - 1] = { text: copy[copy.length - 1].text, done: true };
+              return copy;
+            });
+            setTimeout(function() {
+              if (!cancelled) {
+                setZdMigrationCollapsed(true);
+                setZdMigrationExpanded(false);
+                setZdMigrationProgress(true);
+                setZdMigrationPhase("progress");
+              }
+            }, 500);
+          }
+        }, 600);
+        return;
+      }
+      if (idx > 0) {
+        setZdMigrationSteps(function(prev) {
+          var copy = prev.slice();
+          if (copy.length > 0) copy[copy.length - 1] = { text: copy[copy.length - 1].text, done: true };
+          return copy;
+        });
+      }
+      var stepText = allZdMigrationSteps[idx];
+      setZdMigrationSteps(function(prev) { return prev.concat([{ text: stepText, done: false }]); });
+      idx++;
+      timerId = setTimeout(addStep, 800 + Math.random() * 500);
+    };
+    timerId = setTimeout(addStep, 400);
+    return function() { cancelled = true; clearTimeout(timerId); };
+  }, [zdMigrationPhase]);
+
+  /* ─── Post-Zendesk-migration tour typing ─── */
+  var tourPromptText = "The migration is now in progress \u2014 I\u2019ll notify you once it\u2019s finished. Based on the initial data, it should take approximately 18\u201324 hours.\n\nMeanwhile, I\u2019ll start setting up the platform based on what we\u2019ve discussed. I\u2019m ready to walk you through some of the basics using sample ticket data, or you can take a break and come back when you\u2019re ready.";
+
+  useEffect(function() {
+    if (zdMigrationPhase !== "progress") return;
+    if (tourTypingStartedRef.current) return;
+    tourTypingStartedRef.current = true;
+    var t = setTimeout(function() { setTourPhase("typing"); }, 800);
+    return function() { clearTimeout(t); };
+  }, [zdMigrationPhase]);
+
+  useEffect(function() {
+    if (tourPhase !== "typing") return;
+    setTourTypingActive(true);
+    var charIdx = 0;
+    var interval = setInterval(function() {
+      charIdx++;
+      if (charIdx >= tourPromptText.length) {
+        clearInterval(interval);
+        setTourTypingText(tourPromptText);
+        setTourTypingActive(false);
+        setTourPhase("done");
+        return;
+      }
+      setTourTypingText(tourPromptText.slice(0, charIdx));
+    }, 14);
+    return function() { clearInterval(interval); };
+  }, [tourPhase]);
+
+  useEffect(function() {
+    if (tourPhase !== "done") return;
+    var t = setTimeout(function() { setShowTourPicker(true); }, 800);
+    return function() { clearTimeout(t); };
+  }, [tourPhase]);
+
+  /* ─── Platform setup animation ─── */
+  var allSetupSteps = [
+    "Configuring your Gorgias platform...",
+    "Setting up navigation and workspace...",
+    "Preparing sample conversations...",
+  ];
+
+  useEffect(function() {
+    if (setupPhase !== "running") return;
+    var totalSteps = allSetupSteps.length;
+
+    function runStep(idx) {
+      if (idx >= totalSteps) {
+        setTimeout(function() {
+          setSetupSteps(function(prev) {
+            var copy = prev.slice();
+            if (copy.length > 0) copy[copy.length - 1] = { text: copy[copy.length - 1].text, done: true };
+            return copy;
+          });
+          setTimeout(function() {
+            setSetupComplete(true);
+            setSetupPhase("done");
+            setTimeout(function() {
+              setShowHandoff(true);
+              setTimeout(function() { setHandoffVisible(true); }, 50);
+            }, 600);
+          }, 400);
+        }, 600);
+        return;
+      }
+      if (idx > 0) {
+        setSetupSteps(function(prev) {
+          var copy = prev.slice();
+          if (copy.length > 0) copy[copy.length - 1] = { text: copy[copy.length - 1].text, done: true };
+          return copy;
+        });
+      }
+      var stepText = allSetupSteps[idx];
+      setSetupSteps(function(prev) { return prev.concat([{ text: stepText, done: false }]); });
+      setTimeout(function() { runStep(idx + 1); }, 900 + Math.random() * 400);
+    }
+    setTimeout(function() { runStep(0); }, 400);
+  }, [setupPhase]);
+
   /* ─── Show quick-reply options after report cards appear ─── */
   useEffect(function() {
     if (!showReportCards) return;
@@ -6664,7 +7112,7 @@ function OnboardingChatPage({ profile, onComplete }) {
   return (
     <div style={{
       width: "100vw", height: "100vh", display: "flex",
-      background: CARD_BG, overflow: "hidden",
+      background: CARD_BG, overflow: "hidden", position: "relative",
     }}>
       {/* ─── Left Sidebar ─── */}
       <div style={{
@@ -6686,68 +7134,27 @@ function OnboardingChatPage({ profile, onComplete }) {
         {/* Nav items */}
         <div style={{ padding: "4px 10px", display: "flex", flexDirection: "column", gap: 1 }}>
           <div
-            onClick={function() { setOnboardingSubPage("digest"); }}
+            onClick={function() { setOnboardingSubPage("chat"); }}
             style={{
               padding: "9px 10px", borderRadius: 8, fontSize: 14,
               color: TEXT,
-              background: onboardingSubPage === "digest" ? CARD_BG : "transparent",
-              fontWeight: onboardingSubPage === "digest" ? 500 : 400,
-              boxShadow: onboardingSubPage === "digest" ? "0 1px 3px rgba(0,0,0,.04)" : "none",
+              background: CARD_BG,
+              fontWeight: 500,
+              boxShadow: "0 1px 3px rgba(0,0,0,.04)",
               display: "flex", alignItems: "center", gap: 10, cursor: "pointer", transition: "all .15s",
             }}
-            onMouseEnter={function(e) { if (onboardingSubPage !== "digest") e.currentTarget.style.background = "#EBEBEB"; }}
-            onMouseLeave={function(e) { if (onboardingSubPage !== "digest") e.currentTarget.style.background = "transparent"; }}
           >
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-              <rect x="3" y="4" width="14" height="13" rx="2" stroke={TEXT} strokeWidth="1.3" />
-              <path d="M6 8h8M6 11h5M6 14h7" stroke={TEXT} strokeWidth="1.1" strokeLinecap="round" />
+              <path d="M10 2c-2.5 3-4 6.5-4 10h2.5L10 18l1.5-6H14c0-3.5-1.5-7-4-10z" stroke={TEXT} strokeWidth="1.2" strokeLinejoin="round" fill="none" />
+              <circle cx="10" cy="9.5" r="1.5" stroke={TEXT} strokeWidth="1" />
+              <path d="M6 12c-1.5.5-2.5 1.5-3 3M14 12c1.5.5 2.5 1.5 3 3" stroke={TEXT} strokeWidth="1" strokeLinecap="round" />
             </svg>
-            Daily digest
-          </div>
-          <div
-            onClick={function() {
-              setOnboardingSubPage("chat");
-              setChatMessages([]);
-              setCurrentMsgIndex(0);
-              setTypingText("");
-            }}
-            style={{
-              padding: "9px 10px", borderRadius: 8, fontSize: 14, color: TEXT,
-              display: "flex", alignItems: "center", gap: 10, cursor: "pointer", transition: "all .15s",
-            }}
-            onMouseEnter={function(e) { e.currentTarget.style.background = "#EBEBEB"; }}
-            onMouseLeave={function(e) { e.currentTarget.style.background = "transparent"; }}
-          >
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="7" stroke={TEXT} strokeWidth="1.4" />
-              <path d="M10 7v6M7 10h6" stroke={TEXT} strokeWidth="1.4" strokeLinecap="round" />
-            </svg>
-            New chat
+            Welcome
           </div>
         </div>
 
-        {/* Recents */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "4px 10px" }}>
-          <div style={{
-            fontSize: 11, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase",
-            color: TEXT_MUTED, padding: "16px 10px 6px", userSelect: "none",
-          }}>
-            Recents
-          </div>
-          <div
-            onClick={function() { setOnboardingSubPage("chat"); }}
-            style={{
-              padding: "9px 10px", borderRadius: 8, fontSize: 13.5, cursor: "pointer",
-              color: TEXT,
-              background: onboardingSubPage === "chat" ? CARD_BG : "transparent",
-              fontWeight: onboardingSubPage === "chat" ? 500 : 400,
-              boxShadow: onboardingSubPage === "chat" ? "0 1px 3px rgba(0,0,0,.04)" : "none",
-              transition: "all .15s",
-            }}
-          >
-            Intro and onboarding
-          </div>
-        </div>
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
 
         {/* Bottom: Avatar */}
         <div style={{ padding: "8px 10px 14px", borderTop: `1px solid ${BORDER}` }}>
@@ -6956,7 +7363,7 @@ function OnboardingChatPage({ profile, onComplete }) {
                           <button style={{ fontSize: 12, fontWeight: 500, color: TEXT, background: "transparent", border: ("1px solid " + BORDER), borderRadius: 8, padding: "6px 14px", cursor: "pointer", transition: "all .15s", whiteSpace: "nowrap", flexShrink: 0 }}
                             onMouseEnter={(e) => { e.currentTarget.style.background = SURFACE; }}
                             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                          >View report</button>
+                          >Review</button>
                         </div>
                       </div>
                     ))}
@@ -6972,29 +7379,57 @@ function OnboardingChatPage({ profile, onComplete }) {
           {/* Post-findings messages (quick reply responses) */}
           {postFindingsMessages.map(function(msg, i) {
             if (msg.role === "ai-focus-card") {
+              var inlineFocusAreas = [
+                { title: "Respond to delivery complaints with the right tone and urgency", tag: "Reactive support", desc: "Offering resolutions that match the emotional stakes, and turning a bad experience into a reason to come back.", pickerLabel: "Respond to delivery complaints with the right tone and urgency" },
+                { title: "Keep shoppers in the loop on delivery", tag: "Proactive support", desc: "Sending proactive order and delivery updates across channels, answering status questions instantly, and reducing \u201cwhere is my order\u201d volume before it reaches your team.", pickerLabel: "Keep shoppers in the loop on delivery" },
+                { title: "Turning gifters into repeat shoppers", tag: "Proactive engagement", desc: "Re-engaging one-time gift senders after their first purchase with personalized, well-timed outreach that turns a single occasion into an ongoing relationship.", pickerLabel: "Turning gifters into repeat shoppers" },
+                { title: "Helping shoppers find the right arrangement", tag: "Shopping assistance", desc: "Guiding shoppers to the right bouquet based on occasion, budget, and recipient \u2014 answering questions in real time and turning browsing into buying.", pickerLabel: "Helping shoppers find the right arrangement" },
+              ];
               return (
-                <div key={"pf-" + i} style={{ marginBottom: 20, animation: "fadeInUp .5s cubic-bezier(.16,1,.3,1) forwards" }}>
-                  <div onClick={function() { setActiveReport("focus"); }} style={{
-                    border: activeReport === "focus" ? ("1px solid " + ACCENT) : ("1px solid " + BORDER), borderRadius: 12,
-                    background: CARD_BG, overflow: "hidden", display: "flex",
-                    cursor: "pointer", transition: "border-color .15s, box-shadow .15s",
-                  }}
-                    onMouseEnter={function(e) { if (activeReport !== "focus") { e.currentTarget.style.borderColor = "#D0D0D0"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,.04)"; } }}
-                    onMouseLeave={function(e) { if (activeReport !== "focus") { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = "none"; } }}
-                  >
-                    <div style={{ width: 80, minHeight: 72, background: SURFACE, flexShrink: 0, borderRight: ("1px solid " + BORDER), display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style={{ opacity: 0.4 }}><circle cx="20" cy="20" r="12" stroke={TEXT_MUTED} strokeWidth="0.8" strokeDasharray="3 2" /><circle cx="20" cy="20" r="7" stroke={TEXT_MUTED} strokeWidth="0.7" /><circle cx="20" cy="20" r="2.5" fill={TEXT_MUTED} fillOpacity="0.25" /><path d="M20 6v3M20 31v3M6 20h3M31 20h3" stroke={TEXT_MUTED} strokeWidth="0.6" strokeLinecap="round" /></svg>
-                    </div>
-                    <div style={{ flex: 1, padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: TEXT, lineHeight: 1.3 }}>Focus areas</span>
-                        <span style={{ fontSize: 12, color: TEXT_MUTED, lineHeight: 1.3 }}>High-impact areas where Gorgias agent can drive immediate impact</span>
-                      </div>
-                      <button style={{ fontSize: 12, fontWeight: 500, color: TEXT, background: "transparent", border: ("1px solid " + BORDER), borderRadius: 8, padding: "6px 14px", cursor: "pointer", transition: "all .15s", whiteSpace: "nowrap", flexShrink: 0 }}
-                        onMouseEnter={function(e) { e.currentTarget.style.background = SURFACE; }}
-                        onMouseLeave={function(e) { e.currentTarget.style.background = "transparent"; }}
-                      >Review focus areas</button>
-                    </div>
+                <div key={"pf-" + i} style={{ marginBottom: 20, animation: "fadeInUp .4s cubic-bezier(.16,1,.3,1) forwards" }}>
+                  <div style={{ border: ("1px solid " + BORDER), borderRadius: 12, overflow: "hidden", background: CARD_BG }}>
+                    {inlineFocusAreas.map(function(area, ai) {
+                      return (
+                        <div key={ai}
+                          onClick={function() {
+                            setShowUseCasePicker(false);
+                            setActiveReport(null);
+                            setPostFindingsMessages(function(prev) { return prev.concat([{ role: "user", text: area.pickerLabel }]); });
+                            if (ai === 0) {
+                              setTimeout(function() { setSimPhase("typing-sim-intro"); }, 600);
+                            }
+                          }}
+                          style={{
+                            padding: "14px 18px",
+                            borderBottom: ai < inlineFocusAreas.length - 1 ? ("1px solid " + BORDER) : "none",
+                            cursor: "pointer", transition: "background .15s", position: "relative",
+                          }}
+                          onMouseEnter={function(e) {
+                            e.currentTarget.style.background = SURFACE + "80";
+                            var tip = e.currentTarget.querySelector("[data-focus-tip]");
+                            if (tip) { tip.style.opacity = "1"; tip.style.transform = "translateY(0)"; }
+                          }}
+                          onMouseLeave={function(e) {
+                            e.currentTarget.style.background = "transparent";
+                            var tip = e.currentTarget.querySelector("[data-focus-tip]");
+                            if (tip) { tip.style.opacity = "0"; tip.style.transform = "translateY(4px)"; }
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 4 }}>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: TEXT, lineHeight: 1.4, fontFamily: "'DM Sans', sans-serif" }}>{area.title}</div>
+                            <span style={{ fontSize: 11, color: ACCENT, background: ACCENT + "0E", padding: "3px 10px", borderRadius: 20, whiteSpace: "nowrap", flexShrink: 0 }}>{area.tag}</span>
+                          </div>
+                          <div style={{ fontSize: 13, lineHeight: 1.5, color: TEXT_MUTED, fontFamily: "'DM Sans', sans-serif" }}>{area.desc}</div>
+                          <div data-focus-tip="true" style={{
+                            position: "absolute", right: 14, top: 12,
+                            background: TEXT, color: "white", fontSize: 11, fontWeight: 500,
+                            padding: "4px 10px", borderRadius: 6, whiteSpace: "nowrap",
+                            opacity: 0, transition: "all .15s", pointerEvents: "none",
+                            transform: "translateY(4px)",
+                          }}>Use as my response</div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -7011,9 +7446,9 @@ function OnboardingChatPage({ profile, onComplete }) {
                   <div style={{ border: ("1px solid " + BORDER), borderRadius: 12, overflow: "hidden", background: CARD_BG }}>
                     {gaps.map(function(gap, gi) {
                       return (
-                        <div key={gi} style={{ padding: "16px 20px", borderBottom: gi < gaps.length - 1 ? ("1px solid " + BORDER) : "none" }}>
-                          <div style={{ fontSize: 15, fontWeight: 600, color: TEXT, marginBottom: 4, fontFamily: "'Lora', serif" }}>{gap.title}</div>
-                          <div style={{ fontSize: 14, lineHeight: 1.55, color: TEXT, fontFamily: "'Lora', serif", fontWeight: 450 }}>{gap.desc}</div>
+                        <div key={gi} style={{ padding: "14px 18px", borderBottom: gi < gaps.length - 1 ? ("1px solid " + BORDER) : "none" }}>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: TEXT, marginBottom: 4, fontFamily: "'DM Sans', sans-serif" }}>{gap.title}</div>
+                          <div style={{ fontSize: 13, lineHeight: 1.5, color: TEXT_MUTED, fontFamily: "'DM Sans', sans-serif" }}>{gap.desc}</div>
                         </div>
                       );
                     })}
@@ -7290,6 +7725,66 @@ function OnboardingChatPage({ profile, onComplete }) {
             );
           })}
 
+          {/* Shopify connection thinking animation */}
+          {shopifyConnectPhase !== "idle" && (
+            <div style={{ marginBottom: 16, animation: "fadeInUp .4s cubic-bezier(.16,1,.3,1) forwards" }}>
+              {/* Header — collapsible */}
+              <div
+                onClick={function() { if (shopifyConnectComplete) setShopifyConnectExpanded(function(prev) { return !prev; }); }}
+                style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  cursor: shopifyConnectComplete ? "pointer" : "default",
+                  padding: "8px 0", userSelect: "none",
+                }}
+              >
+                {!shopifyConnectComplete ? (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                    <circle cx="8" cy="8" r="6" stroke={BORDER} strokeWidth="2" />
+                    <path d="M14 8a6 6 0 0 0-6-6" stroke={TEXT_MUTED} strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                    <circle cx="8" cy="8" r="7" fill={TEXT_MUTED} />
+                    <path d="M5 8l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+                <span style={{ fontSize: 13, fontWeight: 500, color: shopifyConnectComplete ? TEXT_MUTED : TEXT }}>
+                  {shopifyConnectComplete ? "Connected Shopify store" : "Connecting Shopify"}
+                </span>
+                {shopifyConnectComplete && (
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{
+                    transition: "transform .2s", transform: shopifyConnectExpanded ? "rotate(0deg)" : "rotate(-90deg)",
+                    marginLeft: "auto",
+                  }}>
+                    <path d="M3 5l4 4 4-4" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+              {/* Steps list */}
+              {shopifyConnectExpanded && shopifyConnectSteps.length > 0 && (
+                <div style={{ paddingLeft: 24, paddingBottom: 4 }}>
+                  {shopifyConnectSteps.map(function(step, si) {
+                    return (
+                      <div key={si} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
+                        {step.done ? (
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
+                            <path d="M2.5 6l2.5 2.5 4.5-5" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        ) : (
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                            <circle cx="6" cy="6" r="4.5" stroke={BORDER} strokeWidth="1.5" />
+                            <path d="M10.5 6a4.5 4.5 0 0 0-4.5-4.5" stroke={TEXT_MUTED} strokeWidth="1.5" strokeLinecap="round" />
+                          </svg>
+                        )}
+                        <span style={{ fontSize: 12, color: step.done ? TEXT_MUTED : TEXT }}>{step.text}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* "I'll do it later" typing text */}
           {laterTypingActive && laterTypingText && (
             <div style={{ marginBottom: 16 }}>
@@ -7303,6 +7798,286 @@ function OnboardingChatPage({ profile, onComplete }) {
             </div>
           )}
 
+          {/* Post-Shopify-connect channel typing text */}
+          {(channelTypingActive || channelPhase === "done") && channelTypingText && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{
+                fontSize: 15, lineHeight: 1.55, color: TEXT,
+                fontFamily: "'Lora', serif", fontWeight: 450,
+                whiteSpace: "pre-wrap",
+              }}>
+                {channelTypingText}{channelTypingActive && <span style={{ opacity: 0.3, animation: "pulse 1s infinite" }}>|</span>}
+              </div>
+            </div>
+          )}
+
+          {/* Post-channel-picker user messages */}
+          {postChannelMessages.map(function(msg, i) {
+            return (
+              <div key={"pc-" + i} style={{
+                marginBottom: 16, display: "flex", flexDirection: "column",
+                alignItems: msg.role === "user" ? "flex-end" : "flex-start",
+                animation: "fadeInUp .35s ease-out",
+              }}>
+                {msg.role === "user" ? (
+                  <div style={{
+                    fontSize: 14, lineHeight: 1.45, color: TEXT,
+                    maxWidth: "85%", textAlign: "left",
+                    padding: "11px 16px", borderRadius: 14,
+                    background: SURFACE, fontFamily: "'DM Sans', sans-serif",
+                  }}>
+                    {msg.text}
+                  </div>
+                ) : (
+                  <div style={{
+                    fontSize: 15, lineHeight: 1.55, color: TEXT,
+                    fontFamily: "'Lora', serif", fontWeight: 450,
+                  }}>
+                    {msg.text}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Email connection thinking animation */}
+          {emailConnectPhase !== "idle" && (
+            <div style={{ marginBottom: 16, animation: "fadeInUp .4s cubic-bezier(.16,1,.3,1) forwards" }}>
+              <div
+                onClick={function() { if (emailConnectComplete) setEmailConnectExpanded(function(prev) { return !prev; }); }}
+                style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  cursor: emailConnectComplete ? "pointer" : "default",
+                  padding: "8px 0", userSelect: "none",
+                }}
+              >
+                {!emailConnectComplete ? (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                    <circle cx="8" cy="8" r="6" stroke={BORDER} strokeWidth="2" />
+                    <path d="M14 8a6 6 0 0 0-6-6" stroke={TEXT_MUTED} strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                    <circle cx="8" cy="8" r="7" fill={TEXT_MUTED} />
+                    <path d="M5 8l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+                <span style={{ fontSize: 13, fontWeight: 500, color: emailConnectComplete ? TEXT_MUTED : TEXT }}>
+                  {emailConnectComplete ? "Connected email support@urbanstems.com" : "Connecting email"}
+                </span>
+                {emailConnectComplete && (
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{
+                    transition: "transform .2s", transform: emailConnectExpanded ? "rotate(0deg)" : "rotate(-90deg)",
+                    marginLeft: "auto",
+                  }}>
+                    <path d="M3 5l4 4 4-4" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+              {emailConnectExpanded && emailConnectSteps.length > 0 && (
+                <div style={{ paddingLeft: 24, paddingBottom: 4 }}>
+                  {emailConnectSteps.map(function(step, si) {
+                    return (
+                      <div key={si} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
+                        {step.done ? (
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
+                            <path d="M2.5 6l2.5 2.5 4.5-5" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        ) : (
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                            <circle cx="6" cy="6" r="4.5" stroke={BORDER} strokeWidth="1.5" />
+                            <path d="M10.5 6a4.5 4.5 0 0 0-4.5-4.5" stroke={TEXT_MUTED} strokeWidth="1.5" strokeLinecap="round" />
+                          </svg>
+                        )}
+                        <span style={{ fontSize: 12, color: step.done ? TEXT_MUTED : TEXT }}>{step.text}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Post-email-connect migration typing text */}
+          {(migrationTypingActive || migrationPhase === "done") && migrationTypingText && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{
+                fontSize: 15, lineHeight: 1.55, color: TEXT,
+                fontFamily: "'Lora', serif", fontWeight: 450,
+                whiteSpace: "pre-wrap",
+              }}>
+                {migrationTypingText}{migrationTypingActive && <span style={{ opacity: 0.3, animation: "pulse 1s infinite" }}>|</span>}
+              </div>
+            </div>
+          )}
+
+          {/* Post-migration-picker user messages */}
+          {postMigrationMessages.map(function(msg, i) {
+            return (
+              <div key={"pm-" + i} style={{
+                marginBottom: 16, display: "flex", flexDirection: "column",
+                alignItems: msg.role === "user" ? "flex-end" : "flex-start",
+                animation: "fadeInUp .35s ease-out",
+              }}>
+                <div style={{
+                  fontSize: 14, lineHeight: 1.45, color: TEXT,
+                  maxWidth: "85%", textAlign: "left",
+                  padding: "11px 16px", borderRadius: 14,
+                  background: SURFACE, fontFamily: "'DM Sans', sans-serif",
+                }}>
+                  {msg.text}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Zendesk migration thinking animation */}
+          {zdMigrationPhase !== "idle" && (
+            <div style={{ marginBottom: 16, animation: "fadeInUp .4s cubic-bezier(.16,1,.3,1) forwards" }}>
+              {/* Collapsed progress state */}
+              {zdMigrationProgress ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                    <circle cx="8" cy="8" r="6" stroke={BORDER} strokeWidth="2" />
+                    <path d="M14 8a6 6 0 0 0-6-6" stroke={TEXT_MUTED} strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: TEXT_MUTED }}>
+                    Migration in progress {"\u2014"} 1% done
+                  </span>
+                </div>
+              ) : (
+                <>
+                  {/* Header — expanding steps */}
+                  <div
+                    onClick={function() { if (zdMigrationCollapsed) setZdMigrationExpanded(function(prev) { return !prev; }); }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 8,
+                      cursor: zdMigrationCollapsed ? "pointer" : "default",
+                      padding: "8px 0", userSelect: "none",
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                      <circle cx="8" cy="8" r="6" stroke={BORDER} strokeWidth="2" />
+                      <path d="M14 8a6 6 0 0 0-6-6" stroke={TEXT_MUTED} strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: TEXT }}>
+                      Migrating from Zendesk
+                    </span>
+                    {zdMigrationCollapsed && (
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{
+                        transition: "transform .2s", transform: zdMigrationExpanded ? "rotate(0deg)" : "rotate(-90deg)",
+                        marginLeft: "auto",
+                      }}>
+                        <path d="M3 5l4 4 4-4" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  {/* Steps list */}
+                  {zdMigrationExpanded && zdMigrationSteps.length > 0 && (
+                    <div style={{ paddingLeft: 24, paddingBottom: 4 }}>
+                      {zdMigrationSteps.map(function(step, si) {
+                        return (
+                          <div key={si} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
+                            {step.done ? (
+                              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
+                                <path d="M2.5 6l2.5 2.5 4.5-5" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            ) : (
+                              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                                <circle cx="6" cy="6" r="4.5" stroke={BORDER} strokeWidth="1.5" />
+                                <path d="M10.5 6a4.5 4.5 0 0 0-4.5-4.5" stroke={TEXT_MUTED} strokeWidth="1.5" strokeLinecap="round" />
+                              </svg>
+                            )}
+                            <span style={{ fontSize: 12, color: step.done ? TEXT_MUTED : TEXT }}>{step.text}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Post-Zendesk-migration tour typing text */}
+          {(tourTypingActive || tourPhase === "done") && tourTypingText && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{
+                fontSize: 15, lineHeight: 1.55, color: TEXT,
+                fontFamily: "'Lora', serif", fontWeight: 450,
+                whiteSpace: "pre-wrap",
+              }}>
+                {tourTypingText}{tourTypingActive && <span style={{ opacity: 0.3, animation: "pulse 1s infinite" }}>|</span>}
+              </div>
+            </div>
+          )}
+
+          {/* Post-tour-picker user messages */}
+          {postTourMessages.map(function(msg, i) {
+            return (
+              <div key={"pt-" + i} style={{
+                marginBottom: 16, display: "flex", flexDirection: "column",
+                alignItems: msg.role === "user" ? "flex-end" : "flex-start",
+                animation: "fadeInUp .35s ease-out",
+              }}>
+                <div style={{
+                  fontSize: 14, lineHeight: 1.45, color: TEXT,
+                  maxWidth: "85%", textAlign: "left",
+                  padding: "11px 16px", borderRadius: 14,
+                  background: SURFACE, fontFamily: "'DM Sans', sans-serif",
+                }}>
+                  {msg.text}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Platform setup thinking animation */}
+          {setupPhase !== "idle" && (
+            <div style={{ marginBottom: 16, animation: "fadeInUp .4s cubic-bezier(.16,1,.3,1) forwards" }}>
+              <div style={{
+                display: "flex", alignItems: "center", gap: 8,
+                padding: "8px 0", userSelect: "none",
+              }}>
+                {!setupComplete ? (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                    <circle cx="8" cy="8" r="6" stroke={BORDER} strokeWidth="2" />
+                    <path d="M14 8a6 6 0 0 0-6-6" stroke={TEXT_MUTED} strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                    <circle cx="8" cy="8" r="7" fill={TEXT_MUTED} />
+                    <path d="M5 8l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+                <span style={{ fontSize: 13, fontWeight: 500, color: setupComplete ? TEXT_MUTED : TEXT }}>
+                  {setupComplete ? "Platform ready" : "Setting up your platform"}
+                </span>
+              </div>
+              {setupSteps.length > 0 && !setupComplete && (
+                <div style={{ paddingLeft: 24, paddingBottom: 4 }}>
+                  {setupSteps.map(function(step, si) {
+                    return (
+                      <div key={si} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
+                        {step.done ? (
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
+                            <path d="M2.5 6l2.5 2.5 4.5-5" stroke={TEXT_MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        ) : (
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ animation: "spin 1s linear infinite", flexShrink: 0 }}>
+                            <circle cx="6" cy="6" r="4.5" stroke={BORDER} strokeWidth="1.5" />
+                            <path d="M10.5 6a4.5 4.5 0 0 0-4.5-4.5" stroke={TEXT_MUTED} strokeWidth="1.5" strokeLinecap="round" />
+                          </svg>
+                        )}
+                        <span style={{ fontSize: 12, color: step.done ? TEXT_MUTED : TEXT }}>{step.text}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           <div ref={chatEndRef} />
         </div>
       </div>
@@ -7311,7 +8086,7 @@ function OnboardingChatPage({ profile, onComplete }) {
       <div style={{
         padding: "0 24px 6px", position: "relative",
         background: "linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.85) 30%, rgba(250,250,250,1) 100%)",
-        paddingTop: (showQuickReplies || showUseCasePicker || showNextStepsPicker || showShopifyPicker) ? 16 : 32,
+        paddingTop: (showQuickReplies || showUseCasePicker || showNextStepsPicker || showShopifyPicker || showChannelPicker || showMigrationPicker || showTourPicker) ? 16 : 32,
       }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
 
@@ -7324,8 +8099,8 @@ function OnboardingChatPage({ profile, onComplete }) {
             }}>
               <div style={{ padding: "14px 18px 12px", fontSize: 13, fontWeight: 500, color: TEXT_MUTED, borderBottom: ("1px solid " + BORDER) }}>Which use case do you want me to focus on first?</div>
               {[
-                "Handling sensitive delivery moments",
-                "Keeping shoppers in the loop on delivery",
+                "Respond to delivery complaints with the right tone and urgency",
+                "Keep shoppers in the loop on delivery",
                 "Turning gifters into repeat shoppers",
                 "Helping shoppers find the right arrangement",
               ].map(function(label, oi) {
@@ -7526,7 +8301,9 @@ function OnboardingChatPage({ profile, onComplete }) {
                       setShowShopifyPicker(false);
                       setActiveReport(null);
                       setPostShopifyMessages(function(prev) { return prev.concat([{ role: "user", text: opt.label }]); });
-                      if (oi === 1) {
+                      if (oi === 0) {
+                        setTimeout(function() { setShopifyConnectPhase("running"); }, 600);
+                      } else if (oi === 1) {
                         setTimeout(function() { setLaterPhase("typing"); }, 800);
                       }
                     }}
@@ -7573,6 +8350,203 @@ function OnboardingChatPage({ profile, onComplete }) {
               </div>
             </div>
 
+          ) : showChannelPicker && !channelPickerFreeform ? (
+            <div style={{
+              animation: "fadeInUp .35s ease-out",
+              border: ("1.5px solid " + BORDER), borderRadius: 16, background: CARD_BG,
+              boxShadow: "0 2px 16px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.02)",
+              overflow: "hidden",
+            }}>
+              {[
+                { label: "Connect Email", icon: "email" },
+                { label: "Connect SMS", icon: "sms" },
+                { label: "Connect Social", icon: "social" },
+              ].map(function(opt, oi) {
+                return (
+                  <div key={oi}
+                    onClick={function() {
+                      setShowChannelPicker(false);
+                      setActiveReport(null);
+                      setPostChannelMessages(function(prev) { return prev.concat([{ role: "user", text: opt.label }]); });
+                      if (oi === 0) {
+                        setTimeout(function() { setEmailConnectPhase("running"); }, 600);
+                      }
+                    }}
+                    style={{
+                      padding: "12px 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
+                      transition: "background .15s", borderBottom: ("1px solid " + BORDER),
+                      background: CARD_BG,
+                    }}
+                    onMouseEnter={function(e) { e.currentTarget.style.background = SURFACE; }}
+                    onMouseLeave={function(e) { e.currentTarget.style.background = CARD_BG; }}
+                  >
+                    <div style={{
+                      width: 28, height: 28, borderRadius: 8, background: SURFACE,
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                    }}>
+                      {opt.icon === "email" ? (
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="10" rx="2" stroke={ACCENT} strokeWidth="1.2"/><path d="M1.5 5l6.5 4 6.5-4" stroke={ACCENT} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      ) : opt.icon === "sms" ? (
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="4" y="1" width="8" height="14" rx="2" stroke={ACCENT} strokeWidth="1.2"/><circle cx="8" cy="12.5" r="0.8" fill={ACCENT}/><path d="M6 3.5h4" stroke={ACCENT} strokeWidth="0.8" strokeLinecap="round"/></svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke={ACCENT} strokeWidth="1.2"/><path d="M5 6.5c0-1.1.9-2 2-2h2c1.1 0 2 .9 2 2 0 1.5-2 2-2 3v.5" stroke={ACCENT} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/><circle cx="8" cy="12" r="0.6" fill={ACCENT}/></svg>
+                      )}
+                    </div>
+                    <span style={{ fontSize: 14, color: TEXT, fontFamily: "'DM Sans', sans-serif" }}>{opt.label}</span>
+                  </div>
+                );
+              })}
+              {/* Something else — freeform */}
+              <div
+                onClick={function() { setChannelPickerFreeform(true); setShowChannelPicker(false); setActiveReport(null); }}
+                style={{
+                  padding: "12px 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
+                  transition: "background .15s",
+                  background: CARD_BG,
+                }}
+                onMouseEnter={function(e) { e.currentTarget.style.background = SURFACE; }}
+                onMouseLeave={function(e) { e.currentTarget.style.background = CARD_BG; }}
+              >
+                <div style={{
+                  width: 28, height: 28, borderRadius: 8, background: SURFACE,
+                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11.2 1.8a1.6 1.6 0 0 1 2.3 0l.7.7a1.6 1.6 0 0 1 0 2.3L5.7 13.3l-3.4.9.9-3.4Z" stroke={ACCENT} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none" /><path d="M9.5 3.5l3 3" stroke={ACCENT} strokeWidth="1.2" strokeLinecap="round" /></svg>
+                </div>
+                <span style={{ fontSize: 14, color: TEXT_MUTED, fontFamily: "'DM Sans', sans-serif" }}>Something else</span>
+              </div>
+            </div>
+
+          ) : showMigrationPicker && !migrationPickerFreeform ? (
+            <div style={{
+              animation: "fadeInUp .35s ease-out",
+              border: ("1.5px solid " + BORDER), borderRadius: 16, background: CARD_BG,
+              boxShadow: "0 2px 16px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.02)",
+              overflow: "hidden",
+            }}>
+              {[
+                { label: "Migrate from Zendesk", favicon: "zendesk.com" },
+                { label: "Migrate from Intercom", favicon: "intercom.com" },
+                { label: "Migrate from Gladly", favicon: "gladly.com" },
+                { label: "I don\u2019t have a Helpdesk right now", icon: "skip" },
+              ].map(function(opt, oi) {
+                return (
+                  <div key={oi}
+                    onClick={function() {
+                      setShowMigrationPicker(false);
+                      setActiveReport(null);
+                      setPostMigrationMessages(function(prev) { return prev.concat([{ role: "user", text: opt.label }]); });
+                      if (oi === 0) {
+                        setTimeout(function() { setZdMigrationPhase("running"); }, 600);
+                      }
+                    }}
+                    style={{
+                      padding: "12px 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
+                      transition: "background .15s", borderBottom: ("1px solid " + BORDER),
+                      background: CARD_BG,
+                    }}
+                    onMouseEnter={function(e) { e.currentTarget.style.background = SURFACE; }}
+                    onMouseLeave={function(e) { e.currentTarget.style.background = CARD_BG; }}
+                  >
+                    <div style={{
+                      width: 28, height: 28, borderRadius: 8, background: SURFACE,
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                    }}>
+                      {opt.favicon ? (
+                        <img src={"https://www.google.com/s2/favicons?domain=" + opt.favicon + "&sz=32"} alt="" style={{ width: 16, height: 16, borderRadius: 3, display: "block" }} />
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" /></svg>
+                      )}
+                    </div>
+                    <span style={{ fontSize: 14, color: TEXT, fontFamily: "'DM Sans', sans-serif" }}>{opt.label}</span>
+                  </div>
+                );
+              })}
+              {/* Something else — freeform */}
+              <div
+                onClick={function() { setMigrationPickerFreeform(true); setShowMigrationPicker(false); setActiveReport(null); }}
+                style={{
+                  padding: "12px 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
+                  transition: "background .15s",
+                  background: CARD_BG,
+                }}
+                onMouseEnter={function(e) { e.currentTarget.style.background = SURFACE; }}
+                onMouseLeave={function(e) { e.currentTarget.style.background = CARD_BG; }}
+              >
+                <div style={{
+                  width: 28, height: 28, borderRadius: 8, background: SURFACE,
+                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11.2 1.8a1.6 1.6 0 0 1 2.3 0l.7.7a1.6 1.6 0 0 1 0 2.3L5.7 13.3l-3.4.9.9-3.4Z" stroke={ACCENT} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none" /><path d="M9.5 3.5l3 3" stroke={ACCENT} strokeWidth="1.2" strokeLinecap="round" /></svg>
+                </div>
+                <span style={{ fontSize: 14, color: TEXT_MUTED, fontFamily: "'DM Sans', sans-serif" }}>Something else</span>
+              </div>
+            </div>
+
+          ) : showTourPicker && !tourPickerFreeform ? (
+            <div style={{
+              animation: "fadeInUp .35s ease-out",
+              border: ("1.5px solid " + BORDER), borderRadius: 16, background: CARD_BG,
+              boxShadow: "0 2px 16px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.02)",
+              overflow: "hidden",
+            }}>
+              {[
+                { label: "Yes, show me around", icon: "tour" },
+                { label: "I\u2019ll need a break \u2014 let\u2019s do it later", icon: "pause" },
+              ].map(function(opt, oi) {
+                return (
+                  <div key={oi}
+                    onClick={function() {
+                      setShowTourPicker(false);
+                      setActiveReport(null);
+                      setPostTourMessages(function(prev) { return prev.concat([{ role: "user", text: opt.label }]); });
+                      if (oi === 0) {
+                        setTimeout(function() { setSetupPhase("running"); }, 600);
+                      }
+                    }}
+                    style={{
+                      padding: "12px 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
+                      transition: "background .15s", borderBottom: ("1px solid " + BORDER),
+                      background: CARD_BG,
+                    }}
+                    onMouseEnter={function(e) { e.currentTarget.style.background = SURFACE; }}
+                    onMouseLeave={function(e) { e.currentTarget.style.background = CARD_BG; }}
+                  >
+                    <div style={{
+                      width: 28, height: 28, borderRadius: 8, background: SURFACE,
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                    }}>
+                      {opt.icon === "tour" ? (
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2v12M3 3h8l-2 3 2 3H3" stroke={ACCENT} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke={ACCENT} strokeWidth="1.2"/><path d="M6 6v4M10 6v4" stroke={ACCENT} strokeWidth="1.4" strokeLinecap="round"/></svg>
+                      )}
+                    </div>
+                    <span style={{ fontSize: 14, color: TEXT, fontFamily: "'DM Sans', sans-serif" }}>{opt.label}</span>
+                  </div>
+                );
+              })}
+              {/* Something else — freeform */}
+              <div
+                onClick={function() { setTourPickerFreeform(true); setShowTourPicker(false); setActiveReport(null); }}
+                style={{
+                  padding: "12px 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
+                  transition: "background .15s",
+                  background: CARD_BG,
+                }}
+                onMouseEnter={function(e) { e.currentTarget.style.background = SURFACE; }}
+                onMouseLeave={function(e) { e.currentTarget.style.background = CARD_BG; }}
+              >
+                <div style={{
+                  width: 28, height: 28, borderRadius: 8, background: SURFACE,
+                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11.2 1.8a1.6 1.6 0 0 1 2.3 0l.7.7a1.6 1.6 0 0 1 0 2.3L5.7 13.3l-3.4.9.9-3.4Z" stroke={ACCENT} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none" /><path d="M9.5 3.5l3 3" stroke={ACCENT} strokeWidth="1.2" strokeLinecap="round" /></svg>
+                </div>
+                <span style={{ fontSize: 14, color: TEXT_MUTED, fontFamily: "'DM Sans', sans-serif" }}>Something else</span>
+              </div>
+            </div>
+
           ) : (
             <div style={{
               border: ("1.5px solid " + BORDER), borderRadius: 16, background: CARD_BG,
@@ -7584,9 +8558,9 @@ function OnboardingChatPage({ profile, onComplete }) {
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                placeholder={useCasePickerFreeform ? "Describe your use case..." : quickReplyFreeform ? "Tell us what needs updating..." : nextStepsPickerFreeform ? "Ask your questions..." : shopifyPickerFreeform ? "Type your question..." : "Reply..."}
+                placeholder={useCasePickerFreeform ? "Describe your use case..." : quickReplyFreeform ? "Tell us what needs updating..." : nextStepsPickerFreeform ? "Ask your questions..." : shopifyPickerFreeform ? "Type your question..." : channelPickerFreeform ? "Type your question..." : migrationPickerFreeform ? "Type your question..." : tourPickerFreeform ? "Type your question..." : "Reply..."}
                 rows={1}
-                autoFocus={quickReplyFreeform || useCasePickerFreeform || nextStepsPickerFreeform || shopifyPickerFreeform}
+                autoFocus={quickReplyFreeform || useCasePickerFreeform || nextStepsPickerFreeform || shopifyPickerFreeform || channelPickerFreeform || migrationPickerFreeform || tourPickerFreeform}
                 style={{
                   width: "100%", border: "none", outline: "none", resize: "none",
                   padding: "8px 10px 4px", fontSize: 14, lineHeight: 1.5,
@@ -7685,7 +8659,7 @@ function OnboardingChatPage({ profile, onComplete }) {
               {activeReport === "personas" && (<ReportPersonas />)}
               {activeReport === "focus" && (<ReportFocus />)}
               {activeReport === "simulation" && (<ReportSimulation />)}
-              {activeReport === "checklist" && (<ReportChecklist />)}
+              {activeReport === "checklist" && (<ReportChecklist shopifyConnected={shopifyConnected} emailConnected={emailConnected} />)}
               {selectionTooltip && (
                 <div id="ai-selection-tooltip" style={{
                   position: "absolute", top: selectionTooltip.y, left: selectionTooltip.x,
@@ -7840,7 +8814,7 @@ function DigestPage({ profile, onStartChat }) {
               boxShadow: "0 2px 16px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.02)",
               display: "flex", flexDirection: "column", padding: "4px 6px 4px 6px",
               cursor: "pointer", transition: "border-color .15s, box-shadow .15s",
-              marginBottom: 32,
+              marginBottom: 14,
             }}
             onMouseEnter={function(e) { e.currentTarget.style.borderColor = "#D0D0D0"; e.currentTarget.style.boxShadow = "0 2px 16px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04)"; }}
             onMouseLeave={function(e) { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = "0 2px 16px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.02)"; }}
@@ -7875,27 +8849,27 @@ function DigestPage({ profile, onStartChat }) {
 
           {/* ─── Suggested Actions ─── */}
           <div style={{ marginBottom: 32 }}>
-            <div style={{ fontSize: 12, fontWeight: 500, color: TEXT_MUTED, fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Suggested actions</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div style={{ border: ("1px solid " + BORDER), borderRadius: 14, background: CARD_BG, overflow: "hidden" }}>
+              <div style={{ padding: "14px 20px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ fontSize: 12, fontWeight: 500, color: TEXT_MUTED, fontFamily: "'DM Sans', sans-serif" }}>Suggested actions</div>
+              </div>
               {[
                 { label: "Connect Shopify store", icon: "shopify" },
                 { label: "Add return and refund policies", icon: "policy" },
                 { label: "Add delivery and shipping guidelines", icon: "delivery" },
                 { label: "Connect at least one channel", icon: "channel" },
-                { label: "Something else", icon: "pencil" },
               ].map(function(action, ai) {
                 return (
                   <div key={ai}
                     onClick={onStartChat}
                     style={{
-                      display: "flex", alignItems: "center", gap: 8,
-                      padding: "8px 14px", borderRadius: 10,
-                      border: ("1px solid " + BORDER), background: CARD_BG,
-                      cursor: "pointer", transition: "all .15s",
-                      fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: TEXT,
+                      padding: "12px 20px", cursor: "pointer",
+                      display: "flex", alignItems: "center", gap: 12,
+                      transition: "background .15s",
+                      borderTop: ("1px solid " + BORDER),
                     }}
-                    onMouseEnter={function(e) { e.currentTarget.style.borderColor = "#D0D0D0"; e.currentTarget.style.background = SURFACE; }}
-                    onMouseLeave={function(e) { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = CARD_BG; }}
+                    onMouseEnter={function(e) { e.currentTarget.style.background = SURFACE; }}
+                    onMouseLeave={function(e) { e.currentTarget.style.background = "transparent"; }}
                   >
                     {action.icon === "shopify" ? (
                       <img src="https://www.google.com/s2/favicons?domain=shopify.com&sz=32" alt="" style={{ width: 16, height: 16, borderRadius: 3, flexShrink: 0 }} />
@@ -7908,7 +8882,7 @@ function DigestPage({ profile, onStartChat }) {
                     ) : (
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}><path d="M11.2 1.8a1.6 1.6 0 0 1 2.3 0l.7.7a1.6 1.6 0 0 1 0 2.3L5.7 13.3l-3.4.9.9-3.4Z" stroke={TEXT_MUTED} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none" /><path d="M9.5 3.5l3 3" stroke={TEXT_MUTED} strokeWidth="1.2" strokeLinecap="round" /></svg>
                     )}
-                    <span>{action.label}</span>
+                    <span style={{ fontSize: 14, color: TEXT, fontFamily: "'DM Sans', sans-serif" }}>{action.label}</span>
                   </div>
                 );
               })}
@@ -7974,6 +8948,269 @@ function DigestPage({ profile, onStartChat }) {
 
         </div>
       </div>
+
+      {/* ─── Handoff Overlay ─── */}
+      {showHandoff && (
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+          zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+          background: "rgba(255,255,255,0.6)",
+          opacity: handoffVisible ? 1 : 0,
+          transition: "opacity .8s cubic-bezier(.16,1,.3,1)",
+        }}>
+          {/* Faint silhouette of Gorgias helpdesk layout — purely decorative */}
+          <div style={{
+            position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+            opacity: 0.15, pointerEvents: "none", display: "flex",
+          }}>
+            {/* ── Col 1: Left nav sidebar (~210px) ── */}
+            <div style={{ width: 210, minWidth: 210, background: "#EBEBEB", borderRight: "1px solid #D5D5D5", display: "flex", flexDirection: "column" }}>
+              {/* Top bar with Inbox + icons */}
+              <div style={{ padding: "12px 14px", borderBottom: "1px solid #D5D5D5", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ width: 18, height: 18, borderRadius: 4, background: "#C5C5C5" }} />
+                <div style={{ width: 50, height: 14, borderRadius: 4, background: "#C0C0C0" }} />
+                <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+                  <div style={{ width: 16, height: 16, borderRadius: 4, background: "#D0D0D0" }} />
+                  <div style={{ width: 16, height: 16, borderRadius: 4, background: "#D0D0D0" }} />
+                </div>
+              </div>
+              {/* Create button */}
+              <div style={{ padding: "10px 14px" }}>
+                <div style={{ width: 70, height: 26, borderRadius: 6, background: "#D8D8D8" }} />
+              </div>
+              {/* Default views */}
+              <div style={{ padding: "0 14px", display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ width: 90, height: 10, borderRadius: 3, background: "#CDCDCD", marginBottom: 4 }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 6px", borderRadius: 5 }}>
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: "#D0D0D0" }} />
+                  <div style={{ width: 85, height: 10, borderRadius: 3, background: "#CDCDCD" }} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 6px", borderRadius: 5 }}>
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: "#D0D0D0" }} />
+                  <div style={{ width: 72, height: 10, borderRadius: 3, background: "#CDCDCD" }} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 6px", borderRadius: 5, background: "#D0D0E8" }}>
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: "#B8B8D8" }} />
+                  <div style={{ width: 20, height: 10, borderRadius: 3, background: "#B8B8D8" }} />
+                  <div style={{ marginLeft: "auto", width: 24, height: 14, borderRadius: 8, background: "#B0B0D8" }} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 6px", borderRadius: 5 }}>
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: "#D0D0D0" }} />
+                  <div style={{ width: 34, height: 10, borderRadius: 3, background: "#CDCDCD" }} />
+                </div>
+              </div>
+              {/* Shared views */}
+              <div style={{ padding: "16px 14px 0", display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ width: 80, height: 10, borderRadius: 3, background: "#CDCDCD", marginBottom: 4 }} />
+                {[95, 30, 100, 85, 75, 90, 80, 95, 85, 70].map(function(w, vi) {
+                  return (
+                    <div key={vi} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 6px" }}>
+                      <div style={{ width: 12, height: 12, borderRadius: 3, background: vi < 2 ? "#D0D0D0" : "#D5D5D5" }} />
+                      <div style={{ width: w, height: 9, borderRadius: 3, background: "#D2D2D2" }} />
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Bottom icons */}
+              <div style={{ marginTop: "auto", padding: "12px 14px", borderTop: "1px solid #D5D5D5", display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#C8C8C8" }} />
+                <div style={{ width: 18, height: 18, borderRadius: 4, background: "#D2D2D2" }} />
+                <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+                  <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#D0D0D0" }} />
+                </div>
+              </div>
+            </div>
+
+            {/* ── Col 2: Ticket list (~270px) ── */}
+            <div style={{ width: 270, minWidth: 270, borderRight: "1px solid #D5D5D5", display: "flex", flexDirection: "column" }}>
+              {/* Header bar with filter icons */}
+              <div style={{ height: 42, borderBottom: "1px solid #D5D5D5", display: "flex", alignItems: "center", padding: "0 12px", gap: 8 }}>
+                <div style={{ width: 16, height: 16, borderRadius: 3, background: "#D0D0D0" }} />
+                <div style={{ width: 24, height: 12, borderRadius: 3, background: "#D0D0D0" }} />
+                <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: "#D5D5D5" }} />
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: "#D5D5D5" }} />
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: "#D5D5D5" }} />
+                </div>
+              </div>
+              {/* Select all row */}
+              <div style={{ padding: "6px 12px", borderBottom: "1px solid #E0E0E0", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ width: 14, height: 14, borderRadius: 3, border: "1.5px solid #CDCDCD", background: "transparent" }} />
+                <div style={{ width: 55, height: 10, borderRadius: 3, background: "#D5D5D5" }} />
+              </div>
+              {/* Ticket rows */}
+              {[
+                { active: true, w1: 48, w2: 160, w3: 130 },
+                { active: false, w1: 110, w2: 170, w3: 140 },
+                { active: false, w1: 110, w2: 170, w3: 120 },
+                { active: false, w1: 100, w2: 155, w3: 145 },
+                { active: false, w1: 50, w2: 160, w3: 135 },
+                { active: false, w1: 50, w2: 160, w3: 120 },
+                { active: false, w1: 50, w2: 160, w3: 130 },
+                { active: false, w1: 110, w2: 145, w3: 140 },
+              ].map(function(row, ri) {
+                return (
+                  <div key={ri} style={{ padding: "10px 12px", borderBottom: "1px solid #ECECEC", background: row.active ? "#F0F0F0" : "transparent" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#D5D5D5" }} />
+                      <div style={{ width: row.w1, height: 11, borderRadius: 3, background: "#C5C5C5" }} />
+                      <div style={{ marginLeft: "auto", display: "flex", gap: 3 }}>
+                        <div style={{ width: 12, height: 12, borderRadius: 3, background: "#DDDDDD" }} />
+                        <div style={{ width: 12, height: 12, borderRadius: 3, background: "#DDDDDD" }} />
+                      </div>
+                      <div style={{ width: 22, height: 9, borderRadius: 3, background: "#DDDDDD" }} />
+                    </div>
+                    <div style={{ width: row.w2, height: 9, borderRadius: 3, background: ri === 0 ? "#C0C0C0" : "#D5D5D5", marginBottom: 4, marginLeft: 24 }} />
+                    <div style={{ width: row.w3, height: 9, borderRadius: 3, background: "#DCDCDC", marginLeft: 24 }} />
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ── Col 3: Conversation pane (flex) ── */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              {/* Ticket header bar */}
+              <div style={{ height: 42, borderBottom: "1px solid #D5D5D5", display: "flex", alignItems: "center", padding: "0 16px", gap: 10 }}>
+                <div style={{ width: 40, height: 11, borderRadius: 3, background: "#C8C8C8" }} />
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#D0D0D0" }} />
+                <div style={{ width: 180, height: 11, borderRadius: 3, background: "#CDCDCD" }} />
+                <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+                  <div style={{ width: 50, height: 20, borderRadius: 10, background: "#C8E8C8" }} />
+                  <div style={{ width: 16, height: 16, borderRadius: 3, background: "#D5D5D5" }} />
+                </div>
+              </div>
+              {/* Messages area */}
+              <div style={{ flex: 1, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 18 }}>
+                {/* Customer message */}
+                <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#D0C8E0", flexShrink: 0 }} />
+                  <div>
+                    <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
+                      <div style={{ width: 36, height: 10, borderRadius: 3, background: "#C5C5C5" }} />
+                      <div style={{ width: 12, height: 12, borderRadius: 3, background: "#DDDDDD" }} />
+                      <div style={{ width: 70, height: 10, borderRadius: 3, background: "#DDDDDD" }} />
+                    </div>
+                    <div style={{ width: 380, height: 12, borderRadius: 3, background: "#D0D0D0", marginBottom: 5 }} />
+                    <div style={{ width: 200, height: 12, borderRadius: 3, background: "#D5D5D5" }} />
+                  </div>
+                </div>
+                {/* Bot response */}
+                <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#C8D8C8", flexShrink: 0 }} />
+                  <div>
+                    <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
+                      <div style={{ width: 64, height: 10, borderRadius: 3, background: "#C5C5C5" }} />
+                      <div style={{ width: 12, height: 12, borderRadius: 3, background: "#DDDDDD" }} />
+                      <div style={{ width: 70, height: 10, borderRadius: 3, background: "#DDDDDD" }} />
+                    </div>
+                    <div style={{ width: 400, height: 12, borderRadius: 3, background: "#D0D0D0", marginBottom: 5 }} />
+                    <div style={{ width: 340, height: 12, borderRadius: 3, background: "#D5D5D5", marginBottom: 5 }} />
+                    <div style={{ width: 260, height: 12, borderRadius: 3, background: "#D5D5D5" }} />
+                  </div>
+                </div>
+              </div>
+              {/* Reply composer area */}
+              <div style={{ borderTop: "1px solid #D5D5D5", padding: "10px 16px" }}>
+                <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+                  <div style={{ width: 16, height: 16, borderRadius: 3, background: "#D5D5D5" }} />
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#D8D8D8", alignSelf: "center" }} />
+                  <div style={{ width: 140, height: 11, borderRadius: 3, background: "#D5D5D5" }} />
+                </div>
+                <div style={{ width: 200, height: 11, borderRadius: 3, background: "#DDDDDD", marginBottom: 10 }} />
+                <div style={{ height: 60, borderRadius: 6, background: "#F0F0F0", marginBottom: 10 }} />
+                {/* Toolbar icons */}
+                <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+                  {[1,2,3,4,5,6,7,8,9].map(function(ti) {
+                    return <div key={ti} style={{ width: 16, height: 16, borderRadius: 3, background: "#DCDCDC" }} />;
+                  })}
+                </div>
+                {/* Send buttons */}
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ width: 56, height: 28, borderRadius: 6, background: "#C0C0E0" }} />
+                  <div style={{ width: 80, height: 28, borderRadius: 6, background: "#D8D8D8" }} />
+                </div>
+              </div>
+            </div>
+
+            {/* ── Col 4: Right copilot panel (~320px) ── */}
+            <div style={{ width: 320, minWidth: 320, borderLeft: "1px solid #D5D5D5", display: "flex", flexDirection: "column" }}>
+              {/* Panel header */}
+              <div style={{ padding: "14px 16px", borderBottom: "1px solid #D5D5D5", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ width: 16, height: 16, borderRadius: 3, background: "#D0D0D0" }} />
+                <div style={{ width: 60, height: 12, borderRadius: 3, background: "#C8C8C8" }} />
+                <div style={{ width: 90, height: 10, borderRadius: 3, background: "#DDDDDD" }} />
+                <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: "#D5D5D5" }} />
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: "#D5D5D5" }} />
+                </div>
+              </div>
+              {/* Greeting */}
+              <div style={{ padding: "32px 20px 16px" }}>
+                <div style={{ width: 130, height: 22, borderRadius: 4, background: "#C0C0C0", marginBottom: 8 }} />
+                <div style={{ width: 180, height: 14, borderRadius: 3, background: "#D5D5D5" }} />
+              </div>
+              {/* Suggestion cards */}
+              <div style={{ padding: "0 20px", display: "flex", gap: 10 }}>
+                <div style={{ flex: 1, padding: "14px 12px", borderRadius: 10, border: "1px solid #E0E0E0" }}>
+                  <div style={{ width: "90%", height: 11, borderRadius: 3, background: "#CDCDCD", marginBottom: 6 }} />
+                  <div style={{ width: "70%", height: 11, borderRadius: 3, background: "#CDCDCD", marginBottom: 8 }} />
+                  <div style={{ width: "80%", height: 9, borderRadius: 3, background: "#DDDDDD" }} />
+                </div>
+                <div style={{ flex: 1, padding: "14px 12px", borderRadius: 10, border: "1px solid #E0E0E0" }}>
+                  <div style={{ width: "85%", height: 11, borderRadius: 3, background: "#CDCDCD", marginBottom: 6 }} />
+                  <div style={{ width: "65%", height: 11, borderRadius: 3, background: "#CDCDCD", marginBottom: 8 }} />
+                  <div style={{ width: "75%", height: 9, borderRadius: 3, background: "#DDDDDD" }} />
+                </div>
+              </div>
+              {/* Bottom input */}
+              <div style={{ marginTop: "auto", padding: "12px 16px", borderTop: "1px solid #D5D5D5" }}>
+                <div style={{ height: 36, borderRadius: 10, background: "#F0F0F0", marginBottom: 8 }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#D0D0D0" }} />
+                  <div style={{ width: 32, height: 16, borderRadius: 8, background: "#C8C8E8" }} />
+                  <div style={{ width: 70, height: 10, borderRadius: 3, background: "#DDDDDD" }} />
+                  <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
+                    <div style={{ width: 14, height: 14, borderRadius: 3, background: "#D5D5D5" }} />
+                    <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#D0C8E8" }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Handoff message */}
+          <div style={{
+            position: "relative", zIndex: 1, textAlign: "center",
+            maxWidth: 520, padding: "0 24px",
+            animation: "fadeInUp .6s cubic-bezier(.16,1,.3,1) .2s both",
+          }}>
+            <div style={{
+              width: 64, height: 64, borderRadius: "50%",
+              background: "linear-gradient(135deg, " + ACCENT + "20, " + ACCENT + "08)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 24px",
+              border: "1px solid " + ACCENT + "18",
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M13 5l7 7-7 7M5 12h14" stroke={ACCENT} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h2 style={{
+              fontFamily: "'Lora', serif", fontSize: 26, fontWeight: 500,
+              color: TEXT, marginBottom: 12, lineHeight: 1.35, letterSpacing: "-0.01em",
+            }}>
+              Now handing over to Mike
+            </h2>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif", fontSize: 15, lineHeight: 1.6,
+              color: TEXT_MUTED, margin: 0,
+            }}>
+              to present the in-product copilot experience
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -8156,22 +9393,6 @@ function ReportSimulation() {
         </p>
       </div>
 
-      {/* Occasion */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT_MUTED, marginBottom: 8 }}>Occasion</div>
-        <p style={{ fontSize: 14, lineHeight: 1.65, color: TEXT, margin: 0 }}>
-          Mom{"\u2019"}s 60th birthday
-        </p>
-      </div>
-
-      {/* What happened */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT_MUTED, marginBottom: 8 }}>What happened</div>
-        <p style={{ fontSize: 14, lineHeight: 1.65, color: TEXT, margin: 0 }}>
-          Sarah ordered a bouquet for her mom{"\u2019"}s 60th birthday. The flowers arrived a day late with bruised petals. She{"\u2019"}s very upset and reaching out.
-        </p>
-      </div>
-
       {/* Simulated conversation card */}
       <div style={{ border: ("1px solid " + BORDER), borderRadius: 12, overflow: "hidden", marginBottom: 24 }}>
         <div style={{ padding: "10px 16px", borderBottom: ("1px solid " + BORDER), background: SURFACE + "80" }}>
@@ -8238,15 +9459,16 @@ function ReportSimulation() {
   );
 }
 
-function ReportChecklist() {
+function ReportChecklist({ shopifyConnected, emailConnected }) {
   var mustHaves = [
     { title: "Connect your Shopify store", favicon: "shopify.com", desc: "So I can look up orders, check delivery statuses, verify shopper history, and take actions like processing re-deliveries." },
-    { title: "Add your return and refund policies", icon: "policy", desc: "I need to know what I can offer \u2014 when to re-deliver, when to refund, and what the limits are. Without this, I\u2019d be guessing." },
-    { title: "Add your delivery and shipping guidelines", icon: "shipping", desc: "Specific delivery windows, carrier information, same-day cutoff times, and how you handle delivery exceptions." },
     { title: "Connect at least one channel", icon: "channel", desc: "Email, chat, or SMS \u2014 I need a way to receive and respond to shopper messages, and to send proactive outreach. Pick where most delivery conversations happen today." },
-    { title: "Review your tone of voice settings", icon: "voice", desc: "I\u2019ve drafted these from your website, but you flagged some nuances already (\u201Con us\u201D not \u201Cat no cost\u201D). A quick review makes sure I sound like your team from day one." },
+    { title: "Migrate from your current Helpdesk", icon: "migrate", desc: "Import your existing setup from Zendesk, Intercom, Gladly, or other providers \u2014 so you don\u2019t have to start from scratch." },
   ];
   var niceToHaves = [
+    { title: "Add your return and refund policies", icon: "policy", desc: "I need to know what I can offer \u2014 when to re-deliver, when to refund, and what the limits are. Without this, I\u2019d be guessing." },
+    { title: "Add your delivery and shipping guidelines", icon: "shipping", desc: "Specific delivery windows, carrier information, same-day cutoff times, and how you handle delivery exceptions." },
+    { title: "Review your tone of voice settings", icon: "voice", desc: "I\u2019ve drafted these from your website, but you flagged some nuances already (\u201Con us\u201D not \u201Cat no cost\u201D). A quick review makes sure I sound like your team from day one." },
     { title: "Review default guardrails and constraints", icon: "guardrails", desc: "I\u2019ve set smart defaults for things like discount limits, escalation triggers, and response boundaries. Review these to make sure they match how your team operates." },
     { title: "Connect additional integrations", icon: "integrations", desc: "Depending on your stack: subscription tools (Recharge, Skio), review platforms (Yotpo, Okendo), loyalty programs, or other tools your team relies on." },
     { title: "Enable agent actions", icon: "actions", desc: "Allow me to perform actions like issuing refunds, canceling orders, creating discount codes, or initiating re-deliveries \u2014 instead of just recommending them." },
@@ -8269,21 +9491,27 @@ function ReportChecklist() {
     brand: function() { return React.createElement("svg", { width: 18, height: 18, viewBox: "0 0 20 20", fill: "none" }, React.createElement("rect", { x: "3", y: "3", width: "14", height: "14", rx: "3", stroke: TEXT_MUTED, strokeWidth: "1.2" }), React.createElement("path", { d: "M7 13V9l3-2 3 2v4", stroke: TEXT_MUTED, strokeWidth: "1.1", strokeLinecap: "round", strokeLinejoin: "round" })); },
     team: function() { return React.createElement("svg", { width: 18, height: 18, viewBox: "0 0 20 20", fill: "none" }, React.createElement("circle", { cx: "10", cy: "7", r: "3", stroke: TEXT_MUTED, strokeWidth: "1.2" }), React.createElement("path", { d: "M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6", stroke: TEXT_MUTED, strokeWidth: "1.2" })); },
     notifications: function() { return React.createElement("svg", { width: 18, height: 18, viewBox: "0 0 20 20", fill: "none" }, React.createElement("path", { d: "M10 3a5 5 0 0 0-5 5v3l-1.5 2h13L15 11V8a5 5 0 0 0-5-5z", stroke: TEXT_MUTED, strokeWidth: "1.2", strokeLinejoin: "round" }), React.createElement("path", { d: "M8 16a2 2 0 0 0 4 0", stroke: TEXT_MUTED, strokeWidth: "1.2", strokeLinecap: "round" })); },
+    migrate: function() { return React.createElement("svg", { width: 18, height: 18, viewBox: "0 0 20 20", fill: "none" }, React.createElement("path", { d: "M4 10h12M12 6l4 4-4 4", stroke: TEXT_MUTED, strokeWidth: "1.2", strokeLinecap: "round", strokeLinejoin: "round" }), React.createElement("rect", { x: "2", y: "4", width: "5", height: "12", rx: "1.5", stroke: TEXT_MUTED, strokeWidth: "1.1" })); },
   };
 
   function renderItem(item, idx, startNum) {
+    var isShopifyItem = item.favicon === "shopify.com";
+    var isChannelItem = item.icon === "channel";
+    var isConnected = (isShopifyItem && shopifyConnected) || (isChannelItem && emailConnected);
     return (
-      <div key={idx} style={{ display: "flex", gap: 14, padding: "16px 0", borderBottom: ("1px solid " + BORDER) }}>
-        <div style={{ width: 32, height: 32, borderRadius: "50%", background: SURFACE, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
-          {item.favicon ? (
+      <div key={idx} style={{ display: "flex", gap: 14, padding: "16px 0", borderBottom: ("1px solid " + BORDER), opacity: isConnected ? 0.55 : 1, transition: "opacity .3s" }}>
+        <div style={{ width: 32, height: 32, borderRadius: "50%", background: isConnected ? (ACCENT + "12") : SURFACE, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
+          {isConnected ? (
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-6.5" stroke={ACCENT} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          ) : item.favicon ? (
             <img src={"https://www.google.com/s2/favicons?domain=" + item.favicon + "&sz=32"} alt="" style={{ width: 18, height: 18, borderRadius: 4, display: "block" }} />
           ) : (
             iconMap[item.icon] ? iconMap[item.icon]() : null
           )}
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: TEXT, marginBottom: 4 }}>{item.title}</div>
-          <div style={{ fontSize: 13, lineHeight: 1.55, color: TEXT_MUTED }}>{item.desc}</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: isConnected ? TEXT_MUTED : TEXT, marginBottom: 4, textDecoration: isConnected ? "line-through" : "none" }}>{item.title}</div>
+          <div style={{ fontSize: 13, lineHeight: 1.55, color: TEXT_MUTED, textDecoration: isConnected ? "line-through" : "none" }}>{item.desc}</div>
         </div>
       </div>
     );
@@ -8302,7 +9530,7 @@ function ReportChecklist() {
 
       {/* Nice-to-haves */}
       <div>
-        <h3 style={{ fontFamily: "'Lora', serif", fontSize: 17, fontWeight: 500, color: TEXT, marginBottom: 4 }}>Nice-to-haves to configure over time</h3>
+        <h3 style={{ fontFamily: "'Lora', serif", fontSize: 17, fontWeight: 500, color: TEXT, marginBottom: 4 }}>Configure over time</h3>
         <p style={{ fontSize: 13, color: TEXT_MUTED, marginBottom: 8 }}>These will make your Agent smarter and more capable, but you can add them gradually.</p>
         <div>
           {niceToHaves.map(function(item, i) { return renderItem(item, i, 6); })}
