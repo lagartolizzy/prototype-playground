@@ -76,5 +76,14 @@
     "tags": [],
     "description": "Lifecycle onboarding prototype with conversational UI flow",
     "file": "conversational-onboarding.html"
+  },
+  {
+    "name": "80% automation - Skills & Campaigns",
+    "author": "Lisa Timanova",
+    "date": "2026-04-16",
+    "status": "Draft",
+    "tags": [],
+    "description": "Journey 3 exploration of 80% automation across Skills and Campaigns, framed around a Mother's Day campaign",
+    "file": "journey3-mothers-day.html"
   }
 ]
