@@ -85,5 +85,14 @@
     "tags": [],
     "description": "Journey 3 exploration of 80% automation across Skills and Campaigns, framed around a Mother's Day campaign",
     "file": "journey3-mothers-day.html"
+  },
+  {
+    "name": "Campaigns",
+    "author": "Lisa Timanova",
+    "date": "2026-04-21",
+    "status": "Draft",
+    "tags": [],
+    "description": "Campaigns prototype",
+    "file": "campaigns-prototype.html"
   }
 ]
