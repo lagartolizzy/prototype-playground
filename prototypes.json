@@ -85,5 +85,14 @@
     "tags": [],
     "description": "Journey 3 exploration of 80% automation across Skills and Campaigns, framed around a Mother's Day campaign",
     "file": "journey3-mothers-day.html"
+  },
+  {
+    "name": "CX Connect prototype",
+    "author": "Lisa Timanova",
+    "date": "2026-05-06",
+    "status": "Draft",
+    "tags": [],
+    "description": "Journey 3 Skills landing page exploration",
+    "file": "journey3-skills-landing.html"
   }
 ]
